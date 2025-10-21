@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro</title>
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f7f9fb;
+      font-family: Arial, sans-serif;
+    }
+    .card {
+      max-width: 420px;
+      margin: 60px auto;
+      border: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border-radius: 12px;
+    }
+    .logo {
+      width: 90px;
+      display: block;
+      margin: 20px auto;
+    }
+    .btn-primary {
+      background-color: #007bff;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+    .password-strength {
+      height: 6px;
+      border-radius: 4px;
+      margin-top: 5px;
+      transition: all 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <div class="card p-4">
+    <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" class="logo">
+    <h4 class="text-center mb-3">Crear cuenta</h4>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+      <div class="mb-3">
+        <label>Nombre completo</label>
+        <input type="text" name="nombre" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label>Correo electrónico</label>
+        <input type="email" name="correo" class="form-control" required>
+      </div>
+
+      <!-- Campo contraseña con ojito y barra de fuerza -->
+      <div class="mb-3 position-relative">
+        <label>Contraseña</label>
+        <div class="input-group">
+          <input type="password" name="contrasena" id="contrasena" class="form-control" minlength="8"
+                required oninput="evaluarFuerza()">
+          <button class="btn btn-outline-secondary" type="button" onclick="verContrasena('contrasena', this)">
+            <i class="bi bi-eye"></i>
+          </button>
+        </div>
+        <div id="barraFuerza" class="password-strength bg-danger"></div>
+        <small id="mensajeFuerza" class="text-muted"></small>
+      </div>
+
+      <!-- Confirmar contraseña -->
+      <div class="mb-3 position-relative">
+        <label>Confirmar contraseña</label>
+        <div class="input-group">
+          <input type="password" name="confirmar" id="confirmar" class="form-control" required>
+          <button class="btn btn-outline-secondary" type="button" onclick="verContrasena('confirmar', this)">
+            <i class="bi bi-eye"></i>
+          </button>
+        </div>
+      </div>
+
+
+      <div class="mb-3">
+        <label>Tipo de usuario</label>
+        <select name="tipo" class="form-select">
+          <option value="estudiante">Estudiante</option>
+          <option value="administrador">Administrador</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+    </form>
+
+    <p class="text-center mt-3">
+      ¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia sesión</a>
+    </p>
+  </div>
+
+  <script>
+  function verContrasena(idCampo, boton) {
+    const campo = document.getElementById(idCampo);
+    const icono = boton.querySelector("i");
+
+    if (campo.type === "password") {
+      campo.type = "text";
+      icono.classList.remove("bi-eye");
+      icono.classList.add("bi-eye-slash");
+    } else {
+      campo.type = "password";
+      icono.classList.remove("bi-eye-slash");
+      icono.classList.add("bi-eye");
+    }
+  }
+
+  function evaluarFuerza() {
+    const contrasena = document.getElementById("contrasena").value;
+    const barra = document.getElementById("barraFuerza");
+    const mensaje = document.getElementById("mensajeFuerza");
+
+    let fuerza = 0;
+    if (contrasena.length >= 8) fuerza++;
+    if (/[A-Z]/.test(contrasena)) fuerza++;
+    if (/\d/.test(contrasena)) fuerza++;
+    if (/[@$!%*?&.#]/.test(contrasena)) fuerza++;
+
+    switch (fuerza) {
+      case 0:
+      case 1:
+        barra.style.width = "25%";
+        barra.className = "password-strength bg-danger";
+        mensaje.innerText = "Contraseña débil";
+        break;
+      case 2:
+        barra.style.width = "50%";
+        barra.className = "password-strength bg-warning";
+        mensaje.innerText = "Contraseña media";
+        break;
+      case 3:
+        barra.style.width = "75%";
+        barra.className = "password-strength bg-info";
+        mensaje.innerText = "Buena contraseña";
+        break;
+      case 4:
+        barra.style.width = "100%";
+        barra.className = "password-strength bg-success";
+        mensaje.innerText = "Contraseña fuerte";
+        break;
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mi progreso</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#eef3f6; text-align:center; }
+    table { margin: 20px auto; border-collapse: collapse; background:#fff; }
+    th, td { padding: 10px 15px; border: 1px solid #ccc; }
+    th { background:#3d9435; color:#fff; }
+  </style>
+</head>
+<body>
+  <h2>⭐ Mi Progreso</h2>
+
+  {% if progreso %}
+  <table>
+    <thead>
+      <tr><th>Unidad</th><th>Puntaje (%)</th><th>Fecha</th></tr>
+    </thead>
+    <tbody>
+      {% for p in progreso %}
+      <tr>
+        <td>{{ p[0] }}</td>
+        <td>{{ "%.1f"|format(p[1]) }}</td>
+        <td>{{ p[2] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p>Aún no tienes progreso registrado.</p>
+  {% endif %}
+
+  <a href="/tematicas">Volver al menú</a>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar sesión - RETOMATE</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+ <style>
+  body {
+    background-color: #f4f6f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .login-card {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 400px;
+  }
+  .logo {
+    display: block;
+    margin: 0 auto 1rem auto;
+    width: 120px;
+  }
+  .password-container {
+    position: relative;
+  }
+  .toggle-password {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+}
+.toggle-password i {
+  color: #000000;
+}
+.toggle-password:hover i {
+  color: #000;
+}
+
+</style>
+
+</head>
+<body>
+  <div class="login-card">
+    <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE" class="logo">
+    <h4 class="text-center mb-3">Iniciar sesión</h4>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="/login">
+      <div class="mb-3">
+        <label for="correo" class="form-label">Correo electrónico</label>
+        <input type="email" class="form-control" name="correo" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="contrasena" class="form-label">Contraseña</label>
+        <div class="input-group">
+          <input type="password" class="form-control" name="contrasena" id="contrasena" required>
+          <button type="button" class="btn btn-outline-secondary toggle-password" onclick="togglePassword(this)">
+            <i class="bi bi-eye"></i> <!-- Ícono inicial -->
+          </button>
+        </div>
+      </div>
+
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" name="aceptar" id="aceptar">
+        <label class="form-check-label" for="aceptar">
+          Acepto las <a href="/politicas" target="_blank">políticas de tratamiento de datos</a>
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Entrar</button>
+
+      <div class="mt-3 text-center">
+        <a href="/recuperar" class="text-decoration-none">¿Olvidaste tu contraseña?</a>
+      </div>
+
+      <p class="text-center mt-3 mb-0">
+        ¿No tienes cuenta? <a href="/registro" class="text-decoration-none">Regístrate aquí</a>
+      </p>
+    </form>
+  </div>
+
+  <script>
+    function togglePassword(btn) {
+      const input = document.getElementById('contrasena');
+      const icon = btn.querySelector('i');
+
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("bi-eye-slash");
+        icon.classList.add("bi-eye");
+      } else {
+        input.type = "password";
+        icon.classList.remove("bi-eye");
+        icon.classList.add("bi-eye-slash"); 
+    }
+  }
+  </script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

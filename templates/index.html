@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RETOMATE - Inicio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE" height="80">
+        <h1>RETOMATE</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Inicio</a></li>
+                <li><a href="{{ url_for('tematicas') }}">Temáticas</a></li>
+                <li><a href="{{ url_for('videos') }}">Videos</a></li>
+                <li><a href="{{ url_for('progreso') }}">Progreso</a></li>
+                <li><a href="{{ url_for('login') }}">Iniciar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>¡Bienvenido a RETOMATE!</h2>
+        <p>Aprende matemáticas de forma divertida con nuestro amigo RETOMATE.</p>
+    </main>
+
+    <footer>
+        <p>© 2025 RETOMATE - Aprende matemáticas jugando</p>
+    </footer>
+</body>
+</html>

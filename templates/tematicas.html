@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RETOMATE - Temáticas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        /* ====== ESTILO MEJORADO PARA TEMÁTICAS ====== */
+        body {
+            background: #e9f2f9;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #133b5c;
+            margin-bottom: 30px;
+        }
+
+        section {
+            margin-bottom: 40px;
+        }
+
+        h3 {
+            background-color: #133b5c;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            display: inline-block;
+        }
+
+        .unidad-lista {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .unidad-lista li {
+            background: #f8fbff;
+            border: 2px solid #cde0f9;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        }
+
+        .unidad-lista li:hover {
+            transform: translateY(-5px);
+            background: #e3f2fd;
+            border-color: #90caf9;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .unidad-lista a {
+            text-decoration: none;
+            font-weight: 600;
+            color: #133b5c;
+            display: block;
+            transition: 0.2s;
+        }
+
+        .unidad-lista a:hover {
+            color: #1976d2;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 15px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE" height="80">
+        <h1>RETOMATE</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Inicio</a></li>
+                <li><a href="{{ url_for('tematicas') }}">Temáticas</a></li>
+                <li><a href="{{ url_for('videos') }}">Videos</a></li>
+                <li><a href="{{ url_for('progreso') }}">Progreso</a></li>
+                <li><a href="{{ url_for('login') }}">Iniciar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>📘 Temáticas de Matemáticas - Grado 6°</h2>
+
+        <section>
+            <h3>Primer Periodo</h3>
+            <ul class="unidad-lista">
+                <li><a href="{{ url_for('unidad1') }}">Unidad 1: Números Naturales</a></li>
+                <li><a href="#">Unidad 2: Teoría de Números</a></li>
+                <li><a href="#">Unidad 3: Problemas, Lógica y Conjuntos</a></li>
+                <li><a href="#">Unidad 4: Números Fraccionarios</a></li>
+            </ul>
+        </section>
+
+        <section>
+            <h3>Segundo Periodo</h3>
+            <ul class="unidad-lista">
+                <li><a href="#">Unidad 5: Números Decimales</a></li>
+                <li><a href="#">Unidad 6: Medida y Geometría</a></li>
+                <li><a href="#">Unidad 7: Razón, Proporción y Porcentaje</a></li>
+                <li><a href="#">Unidad 8: Estadística Descriptiva</a></li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 RETOMATE - Aprende matemáticas jugando</p>
+    </footer>
+</body>
+</html>
