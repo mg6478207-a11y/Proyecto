@@ -5,6 +5,94 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RETOMATE - Inicio</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        main {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        /* Tarjeta flotante */
+        .tarjeta {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            max-width: 900px;
+            margin: 40px auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: flotar 3s ease-in-out infinite;
+        }
+
+        .tarjeta:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes flotar {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .tarjeta img {
+            width: 45%;
+            min-width: 280px;
+            object-fit: cover;
+        }
+
+        .contenido {
+            padding: 30px;
+            flex: 1;
+            text-align: left;
+        }
+
+        .contenido h2 {
+            color: #1a73e8;
+            margin-bottom: 10px;
+        }
+
+        .contenido p {
+            line-height: 1.6;
+            font-size: 1.1em;
+        }
+
+        /* Recuadro informativo */
+        .instrucciones {
+            margin-top: 15px;
+            background: #eaf3ff;
+            border-left: 5px solid #1a73e8;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            color: #333;
+        }
+
+        .instrucciones strong {
+            color: #1a73e8;
+        }
+
+        /* Próximamente */
+        .proximamente {
+            margin-top: 60px;
+            background: linear-gradient(135deg, #eaf3ff, #fff0ff);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+        }
+
+        .proximamente h3 {
+            color: #d35400;
+            font-weight: bold;
+        }
+
+        .proximamente p {
+            font-size: 1.05em;
+            color: #333;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -24,6 +112,31 @@
     <main>
         <h2>¡Bienvenido a RETOMATE!</h2>
         <p>Aprende matemáticas de forma divertida con nuestro amigo RETOMATE.</p>
+
+        <!-- 🦊 Tarjeta de la Unidad 1 -->
+        <div class="tarjeta">
+            <img src="{{ url_for('static', filename='img/unidad1.gif') }}" alt="Unidad 1 RETOMATE">
+            <div class="contenido">
+                <h2>Unidad 1: Números Naturales</h2>
+                <p>En esta unidad aprenderás sobre los números naturales y sus propiedades.
+                   A través de ejemplos, retos y juegos con nuestro amigo el Zorrito,
+                   descubrirás cómo se usan los números para contar, ordenar y resolver
+                   problemas del día a día.</p>
+                <p><strong>¡Prepárate para aprender jugando! 🦊</strong></p>
+
+                <div class="instrucciones">
+                    🔍 <strong>¿Dónde puedes encontrar esta unidad?</strong><br>
+                    Ingresa a tu cuenta en <strong>Iniciar Sesión</strong>, luego dirígete al menú <strong>Tematicas</strong> y selecciona <strong>Unidad 1</strong> para comenzar tu aprendizaje.
+                </div>
+            </div>
+        </div>
+
+        <!-- 📘 Próximamente -->
+        <div class="proximamente">
+            <h3>📘 Próximamente: Unidad 2</h3>
+            <p><strong>Teoría de Números</strong> — Aprende sobre múltiplos, divisores,
+               números primos y mucho más en nuestra próxima aventura matemática.</p>
+        </div>
     </main>
 
     <footer>
