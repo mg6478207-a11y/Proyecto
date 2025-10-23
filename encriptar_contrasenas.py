@@ -1,16 +1,21 @@
-import MySQLdb
+import psycopg2
 from werkzeug.security import generate_password_hash
 
 # --- Conexión a tu base de datos ---
-conexion = MySQLdb.connect(
-    host='localhost',
-    user='root',
-    passwd='',
-    db='retomate',
-    charset='utf8'
-)
+def conectar():
+    return psycopg2.connect(
+        host="dpg-d3so92h5pdvs73fp0460-a.oregon-postgres.render.com",
+        database="retomate_db",
+        user="retomate_db_user",
+        password="miZj09YIgbDHOeWmL6OBUgmJ2hgj1kVX",
+        port="5432",
+        sslmode="require"
+    )
 
+# Crear la conexión
+conexion = conectar()
 cursor = conexion.cursor()
+
 
 # --- Leer usuarios y contraseñas actuales ---
 cursor.execute("SELECT id, contraseña FROM usuarios")

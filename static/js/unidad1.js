@@ -20,9 +20,9 @@ let pausado = false;
 let colisionLock = false;
 
 // === SONIDOS ===
-const sonidoSalto = new Audio("https://actions.google.com/sounds/v1/cartoon/slide_whistle_to_drum_hit.ogg");
+const sonidoSalto = new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg");
 const sonidoCorrecto = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
-const sonidoError = new Audio("https://actions.google.com/sounds/v1/cartoon/boing.ogg");
+const sonidoError = new Audio("https://actions.google.com/sounds/v1/cartoon/concussive_guitar_hit.ogg");
 
 // === MÚSICA DE FONDO ===
 const musicaFondo = new Audio("/static/sounds/fondo.mp3");
@@ -155,7 +155,7 @@ function drawFox() {
 
 // === DIBUJAR BLOQUES ===
 function drawBlock(b) {
-  ctx.fillStyle = b.correcta ? "#f3d97a" : "#b07a4a";
+  ctx.fillStyle = b.correcta ? "#b07a4a" : "#b07a4a";
   ctx.fillRect(b.x, b.y, b.w, b.h);
   ctx.strokeStyle = "#000";
   ctx.strokeRect(b.x, b.y, b.w, b.h);

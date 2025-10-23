@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
-import MySQLdb
+#import MySQLdb
+import psycopg2
+import psycopg2.extras
 import matplotlib.pyplot as plt
 import io
 import base64
@@ -24,14 +26,18 @@ mail = Mail(app)
 
 # -------------------- Conexión a la base de datos --------------------
 def conectar():
-    return MySQLdb.connect(
-        host='localhost',
-        user='root',
-        passwd='',
-        db='retomate',
-        charset='utf8'
+    conn = psycopg2.connect(
+        host="dpg-d3so92h5pdvs73fp0460-a.oregon-postgres.render.com",
+        database="retomate_db",
+        user="retomate_db_user",
+        password="miZj09YIgbDHOeWmL6OBUgmJ2hgj1kVX",
+        port="5432",
+        sslmode="require"
     )
-
+    # fijar la zona horaria de la sesión a Colombia (America/Bogota)
+    with conn.cursor() as cur:
+        cur.execute("SET TIME ZONE 'America/Bogota';")
+    return conn
 
 # -------------------- Página principal --------------------
 @app.route('/')
@@ -52,13 +58,13 @@ def login():
             return render_template("login.html")
 
         db = conectar()
-        cur = db.cursor(MySQLdb.cursors.DictCursor)
+        cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cur.execute("SELECT * FROM usuarios WHERE correo=%s", (correo,))
         usuario = cur.fetchone()
         db.close()
 
         if usuario:
-            if check_password_hash(usuario['contraseña'], contrasena):
+            if check_password_hash(usuario['contrasena'], contrasena):
                 session['id'] = usuario['id']
                 session['nombre'] = usuario['nombre']
                 session['tipo'] = usuario['tipo']
@@ -105,7 +111,7 @@ def registro():
         # --- Guardar ---
         db = conectar()
         cur = db.cursor()
-        cur.execute("INSERT INTO usuarios (nombre, correo, contraseña, tipo) VALUES (%s, %s, %s, %s)",
+        cur.execute("INSERT INTO usuarios (nombre, correo, contrasena, tipo) VALUES (%s, %s, %s, %s)",
                     (nombre, correo, hash_contrasena, tipo))
         db.commit()
         db.close()
@@ -360,7 +366,7 @@ def nueva_contrasena():
 
             conexion = conectar()
             cursor = conexion.cursor()
-            cursor.execute("UPDATE usuarios SET contraseña = %s WHERE correo = %s", (hashed, correo))
+            cursor.execute("UPDATE usuarios SET contrasena = %s WHERE correo = %s", (hashed, correo))
             conexion.commit()
             conexion.close()
 

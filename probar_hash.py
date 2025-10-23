@@ -1,21 +1,23 @@
 # probar_hash.py
-import MySQLdb
+import psycopg2
 from werkzeug.security import check_password_hash
 
 def conectar():
-    return MySQLdb.connect(
-        host='localhost',
-        user='root',
-        passwd='',
-        db='retomate',
-        charset='utf8'
+    return psycopg2.connect(
+        host="dpg-d3so92h5pdvs73fp0460-a.oregon-postgres.render.com",
+        database="retomate_db",
+        user="retomate_db_user",
+        password="miZj09YIgbDHOeWmL6OBUgmJ2hgj1kVX",
+        port="5432",
+        sslmode="require"
     )
+
 
 correo_a_probar = input("Correo a probar: ").strip()
 clave_a_probar = input("Contraseña a probar (texto plano): ").strip()
 
 db = conectar()
-cur = db.cursor(MySQLdb.cursors.DictCursor)
+cur = db.cursor(psycopg2.cursors.DictCursor)
 cur.execute("SELECT * FROM usuarios WHERE correo=%s", (correo_a_probar,))
 usuario = cur.fetchone()
 db.close()

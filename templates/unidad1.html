@@ -26,6 +26,19 @@
   </style>
 </head>
 <body>
+  <header>
+        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE" height="80">
+        <h1>RETOMATE</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Inicio</a></li>
+                <li><a href="{{ url_for('tematicas') }}">Temáticas</a></li>
+                <li><a href="{{ url_for('videos') }}">Videos</a></li>
+                <li><a href="{{ url_for('progreso') }}">Progreso</a></li>
+                <li><a href="{{ url_for('login') }}">Iniciar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
   <main>
     <h2>📘 Unidad 1: Números Naturales</h2>
     <div id="usuario">
