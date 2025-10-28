@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>RETOMATE - Unidad 1: Números Naturales</title>
+  <title>RETOMATE - Unidad 3: Problemas, Lógica y Conjuntos</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
   <style>
@@ -40,14 +40,14 @@
         </nav>
     </header>
   <main>
-    <h2>📘 Unidad 1: Números Naturales</h2>
+    <h2>📘 Unidad 3: Problemas, Lógica y Conjuntos</h2>
     <div id="usuario">
       Bienvenido, <strong>{{ session['nombre'] }}</strong> 👋
     </div>
 
-    <p>Los <strong>números naturales</strong> son aquellos que usamos para contar y ordenar. Empiezan desde 1.</p>
+    <p>En esta unidad trabajaremos situaciones que involucran conjuntos, diagramas de Venn y principios básicos de lógica matemática.</p>
 
-    <h3>🎮 Juego : Atrapa el bloque correcto</h3>
+    <h3>🎮 Juego : Resuelve el problema y atrapa la respuesta correcta</h3>
 
     <div id="gameWrapper">
       <canvas id="gameCanvas" width="1000" height="600"></canvas>
@@ -58,6 +58,6 @@
     <input type="hidden" id="usuario_id" value="{{ session['id'] }}">
   </main>
 
-  <script src="{{ url_for('static', filename='js/unidad1.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/unidad3.js') }}"></script>
 </body>
 </html>

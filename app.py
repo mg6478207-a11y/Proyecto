@@ -143,6 +143,28 @@ def unidad1():
     return render_template('unidad1.html')
 
 
+# -------------------- Unidad 3 --------------------
+@app.route('/unidad3')
+def unidad3():
+    if 'id' not in session:
+        return redirect(url_for('login'))
+    return render_template('unidad3.html')
+
+# -------------------- Unidad 5 --------------------
+@app.route('/unidad5')
+def unidad5():
+    if 'id' not in session:
+        return redirect(url_for('login'))
+    return render_template('unidad5.html')
+
+# -------------------- Unidad 7 --------------------
+@app.route('/unidad7')
+def unidad7():
+    if 'id' not in session:
+        return redirect(url_for('login'))
+    return render_template('unidad7.html')
+
+
 # -------------------- Guardar progreso --------------------
 @app.route('/guardar_progreso', methods=['POST'])
 def guardar_progreso():

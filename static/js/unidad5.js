@@ -1,6 +1,6 @@
-// 🎮 RETOMATE - Unidad 1: Números Naturales
+// 🎮 RETOMATE - Unidad 5: Números Decimales
 // Versión Zorrito + Opciones móviles + Pausa + Sonidos + Envío de puntaje
-// Autores: Laura Nataly & Diego Andrés - 2025
+// Autores: Laura Nataly & Diego Andrés - 2025 (adaptado para Unidad 5)
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -26,7 +26,7 @@ const sonidoError = new Audio("https://actions.google.com/sounds/v1/cartoon/conc
 
 // === MÚSICA DE FONDO ===
 const musicaFondo = new Audio("/static/sounds/fondo.mp3");
-musicaFondo.volume = 0.4;
+musicaFondo.volume = 0.35;
 musicaFondo.loop = true;
 
 sonidoSalto.volume = 0.5;
@@ -41,26 +41,35 @@ let fox = {
   grounded: true
 };
 
-// === FONDO ===
-let sun = { x: 850, y: 100, r: 50, ang: 0 };
+// === FONDO NOCTURNO (N1) ===
+let moon = { x: 820, y: 110, r: 48, ang: 0 };
+let stars = [];
+for (let i = 0; i < 60; i++) {
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * 220 + 10,
+    r: Math.random() * 2 + 0.8,
+    phase: Math.random() * Math.PI * 2
+  });
+}
 let clouds = [
-  { x: 100, y: 80, r: 30 },
-  { x: 400, y: 120, r: 40 },
-  { x: 700, y: 90, r: 35 },
+  { x: 120, y: 120, r: 36, alpha: 0.06 },
+  { x: 440, y: 140, r: 46, alpha: 0.06 },
+  { x: 760, y: 110, r: 38, alpha: 0.06 },
 ];
 
-// === PREGUNTAS ===
+// === PREGUNTAS (10 preguntas - mezcla comparación + operaciones) ===
 const preguntas = [
-  { pregunta: "¿Cuál es el número natural más pequeño?", opciones: ["0", "1", "2"], correcta: 1 },
-  { pregunta: "¿Cuánto es 6 × 7?", opciones: ["36", "40", "42"], correcta: 2 },
-  { pregunta: "¿Cuál sigue después del 99?", opciones: ["100", "101", "98"], correcta: 0 },
-  { pregunta: "¿Cuál es la suma de 8 + 5?", opciones: ["12", "13", "14"], correcta: 1 },
-  { pregunta: "¿Qué número viene antes del 20?", opciones: ["19", "21", "18"], correcta: 0 },
-  { pregunta: "¿Cuál es la mitad de 10?", opciones: ["2", "5", "8"], correcta: 1 },
-  { pregunta: "¿Qué número es par?", opciones: ["7", "9", "10"], correcta: 2 },
-  { pregunta: "¿Qué número tiene dos cifras?", opciones: ["8", "12", "5"], correcta: 1 },
-  { pregunta: "¿Cuál es el doble de 4?", opciones: ["6", "8", "10"], correcta: 1 },
-  { pregunta: "¿Qué número viene después del 49?", opciones: ["48", "50", "51"], correcta: 1 },
+  { pregunta: "¿Cuál es mayor?\n0.8, 0.75, 0.09", opciones: ["0.75", "0.8", "0.09"], correcta: 1 },
+  { pregunta: "¿Cuánto es 0.5 + 0.25?", opciones: ["0.75", "0.7", "0.025"], correcta: 0 },
+  { pregunta: "¿Cuál es menor?\n2.4, 2.04, 2.14", opciones: ["2.4", "2.14", "2.04"], correcta: 2 },
+  { pregunta: "¿Cuánto es 1.2 - 0.5?", opciones: ["0.7", "1.7", "0.5"], correcta: 0 },
+  { pregunta: "¿Cuál es mayor?\n0.305, 0.35, 0.3050", opciones: ["0.305", "0.3050", "0.35"], correcta: 2 },
+  { pregunta: "¿Cuánto es 2.5 + 0.75?", opciones: ["3.25", "3.5", "2.75"], correcta: 0 },
+  { pregunta: "¿Cuál es menor?\n0.9, 0.89, 0.900", opciones: ["0.9", "0.900", "0.89"], correcta: 2 },
+  { pregunta: "¿Cuánto es 3.2 - 1.05?", opciones: ["2.15", "2.05", "2.5"], correcta: 0 },
+  { pregunta: "¿Cuál es mayor?\n1.01, 1.1, 1.001", opciones: ["1.001", "1.01", "1.1"], correcta: 2 },
+  { pregunta: "¿Cuánto es 0.6 + 0.4?", opciones: ["1.0", "0.10", "0.9"], correcta: 0 },
 ];
 
 // === GENERAR BLOQUES DE OPCIONES ===
@@ -78,8 +87,8 @@ function generarBloquesPregunta() {
     bloques.push({
       x: 200 + i * separacion,
       y: startY,
-      w: 120,
-      h: 60,
+      w: 140,
+      h: 64,
       texto: opciones[i],
       correcta: i === preguntas[currentQuestion].correcta,
       vx: 2 * (Math.random() < 0.5 ? 1 : -1)
@@ -87,53 +96,61 @@ function generarBloquesPregunta() {
   }
 }
 
-// === DIBUJAR CIELO, SOL Y NUBES ===
-function drawSky() {
-  ctx.fillStyle = "#9cd1ff";
+// === DIBUJAR CIELO NOCTURNO, LUNA Y NUBES ===
+function drawNightSky() {
+  // gradient night sky
+  const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  grad.addColorStop(0, "#041026");
+  grad.addColorStop(1, "#081225");
+  ctx.fillStyle = grad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  sun.ang += 0.01;
+  // moon
+  moon.ang += 0.002;
   ctx.save();
-  ctx.translate(sun.x, sun.y);
-  ctx.rotate(sun.ang);
-  ctx.fillStyle = "#FFD700";
+  ctx.translate(moon.x, moon.y);
+  ctx.rotate(moon.ang);
+  ctx.fillStyle = "#FFF9E6";
   ctx.beginPath();
-  ctx.arc(0, 0, sun.r, 0, Math.PI * 2);
+  ctx.arc(0, 0, moon.r, 0, Math.PI * 2);
   ctx.fill();
-
-  ctx.strokeStyle = "#FFA500";
-  ctx.lineWidth = 4;
-  for (let i = 0; i < 12; i++) {
-    const angle = (i * Math.PI) / 6;
-    const x1 = Math.cos(angle) * sun.r;
-    const y1 = Math.sin(angle) * sun.r;
-    const x2 = Math.cos(angle) * (sun.r + 18);
-    const y2 = Math.sin(angle) * (sun.r + 18);
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
-  }
+  // subtle crescent
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.beginPath();
+  ctx.arc(moon.r * 0.2, -6, moon.r * 0.9, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalCompositeOperation = "source-over";
   ctx.restore();
 
-  clouds.forEach(c => {
-    c.x -= 0.3;
-    c.y += Math.sin(Date.now() / 1000 + c.x / 100) * 0.15;
-    if (c.x < -80) c.x = 1080;
-    ctx.fillStyle = "white";
+  // stars
+  stars.forEach(s => {
+    const tw = 0.6 + 0.4 * Math.sin(Date.now() / 400 + s.phase);
+    ctx.globalAlpha = tw;
     ctx.beginPath();
-    ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
-    ctx.arc(c.x + 35, c.y + 10, c.r * 0.8, 0, Math.PI * 2);
-    ctx.arc(c.x - 35, c.y + 10, c.r * 0.8, 0, Math.PI * 2);
+    ctx.fillStyle = "#FFD";
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
     ctx.fill();
+    ctx.globalAlpha = 1;
+  });
+
+  // clouds (very subtle, translucent)
+  clouds.forEach(c => {
+    c.x -= 0.2;
+    if (c.x < -120) c.x = canvas.width + 100;
+    ctx.globalAlpha = c.alpha;
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.ellipse(c.x, c.y, c.r * 2.2, c.r, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
   });
 }
 
-// === DIBUJAR SUELO ===
+// === DIBUJAR SUELO (oscuro) ===
 function drawGround() {
-  ctx.fillStyle = "#3d9435";
-  ctx.fillRect(0, floorY, canvas.width, 50);
-  ctx.fillStyle = "#7c4a2d";
+  ctx.fillStyle = "#0b3a24";
+  ctx.fillRect(0, floorY, canvas.width, 60);
+  ctx.fillStyle = "#19361e";
   ctx.fillRect(0, floorY + 40, canvas.width, 60);
 }
 
@@ -198,31 +215,89 @@ function drawFox() {
 
 // === DIBUJAR BLOQUES ===
 function drawBlock(b) {
-  ctx.fillStyle = b.correcta ? "#b07a4a" : "#b07a4a";
+  ctx.fillStyle = b.correcta ? "#8fbf9e" : "#8fbf9e";
   ctx.fillRect(b.x, b.y, b.w, b.h);
   ctx.strokeStyle = "#000";
+  ctx.lineWidth = 2;
   ctx.strokeRect(b.x, b.y, b.w, b.h);
   ctx.fillStyle = "#000";
-  ctx.font = "20px Minecraftia";
+  ctx.font = "18px Minecraftia";
   ctx.textAlign = "center";
-  ctx.fillText(b.texto, b.x + b.w / 2, b.y + 35);
+  // allow number to wrap if too long by drawing multi-line if contains newline (unlikely for options)
+  const lines = ("" + b.texto).split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    ctx.fillText(lines[i], b.x + b.w / 2, b.y + 30 + i * 20);
+  }
   ctx.textAlign = "left";
 }
 
-// === HUD ===
+// === HUD (con wrap para preguntas largas / dos renglones) ===
+function wrapText(text, x, y, maxWidth, lineHeight) {
+  const words = text.split(' ');
+  let line = '';
+  let ty = y;
+  for (let n = 0; n < words.length; n++) {
+    const testLine = line + words[n] + ' ';
+    const metrics = ctx.measureText(testLine);
+    const testWidth = metrics.width;
+    if (testWidth > maxWidth && n > 0) {
+      ctx.fillText(line.trim(), x, ty);
+      line = words[n] + ' ';
+      ty += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line.trim(), x, ty);
+}
+
 function drawHUD() {
-  ctx.fillStyle = "#000";
+  ctx.fillStyle = "#fff";
   ctx.font = "20px Minecraftia";
   ctx.textAlign = "left";
   ctx.fillText(`⭐ Aciertos: ${aciertos}`, 30, 50);
   ctx.fillText(`Pregunta ${Math.min(currentQuestion + 1, preguntas.length)}/${preguntas.length}`, 30, 80);
-  if (!juegoTerminado && currentQuestion < preguntas.length)
-    ctx.fillText(preguntas[currentQuestion].pregunta, 50, 150);
+
+  if (!juegoTerminado && currentQuestion < preguntas.length) {
+    // pregunta: puede tener \n para forzar renglones — si no tiene, hacemos wrap automático
+    const pregunta = preguntas[currentQuestion].pregunta;
+    ctx.fillStyle = "#fff";
+    ctx.font = "26px Minecraftia";
+    ctx.textAlign = "center";
+    const px = canvas.width / 2;
+    const maxW = 820;
+    if (pregunta.includes("\n")) {
+      const lines = pregunta.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], px, 150 + i * 34);
+      }
+    } else {
+      // wrap automatic (si hiciera falta)
+      ctx.textAlign = "center";
+      const words = pregunta.split(' ');
+      let line = '';
+      let lines = [];
+      for (let i = 0; i < words.length; i++) {
+        const test = line + words[i] + ' ';
+        if (ctx.measureText(test).width > maxW && line.length > 0) {
+          lines.push(line.trim());
+          line = words[i] + ' ';
+        } else {
+          line = test;
+        }
+      }
+      lines.push(line.trim());
+      for (let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], px, 130 + i * 34);
+      }
+    }
+    ctx.textAlign = "left";
+  }
 }
 
 // === PARTÍCULAS ===
 function crearParticulas(x, y, color) {
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 18; i++) {
     particulas.push({
       x, y,
       vx: (Math.random() * 4) - 2,
@@ -260,7 +335,7 @@ function update() {
 
   bloques.forEach(b => {
     b.x += b.vx;
-    if (b.x <= 50 || b.x + b.w >= canvas.width - 50) b.vx *= -1;
+    if (b.x <= 20 || b.x + b.w >= canvas.width - 20) b.vx *= -1;
   });
 
   for (let b of bloques) {
@@ -333,7 +408,7 @@ function siguientePregunta() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        unidad: 1,
+        unidad: 5,
         aciertos: aciertos,
         total: totalPreguntas,
         puntaje: puntaje
@@ -350,7 +425,7 @@ function siguientePregunta() {
 // === DIBUJAR ESCENA ===
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawSky();
+  drawNightSky();
   drawGround();
   drawHUD();
   bloques.forEach(drawBlock);

@@ -1,6 +1,6 @@
-// 🎮 RETOMATE - Unidad 1: Números Naturales
+// 🎮 RETOMATE - Unidad 3: Problemas, Lógica y Conjuntos
 // Versión Zorrito + Opciones móviles + Pausa + Sonidos + Envío de puntaje
-// Autores: Laura Nataly & Diego Andrés - 2025
+// Autores: Adaptado para Unidad 3 - 2025
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -49,18 +49,58 @@ let clouds = [
   { x: 700, y: 90, r: 35 },
 ];
 
-// === PREGUNTAS ===
+// === PREGUNTAS UNIDAD 3 (Problemas, Lógica y Conjuntos) ===
 const preguntas = [
-  { pregunta: "¿Cuál es el número natural más pequeño?", opciones: ["0", "1", "2"], correcta: 1 },
-  { pregunta: "¿Cuánto es 6 × 7?", opciones: ["36", "40", "42"], correcta: 2 },
-  { pregunta: "¿Cuál sigue después del 99?", opciones: ["100", "101", "98"], correcta: 0 },
-  { pregunta: "¿Cuál es la suma de 8 + 5?", opciones: ["12", "13", "14"], correcta: 1 },
-  { pregunta: "¿Qué número viene antes del 20?", opciones: ["19", "21", "18"], correcta: 0 },
-  { pregunta: "¿Cuál es la mitad de 10?", opciones: ["2", "5", "8"], correcta: 1 },
-  { pregunta: "¿Qué número es par?", opciones: ["7", "9", "10"], correcta: 2 },
-  { pregunta: "¿Qué número tiene dos cifras?", opciones: ["8", "12", "5"], correcta: 1 },
-  { pregunta: "¿Cuál es el doble de 4?", opciones: ["6", "8", "10"], correcta: 1 },
-  { pregunta: "¿Qué número viene después del 49?", opciones: ["48", "50", "51"], correcta: 1 },
+  {
+    pregunta: "En un curso, 10 estudiantes juegan fútbol y 8 baloncesto. Si 4 practican ambos deportes, ¿cuántos practican solo fútbol?",
+    opciones: ["6", "4", "2"],
+    correcta: 0
+  },
+  {
+    pregunta: "Si A = {1,2,3,4} y B = {3,4,5}, ¿qué representa A ∩ B?",
+    opciones: ["{1,2,3,4,5}", "{3,4}", "{5}"],
+    correcta: 1
+  },
+  {
+    pregunta: "Si dos conjuntos no tienen elementos en común, se dice que son:",
+    opciones: ["Iguales", "Universales", "Disjuntos"],
+    correcta: 2
+  },
+  {
+    pregunta: "Camilo afirma: “Si estudio, gano el examen”. ¿Qué tipo de proposición es?",
+    opciones: ["Condicional", "Bicondicional", "Negación"],
+    correcta: 0
+  },
+  {
+    pregunta: "En lógica, la proposición P ∧ Q solo es verdadera cuando:",
+    opciones: ["Una es verdadera", "Ambas son verdaderas", "Ambas son falsas"],
+    correcta: 1
+  },
+  {
+    pregunta: "Si A = {a,b,c} y B = {b,c,d}, la unión A ∪ B es:",
+    opciones: ["{a,b,c,d}", "{b,c}", "{a,d}"],
+    correcta: 0
+  },
+  {
+    pregunta: "En un diagrama de Venn, la zona donde dos círculos se superponen representa:",
+    opciones: ["La unión", "La intersección", "El complemento"],
+    correcta: 1
+  },
+  {
+    pregunta: "Si en un curso 12 estudiantes tocan guitarra y 7 tocan piano, y ninguno toca ambos, ¿cuántos estudiantes hay en total?",
+    opciones: ["19", "7", "5"],
+    correcta: 0
+  },
+  {
+    pregunta: "La proposición ¬P significa:",
+    opciones: ["P es verdadera", "P es falsa o se niega", "P implica Q"],
+    correcta: 1
+  },
+  {
+    pregunta: "El complemento de un conjunto es:",
+    opciones: ["Los elementos que no pertenecen a él", "Los elementos repetidos", "La unión"],
+    correcta: 0
+  }
 ];
 
 // === GENERAR BLOQUES DE OPCIONES ===
@@ -78,8 +118,9 @@ function generarBloquesPregunta() {
     bloques.push({
       x: 200 + i * separacion,
       y: startY,
-      w: 120,
-      h: 60,
+      w: 240,
+      h: 70,
+
       texto: opciones[i],
       correcta: i === preguntas[currentQuestion].correcta,
       vx: 2 * (Math.random() < 0.5 ? 1 : -1)
@@ -195,19 +236,41 @@ function drawFox() {
 }
 
 
-
 // === DIBUJAR BLOQUES ===
 function drawBlock(b) {
-  ctx.fillStyle = b.correcta ? "#b07a4a" : "#b07a4a";
+  ctx.fillStyle = "#b07a4a";
   ctx.fillRect(b.x, b.y, b.w, b.h);
+
   ctx.strokeStyle = "#000";
   ctx.strokeRect(b.x, b.y, b.w, b.h);
+
   ctx.fillStyle = "#000";
-  ctx.font = "20px Minecraftia";
+  ctx.font = "18px Minecraftia";
   ctx.textAlign = "center";
-  ctx.fillText(b.texto, b.x + b.w / 2, b.y + 35);
+
+  wrapText(b.texto, b.x + b.w / 2, b.y + 25, b.w - 10, 20);
   ctx.textAlign = "left";
 }
+//--
+function wrapText(text, x, y, maxWidth, lineHeight) {
+  const words = text.split(" ");
+  let line = "";
+
+  for (let i = 0; i < words.length; i++) {
+    const testLine = line + words[i] + " ";
+    const testWidth = ctx.measureText(testLine).width;
+
+    if (testWidth > maxWidth && i > 0) {
+      ctx.fillText(line, x, y);
+      line = words[i] + " ";
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, y);
+}
+
 
 // === HUD ===
 function drawHUD() {
@@ -217,7 +280,7 @@ function drawHUD() {
   ctx.fillText(`⭐ Aciertos: ${aciertos}`, 30, 50);
   ctx.fillText(`Pregunta ${Math.min(currentQuestion + 1, preguntas.length)}/${preguntas.length}`, 30, 80);
   if (!juegoTerminado && currentQuestion < preguntas.length)
-    ctx.fillText(preguntas[currentQuestion].pregunta, 50, 150);
+    wrapText(preguntas[currentQuestion].pregunta, 50, 150, 900, 28);
 }
 
 // === PARTÍCULAS ===
@@ -325,23 +388,28 @@ function siguientePregunta() {
       });
     }
 
-    // === 🔹 Enviar puntaje al servidor ===
+    // === 🔹 Enviar puntaje al servidor (unidad 3) ===
     const totalPreguntas = preguntas.length;
     const puntaje = (aciertos / totalPreguntas) * 100;
+
+    // Obtenemos usuario_id si existe en la página
+    const usuarioIdInput = document.getElementById('usuario_id');
+    const usuarioId = usuarioIdInput ? usuarioIdInput.value : null;
 
     fetch("/guardar_progreso", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        unidad: 1,
+        unidad: 3,
         aciertos: aciertos,
         total: totalPreguntas,
-        puntaje: puntaje
+        puntaje: puntaje,
+        usuario_id: usuarioId
       })
     })
     .then(res => res.json())
     .then(data => console.log("✅ Progreso guardado:", data))
-    .catch(err => console.error("❌ Error:", err));
+    .catch(err => console.error("❌ Error al guardar progreso:", err));
   } else {
     generarBloquesPregunta();
   }
