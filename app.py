@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 #import MySQLdb
-import psycopg2
-import psycopg2.extras
+import psycopg
+from psycopg.rows import dict_row
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 from sklearn.neighbors import KNeighborsClassifier
@@ -29,9 +29,9 @@ mail = Mail(app)
 
 # -------------------- Conexión a la base de datos --------------------
 def conectar():
-    conn = psycopg2.connect(
+    conn = psycopg.connect(
         host="dpg-d3so92h5pdvs73fp0460-a.oregon-postgres.render.com",
-        database="retomate_db",
+        dbname="retomate_db",
         user="retomate_db_user",
         password="miZj09YIgbDHOeWmL6OBUgmJ2hgj1kVX",
         port="5432",
@@ -61,7 +61,7 @@ def login():
             return render_template("login.html")
 
         db = conectar()
-        cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cur = db.cursor(row_factory=dict_row)
         cur.execute("SELECT * FROM usuarios WHERE correo=%s", (correo,))
         usuario = cur.fetchone()
         db.close()
