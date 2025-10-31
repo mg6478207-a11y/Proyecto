@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RETOMATE - Videos Educativos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #ff9a56 0%, #ff6a00 50%, #ff9a56 100%);
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        main {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 30px;
+        }
+
+        .page-title {
+            text-align: center;
+            color: white;
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: white;
+            font-size: 1.3em;
+            margin-bottom: 40px;
+        }
+
+        /* Filtros de Unidades */
+        .filters-container {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .filters-title {
+            color: #ff6a00;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            background: linear-gradient(135deg, #ff6a00 0%, #ff8c42 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            transform: scale(1.05);
+        }
+
+        /* Grid de Videos */
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .video-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .video-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .video-card.hidden {
+            display: none;
+        }
+
+        .video-thumbnail {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .video-thumbnail img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .video-card:hover .play-button {
+            transform: translate(-50%, -50%) scale(1.2);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .play-button::before {
+            content: "▶";
+            font-size: 35px;
+            color: #ff6a00;
+            margin-left: 5px;
+        }
+
+        .video-info {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-unit {
+            display: inline-block;
+            background: #ff6a00;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            align-self: flex-start;
+        }
+
+        .video-title {
+            color: #333;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .video-description {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        .video-duration {
+            color: #ff6a00;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .no-videos-message {
+            text-align: center;
+            color: white;
+            font-size: 1.5em;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            margin-top: 30px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2em;
+            }
+
+            .videos-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-buttons {
+                flex-direction: column;
+            }
+
+            .filter-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE" height="80">
+        <h1>RETOMATE</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">🏠 Inicio</a></li>
+                <li><a href="{{ url_for('tematicas') }}">📚 Temáticas</a></li>
+                <li><a href="{{ url_for('videos') }}">🎥 Videos</a></li>
+                <li><a href="{{ url_for('progreso') }}">📊 Progreso</a></li>
+                
+                {% if 'user_id' in session %}
+                    <li><a href="{{ url_for('logout') }}" class="logout-btn">🚪 Cerrar Sesión</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">🔐 Iniciar Sesión</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1 class="page-title">🎥 Videos Educativos 🦊</h1>
+        <p class="page-subtitle">Aprende matemáticas con videos cortos y divertidos</p>
+
+        <!-- Filtros por Unidad -->
+        <div class="filters-container">
+            <h3 class="filters-title">🎯 Selecciona una Unidad</h3>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-unit="todas" onclick="filterVideos('todas')">
+                    📖 Todas las Unidades
+                </button>
+                <button class="filter-btn" data-unit="unidad1" onclick="filterVideos('unidad1')">
+                    Unidad 1
+                </button>
+                <button class="filter-btn" data-unit="unidad2" onclick="filterVideos('unidad2')">
+                    Unidad 2
+                </button>
+                <button class="filter-btn" data-unit="unidad3" onclick="filterVideos('unidad3')">
+                    Unidad 3
+                </button>
+                <button class="filter-btn" data-unit="unidad4" onclick="filterVideos('unidad4')">
+                    Unidad 4
+                </button>
+                <button class="filter-btn" data-unit="unidad5" onclick="filterVideos('unidad5')">
+                    Unidad 5
+                </button>
+                <button class="filter-btn" data-unit="unidad6" onclick="filterVideos('unidad6')">
+                    Unidad 6
+                </button>
+                <button class="filter-btn" data-unit="unidad7" onclick="filterVideos('unidad7')">
+                    Unidad 7
+                </button>
+                <button class="filter-btn" data-unit="unidad8" onclick="filterVideos('unidad8')">
+                    Unidad 8
+                </button>
+            </div>
+        </div>
+
+        <!-- Grid de Videos -->
+        <div class="videos-grid" id="videosGrid">
+            <!-- UNIDAD 1: NÚMEROS NATURALES -->
+            <div class="video-card" data-unit="unidad1" onclick="openVideo('https://youtu.be/hd5qnZfGO1c')">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/hd5qnZfGO1c/maxresdefault.jpg" alt="Video thumbnail">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-unit">Unidad 1</span>
+                    <h3 class="video-title">NÚMEROS NATURALES Super Fácil</h3>
+                    <p class="video-description">Aprende los números naturales de forma súper fácil, ideal para principiantes.</p>
+                    <div class="video-duration">⏱️ Para principiantes</div>
+                </div>
+            </div>
+
+            <div class="video-card" data-unit="unidad1" onclick="openVideo('https://youtu.be/xLAhqCkajWM')">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/xLAhqCkajWM/maxresdefault.jpg" alt="Video thumbnail">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-unit">Unidad 1</span>
+                    <h3 class="video-title">Números Naturales: Uso, Escritura y Lectura</h3>
+                    <p class="video-description">Aprende cómo usar, escribir y leer los números naturales correctamente.</p>
+                    <div class="video-duration">⏱️ Matemáticas para niños</div>
+                </div>
+            </div>
+
+            <!-- UNIDAD 2: TEORÍA DE NÚMEROS -->
+            <div class="video-card" data-unit="unidad2" onclick="openVideo('https://youtu.be/I_gjkfQm3WY')">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/I_gjkfQm3WY/maxresdefault.jpg" alt="Video thumbnail">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-unit">Unidad 2</span>
+                    <h3 class="video-title">Teoría de Números</h3>
+                    <p class="video-description">Descubre los conceptos fundamentales de la teoría de números con la Profe Monse.</p>
+                    <div class="video-duration">⏱️ Profe Monse</div>
+                </div>
+            </div>
+
+            <div class="video-card" data-unit="unidad2" onclick="openVideo('https://youtu.be/A8g-Z_N7-sA')">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/A8g-Z_N7-sA/maxresdefault.jpg" alt="Video thumbnail">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-unit">Unidad 2</span>
+                    <h3 class="video-title">Múltiplos y Divisores</h3>
+                    <p class="video-description">Aprende sobre múltiplos, divisores y números primos de manera clara.</p>
+                    <div class="video-duration">⏱️ Explicación detallada</div>
+                </div>
+            </div>
+
+            <!-- UNIDAD 3: CONJUNTOS -->
+            <div class="video-card" data-unit="unidad3" onclick="openVideo('https://youtu.be/SBcuckgn9rI')">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/SBcuckgn9rI/maxresdefault.jpg" alt="Video thumbnail">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-unit">Unidad 3</span>
+                    <h3 class="video-title">Problemas con Conjuntos</h3>
+                    <p class="video-description">Resuelve problemas utilizando la teoría de conjuntos de forma práctica.</p>
+                    <div class="video-duration">⏱️ Ejercicios resueltos</div>
+                </div>
+            </div>
+
+            <div class="video-card" data-unit="unidad3" onclick="openVideo('https://youtu.be/UIeYM0a2PTc')">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/UIeYM0a2PTc/maxresdefault.jpg" alt="Video thumbnail">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-unit">Unidad 3</span>
+                    <h3 class="video-title">Unión e Intersección de Conjuntos</h3>
+                    <p class="video-description">Aprende las operaciones básicas con conjuntos: unión e intersección.</p>
+                    <div class="video-duration">⏱️ Operaciones con conjuntos</div>
+                </div>
+            </div>
+
+            <!-- UNIDAD 4: FRACCIONES -->
+            <div class="video-card" data-unit="unidad4" onclick="openVideo('https://youtu.be/c9cTIjBqFTw')">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/c9cTIjBqFTw/maxresdefault.jpg" alt="Video thumbnail">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-unit">Unidad 4</span>
+                    <h3 class="video-title">Fracciones para Niños con Pizza</h3>
+                    <p class="video-description">Aprende las fracciones de forma divertida usando pizzas como ejemplo.</p>
+                    <div class="video-duration">⏱️ Introducción divertida</div>
+                </div>
+            </div>
+
+            <div class="video-card" data-unit="unidad4" onclick="openVideo('https://youtu.be/DVXZi9ZWFvo')">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/DVXZi9ZWFvo/maxresdefault.jpg" alt="Video thumbnail">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-unit">Unidad 4</span>
+                    <h3 class="video-title">Aprende a Leer Fracciones</h3>
+                    <p class="video-description">Descubre cómo leer e interpretar fracciones correctamente.</p>
+                    <div class="video-duration">⏱️ Matemáticas para niños</div>
+                </div>
+            </div>
+
+            <!-- UNIDAD 5: DECIMALES -->
+            <div class="video-card" data-unit="unidad5" onclick="openVideo('https://youtu.be/OYjW1gV8SJU')">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/OYjW1gV8SJU/maxresdefault.jpg" alt="Video thumbnail">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-unit">Unidad 5</span>
+                    <h3 class="video-title">Números Decimales - Video 1</h3>
+                    <p class="video-description">Entiende qué son los números decimales y cómo se relacionan con las fracciones.</p>
+                    <div class="video-duration">⏱️ Introducción</div>
+                </div>
+            </div>
+
+            <div class="video-card" data-unit="unidad5" onclick="openVideo('https://youtu.be/bVFExqCCwfE')">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/bVFExqCCwfE/maxresdefault.jpg" alt="Video thumbnail">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-unit">Unidad 5</span>
+                    <h3 class="video-title">Operaciones con Decimales</h3>
+                    <p class="video-description">Aprende a sumar, restar, multiplicar y dividir números decimales.</p>
+                    <div class="video-duration">⏱️ Operaciones básicas</div>
+                </div>
+            </div>
+
+            <!-- UNIDAD 6: GEOMETRÍA -->
+            <div class="video-card" data-unit="unidad6" onclick="openVideo('https://youtu.be/WPMrb95J8i0')">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/WPMrb95J8i0/maxresdefault.jpg" alt="Video thumbnail">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-unit">Unidad 6</span>
+                    <h3 class="video-title">Medida y Geometría - Video 1</h3>
+                    <p class="video-description">Conoce las figuras geométricas y aprende a medirlas correctamente.</p>
+                    <div class="video-duration">⏱️ Figuras básicas</div>
+                </div>
+            </div>
+
+            <div class="video-card" data-unit="unidad6" onclick="openVideo('https://youtu.be/-FvTH9sdL3Q')">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/-FvTH9sdL3Q/maxresdefault.jpg" alt="Video thumbnail">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-unit">Unidad 6</span>
+                    <h3 class="video-title">Perímetro y Área</h3>
+                    <p class="video-description">Aprende a calcular el perímetro y área de diferentes figuras geométricas.</p>
+                    <div class="video-duration">⏱️ Cálculos geométricos</div>
+                </div>
+            </div>
+
+            <!-- UNIDAD 7: PROPORCIONES -->
+            <div class="video-card" data-unit="unidad7" onclick="openVideo('https://youtu.be/3eYwW4sDlxM')">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/3eYwW4sDlxM/maxresdefault.jpg" alt="Video thumbnail">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-unit">Unidad 7</span>
+                    <h3 class="video-title">Razón, Proporción y Porcentaje - Video 1</h3>
+                    <p class="video-description">Entiende qué son las razones y proporciones para comparar cantidades.</p>
+                    <div class="video-duration">⏱️ Conceptos básicos</div>
+                </div>
+            </div>
+
+            <div class="video-card" data-unit="unidad7" onclick="openVideo('https://youtu.be/sWg-OtWlkfs')">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/sWg-OtWlkfs/maxresdefault.jpg" alt="Video thumbnail">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-unit">Unidad 7</span>
+                    <h3 class="video-title">Cálculo de Porcentajes</h3>
+                    <p class="video-description">Aprende a calcular porcentajes de manera fácil y práctica.</p>
+                    <div class="video-duration">⏱️ Ejemplos prácticos</div>
+                </div>
+            </div>
+
+            <!-- UNIDAD 8: ESTADÍSTICA -->
+            <div class="video-card" data-unit="unidad8" onclick="openVideo('https://youtu.be/PcFhnJiZ9v8')">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/PcFhnJiZ9v8/maxresdefault.jpg" alt="Video thumbnail">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-unit">Unidad 8</span>
+                    <h3 class="video-title">Estadística Descriptiva - Video 1</h3>
+                    <p class="video-description">Descubre qué es la estadística y cómo organizar y representar datos.</p>
+                    <div class="video-duration">⏱️ Introducción</div>
+                </div>
+            </div>
+
+            <div class="video-card" data-unit="unidad8" onclick="openVideo('https://youtu.be/0_ybaigJd1s')">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/0_ybaigJd1s/maxresdefault.jpg" alt="Video thumbnail">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-unit">Unidad 8</span>
+                    <h3 class="video-title">Media, Moda y Mediana</h3>
+                    <p class="video-description">Aprende a calcular e interpretar la media, moda y mediana de datos.</p>
+                    <div class="video-duration">⏱️ Medidas estadísticas</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="no-videos-message" id="noVideosMsg" style="display: none;">
+            🦊 No hay videos disponibles para esta unidad todavía. ¡Pronto agregaremos más contenido!
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 RETOMATE - Aprende matemáticas jugando 🦊📚</p>
+    </footer>
+
+    <script>
+        // Función para abrir video en YouTube
+        function openVideo(url) {
+            window.open(url, '_blank');
+        }
+
+        // Función para filtrar videos por unidad
+        function filterVideos(unit) {
+            const allCards = document.querySelectorAll('.video-card');
+            const allButtons = document.querySelectorAll('.filter-btn');
+            const noVideosMsg = document.getElementById('noVideosMsg');
+            let visibleCount = 0;
+
+            // Actualizar botones activos
+            allButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.unit === unit) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Filtrar tarjetas
+            allCards.forEach(card => {
+                if (unit === 'todas' || card.dataset.unit === unit) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            // Mostrar mensaje si no hay videos
+            if (visibleCount === 0) {
+                noVideosMsg.style.display = 'block';
+            } else {
+                noVideosMsg.style.display = 'none';
+            }
+
+            // Scroll suave hacia los videos
+            document.getElementById('videosGrid').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }
+
+        // Cargar filtro desde URL si existe
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const unit = urlParams.get('unit');
+            if (unit) {
+                filterVideos(unit);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RETOMATE - Unidad 6: Aventura en la Playa del Zorrito</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body { background:#87ceeb; font-family: Arial, sans-serif; }
+    main { max-width:1200px; margin:10px auto; padding:10px; }
+    #gameWrapper { display:flex; justify-content:center; }
+    canvas { image-rendering: pixelated; border:4px solid #d4a574; background:#87ceeb; }
+    #hudMsg {
+      text-align:center;
+      font-family:'Minecraftia', monospace;
+      margin-top:8px;
+      color:#222;
+    }
+    #usuario {
+      text-align:center;
+      font-family:'Minecraftia';
+      margin-bottom:10px;
+      color:#333;
+    }
+    h2 {
+      color: #ff6b35;
+      text-align: center;
+    }
+    p {
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h2>🏖️ Unidad 6: Aventura en la Playa del Zorrito - Medida y Geometría</h2>
+    <div id="usuario">
+      Bienvenido, <strong>{{ session['nombre'] }}</strong> 👋
+    </div>
+
+    <p>Ayuda al zorrito a explorar la playa tropical respondiendo preguntas de medida y geometría. ¡Cuidado! Tienes solo 7 vidas.</p>
+
+    <div id="gameWrapper">
+      <canvas id="gameCanvas" width="1000" height="600"></canvas>
+    </div>
+
+    <p id="hudMsg">Usa ← → para moverte, ↑ para saltar, y presiona P para pausar y espacio para activar el super salto.</p>
+
+    <input type="hidden" id="usuario_id" value="{{ session['id'] }}">
+  </main>
+
+  <script src="{{ url_for('static', filename='js/unidad6.js') }}"></script>
+</body>
+</html>

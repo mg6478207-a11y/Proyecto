@@ -110,9 +110,9 @@
             <h3>Primer Periodo</h3>
             <ul class="unidad-lista">
                 <li><a href="{{ url_for('unidad1') }}">Unidad 1: Números Naturales</a></li>
-                <li><a href="#">Unidad 2: Teoría de Números</a></li>
-                <li><a href="#">Unidad 3: Problemas, Lógica y Conjuntos</a></li>
-                <li><a href="#">Unidad 4: Números Fraccionarios</a></li>
+                 <li><a href="{{ url_for('unidad2') }}">Unidad 2: Teoría de Números</a></li>
+                <li><a href="#">Unidad 3: problemas y conjuntos</a></li>
+                <li><a href="{{ url_for('unidad4') }}">Unidad 4: Números Fraccionarios</a></li>
             </ul>
         </section>
 
@@ -120,9 +120,9 @@
             <h3>Segundo Periodo</h3>
             <ul class="unidad-lista">
                 <li><a href="#">Unidad 5: Números Decimales</a></li>
-                <li><a href="#">Unidad 6: Medida y Geometría</a></li>
+                <li><a href="{{ url_for('unidad6') }}">Unidad 6: Medida y Geometría</a></li>
                 <li><a href="#">Unidad 7: Razón, Proporción y Porcentaje</a></li>
-                <li><a href="#">Unidad 8: Estadística Descriptiva</a></li>
+                <li><a href="{{ url_for('unidad8') }}">Unidad 8: Estadística Descriptiva</a></li>
             </ul>
         </section>
     </main>

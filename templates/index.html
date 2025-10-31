@@ -4,143 +4,902 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RETOMATE - Inicio</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <style>
-        main {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff9a56 0%, #ff6a00 50%, #ff9a56 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Burbujas flotantes de fondo */
+        .bubble {
+            position: fixed;
+            bottom: -100px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            animation: rise 15s infinite ease-in;
+            z-index: 0;
+        }
+
+        @keyframes rise {
+            to {
+                bottom: 110vh;
+                transform: translateX(100px);
+            }
+        }
+
+        header {
+            background: linear-gradient(135deg, #ff6a00 0%, #ff8c42 100%);
+            color: white;
+            padding: 20px;
             text-align: center;
-            padding: 40px 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 10;
         }
 
-        /* Tarjeta flotante */
-        .tarjeta {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            max-width: 900px;
-            margin: 40px auto;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            animation: flotar 3s ease-in-out infinite;
+        header h1 {
+            font-size: 3em;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: bounce 2s infinite;
         }
 
-        .tarjeta:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        @keyframes flotar {
+        @keyframes bounce {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
 
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 25px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            background: rgba(255, 255, 255, 0.45);
+            transform: scale(1.1);
+        }
+
+        /* Estilo especial para el botón de logout */
+        nav a.logout-btn {
+            background: rgba(231, 76, 60, 0.8);
+        }
+
+        nav a.logout-btn:hover {
+            background: rgba(231, 76, 60, 1);
+        }
+
+        main {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero {
+            text-align: center;
+            color: white;
+            padding: 40px 20px 20px;
+        }
+
+        .hero h2 {
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+
+        /* Personajes matemáticos flotantes */
+        .math-character {
+            font-size: 5em;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+            margin: 0 15px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .math-character:nth-child(2) { animation-delay: 0.5s; }
+        .math-character:nth-child(3) { animation-delay: 1s; }
+        .math-character:nth-child(4) { animation-delay: 1.5s; }
+
+        /* CARRUSEL DE UNIDADES - PANTALLA COMPLETA */
+        .carousel-section {
+            padding: 30px 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        .carousel-container {
+            width: 95%;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            overflow: hidden;
+            min-height: 700px;
+        }
+
+        .carousel-wrapper {
+            position: relative;
+            overflow: hidden;
+            min-height: 700px;
+        }
+
+        .carousel-slides {
+            display: flex;
+            transition: transform 0.6s ease-in-out;
+            height: 100%;
+        }
+
+        .tarjeta {
+            min-width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 50px;
+            gap: 30px;
+        }
+
         .tarjeta img {
-            width: 45%;
-            min-width: 280px;
+            width: 50%;
+            min-width: 400px;
+            height: 500px;
             object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
         .contenido {
-            padding: 30px;
+            padding: 40px;
             flex: 1;
             text-align: left;
         }
 
         .contenido h2 {
-            color: #1a73e8;
-            margin-bottom: 10px;
+            color: #ff6a00;
+            margin-bottom: 25px;
+            font-size: 2.8em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
         .contenido p {
-            line-height: 1.6;
-            font-size: 1.1em;
+            line-height: 2;
+            font-size: 1.4em;
+            color: #555;
+            margin-bottom: 20px;
         }
 
-        /* Recuadro informativo */
+        .contenido strong {
+            font-size: 1.5em;
+            color: #ff6a00;
+        }
+
         .instrucciones {
-            margin-top: 15px;
-            background: #eaf3ff;
-            border-left: 5px solid #1a73e8;
-            padding: 15px 20px;
-            border-radius: 10px;
-            font-size: 0.95em;
+            margin-top: 30px;
+            background: linear-gradient(135deg, #ffecd2 0%, #ffcb9a 100%);
+            border-left: 8px solid #ff6a00;
+            padding: 25px 30px;
+            border-radius: 20px;
+            font-size: 1.2em;
             color: #333;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
         }
 
         .instrucciones strong {
-            color: #1a73e8;
+            color: #ff6a00;
+            font-size: 1.1em;
         }
 
-        /* Próximamente */
-        .proximamente {
-            margin-top: 60px;
-            background: linear-gradient(135deg, #eaf3ff, #fff0ff);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            display: inline-block;
+        /* Controles del carrusel */
+        .carousel-controls {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            padding: 0 20px;
+            pointer-events: none;
+            z-index: 10;
         }
 
-        .proximamente h3 {
-            color: #d35400;
+        .carousel-btn {
+            pointer-events: all;
+            background: linear-gradient(135deg, #ff6a00 0%, #ff8c42 100%);
+            color: white;
+            border: none;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            font-size: 32px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: bold;
         }
 
-        .proximamente p {
-            font-size: 1.05em;
+        .carousel-btn:hover {
+            background: linear-gradient(135deg, #ff8c42 0%, #ffb366 100%);
+            transform: scale(1.15);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+        }
+
+        .carousel-btn:active {
+            transform: scale(1.05);
+        }
+
+        /* Indicadores */
+        .carousel-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 25px 0;
+            background: rgba(255, 106, 0, 0.1);
+        }
+
+        .indicator {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(255, 106, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .indicator:hover {
+            background: rgba(255, 106, 0, 0.5);
+            transform: scale(1.2);
+        }
+
+        .indicator.active {
+            background: #ff6a00;
+            transform: scale(1.4);
+            border: 2px solid white;
+            box-shadow: 0 0 10px rgba(255, 106, 0, 0.5);
+        }
+
+        /* Barra de progreso automática */
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 106, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6a00 0%, #ff8c42 100%);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* SECCIÓN DE DATOS CURIOSOS */
+        .curious-section {
+            max-width: 1400px;
+            margin: 60px auto 40px;
+            padding: 50px 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .curious-section h2 {
+            text-align: center;
+            color: #ff6a00;
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .curious-section > p {
+            text-align: center;
+            font-size: 1.4em;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .curious-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .curious-btn {
+            background: linear-gradient(135deg, #ff6a00 0%, #ff8c42 100%);
+            border: none;
+            padding: 30px 30px;
+            border-radius: 25px;
+            color: white;
+            font-size: 1.4em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .curious-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .curious-btn:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        .curious-btn:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+        }
+
+        .curious-btn:active {
+            transform: translateY(-4px);
+        }
+
+        /* Modal para datos curiosos */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffecd2 0%, #ffcb9a 100%);
+            margin: 8% auto;
+            padding: 50px;
+            border-radius: 30px;
+            width: 85%;
+            max-width: 700px;
+            position: relative;
+            animation: slideDown 0.5s;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content h3 {
+            color: #ff6a00;
+            font-size: 2.5em;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .modal-content p {
+            font-size: 1.4em;
+            line-height: 2;
             color: #333;
+            text-align: center;
+        }
+
+        .close {
+            color: #ff6a00;
+            float: right;
+            font-size: 45px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #ff8c42;
+            transform: rotate(90deg);
+        }
+
+        footer {
+            background: linear-gradient(135deg, #ff6a00 0%, #ff8c42 100%);
+            color: white;
+            text-align: center;
+            padding: 25px;
+            margin-top: 60px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 1024px) {
+            .tarjeta {
+                flex-direction: column;
+                padding: 30px;
+            }
+            
+            .tarjeta img {
+                width: 100%;
+                min-width: 100%;
+                height: 400px;
+            }
+
+            .contenido {
+                padding: 20px;
+            }
+
+            .contenido h2 {
+                font-size: 2.2em;
+            }
+
+            .contenido p {
+                font-size: 1.2em;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h2 {
+                font-size: 2em;
+            }
+
+            .math-character {
+                font-size: 3em;
+            }
+
+            .carousel-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+
+            .curious-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .carousel-container {
+                min-height: 600px;
+            }
+
+            .carousel-wrapper {
+                min-height: 600px;
+            }
+
+            .tarjeta img {
+                height: 300px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Burbujas de fondo -->
+    <div class="bubble" style="left: 10%; width: 80px; height: 80px; animation-delay: 0s;"></div>
+    <div class="bubble" style="left: 20%; width: 60px; height: 60px; animation-delay: 2s;"></div>
+    <div class="bubble" style="left: 40%; width: 100px; height: 100px; animation-delay: 4s;"></div>
+    <div class="bubble" style="left: 60%; width: 70px; height: 70px; animation-delay: 1s;"></div>
+    <div class="bubble" style="left: 80%; width: 90px; height: 90px; animation-delay: 3s;"></div>
+
     <header>
-        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE" height="80">
-        <h1>RETOMATE</h1>
+        <h1>🦊 RETOMATE 🦊</h1>
         <nav>
             <ul>
-                <li><a href="{{ url_for('home') }}">Inicio</a></li>
-                <li><a href="{{ url_for('tematicas') }}">Temáticas</a></li>
-                <li><a href="{{ url_for('videos') }}">Videos</a></li>
-                <li><a href="{{ url_for('progreso') }}">Progreso</a></li>
-                <li><a href="{{ url_for('login') }}">Iniciar Sesión</a></li>
+                <li><a href="{{ url_for('home') }}">🏠 Inicio</a></li>
+                <li><a href="{{ url_for('tematicas') }}">📚 Temáticas</a></li>
+                <li><a href="{{ url_for('videos') }}">🎥 Videos</a></li>
+                <li><a href="{{ url_for('progreso') }}">📊 Progreso</a></li>
+                
+                {% if 'user_id' in session %}
+                    <li><a href="{{ url_for('logout') }}" class="logout-btn">🚪 Cerrar Sesión</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">🔐 Iniciar Sesión</a></li>
+                {% endif %}
             </ul>
         </nav>
     </header>
 
     <main>
-        <h2>¡Bienvenido a RETOMATE!</h2>
-        <p>Aprende matemáticas de forma divertida con nuestro amigo RETOMATE.</p>
-
-        <!-- 🦊 Tarjeta de la Unidad 1 -->
-        <div class="tarjeta">
-            <img src="{{ url_for('static', filename='img/unidad1.gif') }}" alt="Unidad 1 RETOMATE">
-            <div class="contenido">
-                <h2>Unidad 1: Números Naturales</h2>
-                <p>En esta unidad aprenderás sobre los números naturales y sus propiedades.
-                   A través de ejemplos, retos y juegos con nuestro amigo el Zorrito,
-                   descubrirás cómo se usan los números para contar, ordenar y resolver
-                   problemas del día a día.</p>
-                <p><strong>¡Prepárate para aprender jugando! 🦊</strong></p>
-
-                <div class="instrucciones">
-                    🔍 <strong>¿Dónde puedes encontrar esta unidad?</strong><br>
-                    Ingresa a tu cuenta en <strong>Iniciar Sesión</strong>, luego dirígete al menú <strong>Tematicas</strong> y selecciona <strong>Unidad 1</strong> para comenzar tu aprendizaje.
-                </div>
+        <div class="hero">
+            <h2>¡Bienvenido a RETOMATE!</h2>
+            <p>Aprende matemáticas de forma divertida con nuestro amigo RETOMATE 🦊</p>
+            
+            <div style="margin: 30px 0;">
+                <span class="math-character">🔢</span>
+                <span class="math-character">➗</span>
+                <span class="math-character">🧮</span>
+                <span class="math-character">📐</span>
             </div>
         </div>
 
-        <!-- 📘 Próximamente -->
-        <div class="proximamente">
-            <h3>📘 Próximamente: Unidad 2</h3>
-            <p><strong>Teoría de Números</strong> — Aprende sobre múltiplos, divisores,
-               números primos y mucho más en nuestra próxima aventura matemática.</p>
+        <!-- CARRUSEL DE UNIDADES -->
+        <div class="carousel-section">
+            <div class="carousel-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                
+                <div class="carousel-wrapper">
+                    <div class="carousel-slides" id="carouselSlides">
+                        <!-- Unidad 1 -->
+                        <div class="tarjeta">
+                            <img src="{{ url_for('static', filename='img/unidad1.gif') }}" alt="Unidad 1 RETOMATE">
+                            <div class="contenido">
+                                <h2>Unidad 1: Números Naturales</h2>
+                                <p>En esta unidad aprenderás sobre los números naturales y sus propiedades.
+                                   A través de ejemplos, retos y juegos con nuestro amigo el Zorrito,
+                                   descubrirás cómo se usan los números para contar, ordenar y resolver
+                                   problemas del día a día.</p>
+                                <p><strong>¡Prepárate para aprender jugando! 🦊</strong></p>
+                                <div class="instrucciones">
+                                    🔍 <strong>¿Dónde puedes encontrar esta unidad?</strong><br>
+                                    Ingresa a tu cuenta en <strong>Iniciar Sesión</strong>, luego dirígete al menú <strong>Temáticas</strong> y selecciona <strong>Unidad 1</strong>.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Unidad 2 -->
+                        <div class="tarjeta">
+                            <img src="{{ url_for('static', filename='img/unidad2.gif') }}" alt="Unidad 2 RETOMATE">
+                            <div class="contenido">
+                                <h2>Unidad 2: Teoría de Números</h2>
+                                <p>En esta unidad explorarás el fascinante mundo de la teoría de números.
+                                   Aprenderás sobre múltiplos, divisores, números primos y sus propiedades.
+                                   Con el Zorrito descubrirás los secretos matemáticos que esconden los números.</p>
+                                <p><strong>¡Prepárate para aprender jugando! 🦊</strong></p>
+                                <div class="instrucciones">
+                                    🔍 <strong>¿Dónde puedes encontrar esta unidad?</strong><br>
+                                    Ingresa a tu cuenta en <strong>Iniciar Sesión</strong>, luego dirígete al menú <strong>Temáticas</strong> y selecciona <strong>Unidad 2</strong>.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Unidad 3 -->
+                        <div class="tarjeta">
+                            <img src="{{ url_for('static', filename='img/unidad3.gif') }}" alt="Unidad 3 RETOMATE">
+                            <div class="contenido">
+                                <h2>Unidad 3: Problemas y Conjuntos</h2>
+                                <p>En esta unidad aprenderás a identificar, representar y resolver problemas utilizando conjuntos. 
+                                   Descubrirás cómo clasificar elementos, formar grupos y entender las relaciones entre ellos. 
+                                   Con la ayuda del Zorrito, resolverás desafíos y actividades divertidas.</p>
+                                <p><strong>¡Prepárate para aprender jugando! 🦊</strong></p>
+                                <div class="instrucciones">
+                                    🔍 <strong>¿Dónde puedes encontrar esta unidad?</strong><br>
+                                    Ingresa a tu cuenta en <strong>Iniciar Sesión</strong>, luego dirígete al menú <strong>Temáticas</strong> y selecciona <strong>Unidad 3</strong>.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Unidad 4 -->
+                        <div class="tarjeta">
+                            <img src="{{ url_for('static', filename='img/unidad4.gif') }}" alt="Unidad 4 RETOMATE">
+                            <div class="contenido">
+                                <h2>Unidad 4: Números Fraccionarios</h2>
+                                <p>En esta unidad descubrirás el mundo de los números fraccionarios y aprenderás a reconocerlos como partes de un todo. 
+                                   Junto a nuestro amigo el Zorrito, resolverás retos y juegos que te ayudarán a comparar, sumar, restar y usar fracciones 
+                                   en situaciones reales. ¡Las fracciones están por todas partes!</p>
+                                <p><strong>¡Prepárate para aprender jugando! 🦊</strong></p>
+                                <div class="instrucciones">
+                                    🔍 <strong>¿Dónde puedes encontrar esta unidad?</strong><br>
+                                    Ingresa a tu cuenta en <strong>Iniciar Sesión</strong>, luego dirígete al menú <strong>Temáticas</strong> y selecciona <strong>Unidad 4</strong>.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Unidad 5 -->
+                        <div class="tarjeta">
+                            <img src="{{ url_for('static', filename='img/unidad5.gif') }}" alt="Unidad 5 RETOMATE">
+                            <div class="contenido">
+                                <h2>Unidad 5: Números Decimales</h2>
+                                <p>En esta unidad aprenderás qué son los números decimales y cómo se relacionan con las fracciones. 
+                                   Con la ayuda del Zorrito, descubrirás cómo leer, comparar y realizar operaciones con decimales. 
+                                   ¡Verás cómo los decimales se usan al medir, comprar o calcular distancias!</p>
+                                <p><strong>¡Prepárate para aprender jugando! 🦊</strong></p>
+                                <div class="instrucciones">
+                                    🔍 <strong>¿Dónde puedes encontrar esta unidad?</strong><br>
+                                    Ingresa a tu cuenta en <strong>Iniciar Sesión</strong>, luego dirígete al menú <strong>Temáticas</strong> y selecciona <strong>Unidad 5</strong>.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Unidad 6 -->
+                        <div class="tarjeta">
+                            <img src="{{ url_for('static', filename='img/unidad6.gif') }}" alt="Unidad 6 RETOMATE">
+                            <div class="contenido">
+                                <h2>Unidad 6: Medida y Geometría</h2>
+                                <p>En esta unidad aprenderás sobre las formas, figuras y medidas que te rodean. 
+                                   Con la ayuda del Zorrito, descubrirás cómo identificar figuras geométricas, 
+                                   calcular perímetros, áreas y comparar tamaños. 
+                                   ¡La geometría está en todo lo que te rodea!</p>
+                                <p><strong>¡Prepárate para aprender jugando! 🦊</strong></p>
+                                <div class="instrucciones">
+                                    🔍 <strong>¿Dónde puedes encontrar esta unidad?</strong><br>
+                                    Ingresa a tu cuenta en <strong>Iniciar Sesión</strong>, luego dirígete al menú <strong>Temáticas</strong> y selecciona <strong>Unidad 6</strong>.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Unidad 7 -->
+                        <div class="tarjeta">
+                            <img src="{{ url_for('static', filename='img/unidad7.gif') }}" alt="Unidad 7 RETOMATE">
+                            <div class="contenido">
+                                <h2>Unidad 7: Razón, Proporción y Porcentaje</h2>
+                                <p>En esta unidad descubrirás cómo las razones, proporciones y porcentajes se usan para comparar cantidades. 
+                                   Junto al Zorrito, aprenderás a calcular porcentajes y aplicar estos conceptos en situaciones reales, 
+                                   como descuentos, recetas o mediciones. ¡Una aventura matemática llena de lógica!</p>
+                                <p><strong>¡Prepárate para aprender jugando! 🦊</strong></p>
+                                <div class="instrucciones">
+                                    🔍 <strong>¿Dónde puedes encontrar esta unidad?</strong><br>
+                                    Ingresa a tu cuenta en <strong>Iniciar Sesión</strong>, luego dirígete al menú <strong>Temáticas</strong> y selecciona <strong>Unidad 7</strong>.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Unidad 8 -->
+                        <div class="tarjeta">
+                            <img src="{{ url_for('static', filename='img/unidad8.gif') }}" alt="Unidad 8 RETOMATE">
+                            <div class="contenido">
+                                <h2>Unidad 8: Estadística Descriptiva</h2>
+                                <p>En esta unidad aprenderás a recopilar, organizar y analizar datos para descubrir información útil. 
+                                   Con la ayuda del Zorrito, representarás datos mediante tablas y gráficos, 
+                                   y comprenderás conceptos como la moda, la media y la mediana. 
+                                   ¡La estadística te ayuda a entender mejor el mundo!</p>
+                                <p><strong>¡Prepárate para aprender jugando! 🦊</strong></p>
+                                <div class="instrucciones">
+                                    🔍 <strong>¿Dónde puedes encontrar esta unidad?</strong><br>
+                                    Ingresa a tu cuenta en <strong>Iniciar Sesión</strong>, luego dirígete al menú <strong>Temáticas</strong> y selecciona <strong>Unidad 8</strong>.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Controles -->
+                    <div class="carousel-controls">
+                        <button class="carousel-btn" onclick="previousSlide()">◀</button>
+                        <button class="carousel-btn" onclick="nextSlide()">▶</button>
+                    </div>
+                </div>
+
+                <!-- Indicadores -->
+                <div class="carousel-indicators" id="indicators"></div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE DATOS CURIOSOS -->
+        <div class="curious-section">
+            <h2>🎯 ¡Datos Curiosos de Matemáticas! 🎯</h2>
+            <p>Haz clic en cada botón para descubrir datos fascinantes sobre las matemáticas</p>
+            
+            <div class="curious-buttons">
+                <button class="curious-btn" onclick="showFact(1)">
+                    <span style="position: relative; z-index: 1;">🎲 El Número Mágico</span>
+                </button>
+                <button class="curious-btn" onclick="showFact(2)">
+                    <span style="position: relative; z-index: 1;">🐝 Abejas Matemáticas</span>
+                </button>
+                <button class="curious-btn" onclick="showFact(3)">
+                    <span style="position: relative; z-index: 1;">♾️ El Infinito</span>
+                </button>
+                <button class="curious-btn" onclick="showFact(4)">
+                    <span style="position: relative; z-index: 1;">🚀 Matemáticas Espaciales</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal para datos curiosos -->
+        <div id="factModal" class="modal" onclick="closeModal(event)">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h3 id="factTitle">🎉 ¡Dato Curioso!</h3>
+                <p id="factText"></p>
+            </div>
         </div>
     </main>
 
     <footer>
-        <p>© 2025 RETOMATE - Aprende matemáticas jugando</p>
+        <p>© 2025 RETOMATE - Aprende matemáticas jugando 🦊📚</p>
     </footer>
+
+    <script>
+        // Configuración del carrusel
+        let currentSlide = 0;
+        const totalSlides = 8;
+        const slideInterval = 5000; // 5 segundos
+        let autoPlayInterval;
+        let progressInterval;
+
+        // Datos curiosos
+        const facts = [
+            {
+                title: "🎲 ¡El número más mágico!",
+                text: "¿Sabías que el número 9 es mágico? Si multiplicas cualquier número por 9 y sumas los dígitos del resultado, ¡siempre obtendrás 9! Por ejemplo: 9 × 8 = 72, y 7 + 2 = 9. ¡Inténtalo tú mismo!"
+            },
+            {
+                title: "🐝 ¡Las abejas son matemáticas!",
+                text: "Las abejas construyen sus panales en forma hexagonal porque es la forma geométrica que permite guardar más miel usando menos cera. ¡Son ingenieras naturales! 🐝"
+            },
+            {
+                title: "♾️ ¡El infinito tiene un símbolo!",
+                text: "El símbolo del infinito (∞) fue inventado por el matemático John Wallis en 1655. Se dice que eligió este símbolo porque parece no tener principio ni fin, ¡como el infinito mismo!"
+            },
+            {
+                title: "🚀 ¡Las matemáticas en el espacio!",
+                text: "Los astronautas usan las matemáticas para calcular trayectorias, velocidades y órbitas. Sin matemáticas, ¡no podríamos explorar el espacio! Cada misión espacial es un gran problema matemático resuelto. 🌟"
+            }
+        ];
+
+        // Inicializar indicadores
+        function initIndicators() {
+            const indicatorsContainer = document.getElementById('indicators');
+            for (let i = 0; i < totalSlides; i++) {
+                const indicator = document.createElement('div');
+                indicator.className = 'indicator';
+                if (i === 0) indicator.classList.add('active');
+                indicator.onclick = () => goToSlide(i);
+                indicatorsContainer.appendChild(indicator);
+            }
+        }
+
+        // Actualizar indicadores
+        function updateIndicators() {
+            const indicators = document.querySelectorAll('.indicator');
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        // Ir a una diapositiva específica
+        function goToSlide(index) {
+            currentSlide = index;
+            const slides = document.getElementById('carouselSlides');
+            slides.style.transform = `translateX(-${currentSlide * 100}%)`;
+            updateIndicators();
+            resetAutoPlay();
+        }
+
+        // Siguiente diapositiva
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            goToSlide(currentSlide);
+        }
+
+        // Diapositiva anterior
+        function previousSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            goToSlide(currentSlide);
+        }
+
+        // Barra de progreso
+        function updateProgress() {
+            const progressFill = document.getElementById('progressFill');
+            let width = 0;
+            const increment = 100 / (slideInterval / 100);
+            
+            clearInterval(progressInterval);
+            progressFill.style.width = '0%';
+            
+            progressInterval = setInterval(() => {
+                width += increment;
+                if (width >= 100) {
+                    width = 100;
+                }
+                progressFill.style.width = width + '%';
+            }, 100);
+        }
+
+        // Reiniciar autoplay
+        function resetAutoPlay() {
+            clearInterval(autoPlayInterval);
+            clearInterval(progressInterval);
+            updateProgress();
+            autoPlayInterval = setInterval(nextSlide, slideInterval);
+        }
+
+        // Iniciar autoplay
+        function startAutoPlay() {
+            updateProgress();
+            autoPlayInterval = setInterval(nextSlide, slideInterval);
+        }
+
+        // Pausar al pasar el mouse
+        const carouselContainer = document.querySelector('.carousel-container');
+        carouselContainer.addEventListener('mouseenter', () => {
+            clearInterval(autoPlayInterval);
+            clearInterval(progressInterval);
+        });
+
+        carouselContainer.addEventListener('mouseleave', () => {
+            resetAutoPlay();
+        });
+
+        // Mostrar dato curioso
+        function showFact(num) {
+            const modal = document.getElementById('factModal');
+            const title = document.getElementById('factTitle');
+            const text = document.getElementById('factText');
+            
+            title.textContent = facts[num - 1].title;
+            text.textContent = facts[num - 1].text;
+            
+            modal.style.display = 'block';
+        }
+
+        // Cerrar modal
+        function closeModal(event) {
+            const modal = document.getElementById('factModal');
+            if (!event || event.target === modal || event.target.className === 'close') {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Cerrar modal con tecla ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Navegación con teclado
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                previousSlide();
+            } else if (event.key === 'ArrowRight') {
+                nextSlide();
+            }
+        });
+
+        // Inicializar al cargar
+        window.addEventListener('load', () => {
+            initIndicators();
+            startAutoPlay();
+        });
+    </script>
 </body>
 </html>

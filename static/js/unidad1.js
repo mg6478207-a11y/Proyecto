@@ -28,7 +28,6 @@ const sonidoError = new Audio("https://actions.google.com/sounds/v1/cartoon/conc
 const musicaFondo = new Audio("/static/sounds/fondo.mp3");
 musicaFondo.volume = 0.4;
 musicaFondo.loop = true;
-
 sonidoSalto.volume = 0.5;
 sonidoCorrecto.volume = 0.6;
 sonidoError.volume = 0.5;
