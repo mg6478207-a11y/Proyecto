@@ -2,69 +2,191 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Progreso de estudiantes</title>
+  <title>Predicción de Rendimiento Académico (KNN)</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#eef3f6; text-align:center; }
-    table { margin: 20px auto; border-collapse: collapse; background:#fff; width:720px; }
-    th, td { padding: 10px 12px; border: 1px solid #ccc; font-size:14px; }
-    th { background:#3d9435; color:#fff; }
-    h2, h3 { color:#333; }
-    .gral { margin: 18px auto; width:700px; background:#fff; padding:14px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
-    .individuales { display:flex; flex-wrap:wrap; justify-content:center; gap:14px; margin-top:10px; }
-    .estudiante { width:240px; background:#fff; border-radius:6px; padding:8px; box-shadow:0 1px 4px rgba(0,0,0,0.05); }
-    .estudiante h4 { margin:6px 0; font-size:14px; color:#1f4267; }
-    img { max-width:100%; height:auto; display:block; margin:0 auto; }
-    a.button { display:inline-block; margin:16px 8px; padding:8px 12px; background:#3d9435; color:#fff; text-decoration:none; border-radius:6px; }
-  </style>
+  /* === Estilo general inspirado en RETÓMATE (Zorrito) === */
+  body { 
+    font-family: "Poppins", "Segoe UI", sans-serif;
+    background: linear-gradient(180deg, #fdfaf6 0%, #f2f8f5 100%);
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    color: #3b2c1a;
+  }
+
+  h2 {
+    margin-top: 30px;
+    color: #e26a2c; /* naranja zorrito */
+    text-shadow: 1px 1px #fcebd1;
+    font-size: 26px;
+  }
+
+  h3 {
+    color: #4b2e05; 
+    margin-top: 15px;
+  }
+
+  /* === Tarjeta general === */
+  .gral { 
+    margin: 25px auto; 
+    width: 900px; 
+    background: #fffdf9; 
+    padding: 20px; 
+    border-radius: 16px; 
+    box-shadow: 0 4px 12px rgba(90, 60, 20, 0.15);
+    border: 2px solid #f7d3a0;
+  }
+
+  /* === Gráfico === */
+  img { 
+    max-width: 100%; 
+    height: auto; 
+    display: block; 
+    margin: 20px auto; 
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  p {
+    font-size: 14px;
+    color: #5a4b38;
+  }
+
+  /* === Tabla de datos === */
+  table { 
+    margin: 25px auto; 
+    border-collapse: collapse; 
+    background: #fffdf9; 
+    width: 950px; 
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(90, 60, 20, 0.1);
+  }
+
+  th, td { 
+    padding: 12px 14px; 
+    border-bottom: 1px solid #f0e6da; 
+    font-size: 14px; 
+    text-align: center;
+  }
+
+  th { 
+    background: #e26a2c; 
+    color: #fff; 
+    font-size: 15px;
+    letter-spacing: 0.5px;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  /* === Colores según rendimiento === */
+  .alto { 
+    background-color: #d8f8d0; 
+    color: #226622; 
+    font-weight: bold;
+    border-radius: 6px;
+  }
+
+  .medio { 
+    background-color: #fff3c4; 
+    color: #8a6500; 
+    font-weight: bold;
+    border-radius: 6px;
+  }
+
+  .bajo { 
+    background-color: #ffd9d9; 
+    color: #a02727; 
+    font-weight: bold;
+    border-radius: 6px;
+  }
+
+  td.descripcion {
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.4em;
+    color: #3d2d19;
+    background-color: #fffaf3;
+  }
+
+  /* === Botón estilo Retómate === */
+  a.button { 
+    display: inline-block; 
+    margin: 30px 10px; 
+    padding: 10px 18px; 
+    background: linear-gradient(135deg, #e26a2c, #c85018); 
+    color: #fff; 
+    text-decoration: none; 
+    border-radius: 10px; 
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+
+  a.button:hover { 
+    background: linear-gradient(135deg, #f07c3d, #d86120); 
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  }
+
+  /* === Animación ligera === */
+  tr:hover {
+    background-color: #fff7ec;
+    transition: background-color 0.2s ease;
+  }
+</style>
+
 </head>
 <body>
-  <h2>📊 Progreso General de Estudiantes</h2>
 
-  {% if datos %}
-  <table>
-    <thead>
-      <tr><th>Nombre</th><th>Unidad</th><th>Puntaje (%)</th><th>Fecha</th></tr>
-    </thead>
-    <tbody>
-      {% for d in datos %}
-      <tr>
-        <td>{{ d[0] }}</td>
-        <td>{{ d[1] }}</td>
-        <td>{{ "%.1f"|format(d[2]) }}</td>
-        <td>{{ d[3] }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <h2>📊 Predicción de Rendimiento Académico (KNN)</h2>
+
+  {% if grafico_knn %}
+    <div class="gral">
+      <h3>📈 Clasificación de rendimiento</h3>
+      <img src="data:image/png;base64,{{ grafico_knn }}" alt="Gráfico KNN">
+      <p style="color:#555; font-size:14px;">
+        Este gráfico muestra la clasificación de los estudiantes según su <b>promedio</b> y <b>progreso general</b>.<br>
+        Los colores reflejan el nivel de rendimiento estimado por el modelo KNN.
+      </p>
+    </div>
   {% else %}
-    <p>No hay datos de progreso todavía.</p>
+    <p>No hay suficientes datos para generar el gráfico KNN.</p>
   {% endif %}
 
-  <div class="gral">
-    {% if grafico_general %}
-      <h3>📈 Gráfica General (tendencia del curso)</h3>
-      <img src="data:image/png;base64,{{ grafico_general }}" alt="Gráfico general">
-    {% else %}
-      <p>No hay suficientes datos para la gráfica general.</p>
-    {% endif %}
-  </div>
-
-  <div style="width:90%; margin: 10px auto; max-width:980px;">
-    <h3>📉 Gráficas individuales</h3>
-    <div class="individuales">
-      {% if graficos_individuales %}
-        {% for g in graficos_individuales %}
-          <div class="estudiante">
-            <h4>{{ g.nombre }}</h4>
-            <img src="data:image/png;base64,{{ g.img }}" alt="Progreso {{ g.nombre }}">
-          </div>
+  {% if datos %}
+    <h3>📋 Rendimiento por Estudiante</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Promedio (%)</th>
+          <th>Progreso (%)</th>
+          <th>Rendimiento Real</th>
+          <th>Predicción del Modelo</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for fila in datos %}
+        {% set clase_real = 'alto' if fila.rendimiento_real|lower == 'alto' else 'medio' if fila.rendimiento_real|lower == 'medio' else 'bajo' %}
+        {% set clase_pred = 'alto' if fila.rendimiento_predicho|lower == 'alto' else 'medio' if fila.rendimiento_predicho|lower == 'medio' else 'bajo' %}
+        <tr>
+          <td>{{ fila.nombre }}</td>
+          <td>{{ "%.2f"|format(fila.promedio_puntaje) }}</td>
+          <td>{{ "%.2f"|format(fila.progreso_general) }}</td>
+          <td class="{{ clase_real }}">{{ fila.rendimiento_real }}</td>
+          <td class="{{ clase_pred }}">{{ fila.rendimiento_predicho }}</td>
+          <td class="descripcion">{{ fila.descripcion }}</td>
+        </tr>
         {% endfor %}
-      {% else %}
-        <p>No hay gráficos individuales por el momento.</p>
-      {% endif %}
-    </div>
-  </div>
+      </tbody>
+    </table>
+  {% else %}
+    <p>No hay registros de rendimiento disponibles.</p>
+  {% endif %}
 
   <a class="button" href="/tematicas">Volver al menú</a>
+
 </body>
 </html>

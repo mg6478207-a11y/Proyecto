@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>RETÓMATE - Información del Estudiante</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f9e4c8, #f6d6ad, #ffd8a8);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 700px;
+      background-color: #fff9f3;
+      border: none;
+      border-radius: 25px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      padding: 35px 45px;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h4 {
+      text-align: center;
+      font-weight: 700;
+      color: #4b2e05;
+      margin-bottom: 25px;
+    }
+
+    h4::before {
+      content: "🦊 ";
+    }
+
+    label {
+      font-weight: 500;
+      color: #4b2e05;
+    }
+
+    .form-control, .form-select {
+      border-radius: 12px;
+      border: 1px solid #e0b98f;
+      background-color: #fffdf9;
+      transition: all 0.2s;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: #ff9933;
+      box-shadow: 0 0 0 0.2rem rgba(255, 153, 51, 0.25);
+    }
+
+    button {
+      background: linear-gradient(90deg, #ff9933, #f77f00);
+      border: none;
+      border-radius: 15px;
+      color: white;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 12px;
+      margin-top: 10px;
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(90deg, #f77f00, #d65a00);
+      box-shadow: 0 6px 15px rgba(247, 127, 0, 0.3);
+    }
+
+    .fox-footer {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 0.9em;
+      color: #6c4a1e;
+      opacity: 0.8;
+    }
+
+    .fox-paw {
+      font-size: 1.2em;
+      animation: pawWalk 2s infinite alternate ease-in-out;
+    }
+
+    @keyframes pawWalk {
+      from { transform: translateY(0px); }
+      to { transform: translateY(-4px); }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h4>Información del Estudiante</h4>
+    <form method="POST">
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label>Edad</label>
+          <input type="number" name="edad" class="form-control" required>
+        </div>
+        <div class="col-md-8 mb-3">
+          <label>Género</label>
+          <select name="genero" class="form-select" required>
+            <option value="">Selecciona...</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label>¿Vive con sus padres?</label>
+        <select name="vive_con_padres" class="form-select" required>
+          <option value="t">Sí</option>
+          <option value="f">No</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label>Estrato socioeconómico</label>
+        <input type="number" name="estrato" min="1" max="6" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label>¿Trabaja actualmente?</label>
+        <select name="trabaja" class="form-select" required>
+          <option value="f">No</option>
+          <option value="t">Sí</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label>Horas de estudio al día</label>
+        <input type="number" step="0.1" name="horas_estudio_dia" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label>Promedio anterior</label>
+        <input type="number" name="promedio_anterior" min="0" max="100" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label>Nivel educativo de los padres</label>
+        <select name="nivel_educativo_padres" class="form-select" required>
+          <option value="">Selecciona...</option>
+          <option value="Primaria">Primaria</option>
+          <option value="Secundaria">Secundaria</option>
+          <option value="Bachiller">Bachiller</option>
+          <option value="Universitario">Universitario</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label>¿Tiene acceso a internet?</label>
+        <select name="acceso_internet" class="form-select" required>
+          <option value="t">Sí</option>
+          <option value="f">No</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label>Dispositivo principal de estudio</label>
+        <select name="dispositivo_estudio" class="form-select" required>
+          <option value="Celular">Celular</option>
+          <option value="Tablet">Tablet</option>
+          <option value="Portátil">Portátil</option>
+          <option value="Computador de escritorio">Computador de escritorio</option>
+          <option value="Ninguno">Ninguno</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label>Distancia al colegio (km)</label>
+        <input type="number" step="0.1" name="distancia_colegio" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label>Nivel de motivación (1-5)</label>
+        <input type="number" name="motivacion" min="1" max="5" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label>Nivel de estrés (1-5)</label>
+        <input type="number" name="estres" min="1" max="5" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label>Apoyo familiar (1-5)</label>
+        <input type="number" name="apoyo_familiar" min="1" max="5" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label>Satisfacción con el estudio (1-5)</label>
+        <input type="number" name="satisfaccion_estudio" min="1" max="5" class="form-control" required>
+      </div>
+
+      <button type="submit" class="w-100">Guardar información 🦊</button>
+    </form>
+
+    <div class="fox-footer">
+      <span class="fox-paw">🐾</span> Proyecto RETÓMATE
+    </div>
+  </div>
+</body>
+</html>
