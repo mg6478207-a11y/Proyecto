@@ -4,46 +4,170 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RETOMATE - Mapa de Temáticas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <style>
-        body {
+        * {
             margin: 0;
-            background-color: #ffffff;
-            font-family: 'Poppins', sans-serif;
+            padding: 0;
+            box-sizing: border-box;
         }
-       
 
-        /* === MAPA === */
-        main {
+        body {
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff9a56 0%, #ff6a00 50%, #ff9a56 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(135deg, #2c1810 0%, #5d4037 100%);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            flex-wrap: wrap;
+        }
+
+        header img {
+            height: 70px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        header h1 {
+            color: #ff9a56;
+            font-size: 2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-left: 15px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        nav a:hover {
+            background: #ff9a56;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* CONTENEDOR PRINCIPAL */
+        .container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            color: white;
+            font-size: 3em;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            color: #fff3e0;
+            font-size: 1.3em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* MAPA CON IMAGEN DE FONDO */
+        .mapa-container {
             position: relative;
             width: 100%;
-            max-width: 900px;
-            height: 550px;
-            margin: 40px auto;
-            background: url("{{ url_for('static', filename='img/mapa_tesoro.png') }}") no-repeat center/cover;
-            border: 8px solid #6d4c41;
-            border-radius: 20px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.4);
+            max-width: 1000px;
+            min-height: 650px;
+            margin: 0 auto 50px;
+           background: url("{{ url_for('static', filename='img/mapa_tesoro.png') }}") no-repeat center/cover;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border: 12px solid #6d4c41;
+            border-radius: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
         }
 
-        /* === PUNTOS (UNIDADES) === */
-        .unidad {
+        /* PUNTOS DE UNIDADES */
+        .unidad-punto {
             position: absolute;
-            width: 38px;
-            height: 38px;
-            background: radial-gradient(white, #bbb);
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #ff9a56 0%, #ff6a00 100%);
+            border: 5px solid white;
             border-radius: 50%;
-            border: 3px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: white;
             cursor: pointer;
-            transition: transform 0.2s ease, background 0.3s;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            text-decoration: none;
+            z-index: 10;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
-        .unidad:hover {
-            transform: scale(1.25);
-            background: radial-gradient(#ffeb3b, #f57f17);
+        .unidad-punto:hover {
+            transform: scale(1.4) rotate(10deg);
+            box-shadow: 0 12px 30px rgba(255,106,0,0.6);
+            background: linear-gradient(135deg, #ffeb3b 0%, #ff6a00 100%);
         }
 
-        /* === POSICIONES DE CADA UNIDAD (alineadas al camino del mapa nuevo) === */
+        .unidad-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            background: rgba(44, 24, 16, 0.95);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 0.5em;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-weight: normal;
+        }
+
+        .unidad-punto:hover .unidad-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-5px);
+        }
+
+        .unidad-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: rgba(44, 24, 16, 0.95);
+        }
+
+        /* Posiciones de las unidades en el mapa */
         #u1 { top: 72%; left: 17%; }
         #u2 { top: 80%; left: 32%; }
         #u3 { top: 75%; left: 55%; }
@@ -53,61 +177,224 @@
         #u7 { top: 18%; left: 30%; }
         #u8 { top: 48%; left: 12%; }
 
-        /* Etiquetas emergentes */
-        .unidad span {
-            position: absolute;
-            top: -40px;
-            left: -30px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px 8px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            display: none;
+        /* LISTA DE UNIDADES */
+        .periodos-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        .unidad:hover span {
+        .periodo-card {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 5px solid #ff9a56;
+        }
+
+        .periodo-card h3 {
+            color: #ff6a00;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #ff9a56;
+        }
+
+        .unidad-lista {
+            list-style: none;
+        }
+
+        .unidad-lista li {
+            margin: 15px 0;
+        }
+
+        .unidad-lista a {
             display: block;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border-left: 6px solid #ff6a00;
+            border-radius: 15px;
+            color: #5d4037;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
+        .unidad-lista a:hover {
+            background: linear-gradient(135deg, #ff9a56 0%, #ff6a00 100%);
+            color: white;
+            transform: translateX(10px);
+            box-shadow: 0 6px 20px rgba(255,106,0,0.4);
+        }
+
+        /* FOOTER */
         footer {
             text-align: center;
-            margin: 25px 0;
-            font-size: 0.9rem;
-            color: #3e2723;
+            padding: 25px;
+            background: linear-gradient(135deg, #2c1810 0%, #5d4037 100%);
+            color: white;
+            font-size: 1.1em;
+            margin-top: 50px;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.3);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2em;
+            }
+
+            .periodos-container {
+                grid-template-columns: 1fr;
+            }
+
+            .mapa-container {
+                min-height: 500px;
+            }
+
+            .unidad-punto {
+                width: 55px;
+                height: 55px;
+                font-size: 1.4em;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            header h1 {
+                margin-left: 0;
+            }
+
+            nav ul {
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
-     <header>
-        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE" height="80">
-        <h1>RETOMATE</h1>
+    <header>
+        <div style="display: flex; align-items: center;">
+            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE" height="80">
+            
+            <h1>RETOMATE</h1>
+        </div>
         <nav>
             <ul>
-                <li><a href="{{ url_for('home') }}">Inicio</a></li>
-                <li><a href="{{ url_for('tematicas') }}">Temáticas</a></li>
-                <li><a href="{{ url_for('videos') }}">Videos</a></li>
-                <li><a href="{{ url_for('progreso') }}">Progreso</a></li>
-                <li><a href="{{ url_for('login') }}">Iniciar Sesión</a></li>
+                <li><a href="{{ url_for('home') }}">🏠 Inicio</a></li>
+                <li><a href="{{ url_for('tematicas') }}">📚 Temáticas</a></li>
+                <li><a href="{{ url_for('videos') }}">🎥 Videos</a></li>
+                <li><a href="{{ url_for('progreso') }}">📊 Progreso</a></li>
+                <li><a href="{{ url_for('login') }}">🔐 Iniciar Sesión</a></li>
+                <li><a href="{{ url_for('logout') }}">🚪 Cerrar Sesión</a></li>
+
             </ul>
         </nav>
     </header>
 
-    <main>
-        <!-- Cada punto lleva a una unidad -->
-        <a id="u1" class="unidad" href="{{ url_for('unidad1') }}"><span>Unidad 1: Números Naturales</span></a>
-        <a id="u2" class="unidad" href="{{ url_for('unidad2') }}"><span>Unidad 2: Teoría de Números</span></a>
-        <a id="u3" class="unidad" href="{{ url_for('unidad3') }}"><span>Unidad 3: Problemas y Conjuntos</span></a>
-        <a id="u4" class="unidad" href="{{ url_for('unidad4') }}"><span>Unidad 4: Fracciones</span></a>
-        <a id="u5" class="unidad" href="{{ url_for('unidad5') }}"><span>Unidad 5: Decimales</span></a>
-        <a id="u6" class="unidad" href="{{ url_for('unidad6') }}"><span>Unidad 6: Geometría</span></a>
-        <a id="u7" class="unidad" href="{{ url_for('unidad7') }}"><span>Unidad 7: Proporciones</span></a>
-        <a id="u8" class="unidad" href="{{ url_for('unidad8') }}"><span>Unidad 8: Estadística</span></a>
-    </main>
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">🗺 Mapa de Aventuras Matemáticas 🦊</h1>
+            <p class="page-subtitle">¡Explora las 8 unidades y conviértete en un maestro de las matemáticas!</p>
+        </div>
+
+        <!-- MAPA INTERACTIVO CON TU IMAGEN DE FONDO -->
+        <div class="mapa-container">
+            <a href="{{ url_for('unidad1') }}" id="u1" class="unidad-punto">
+                1
+                <span class="unidad-tooltip">🔢 Unidad 1: Números Naturales</span>
+            </a>
+            
+            <a href="{{ url_for('unidad2') }}" id="u2" class="unidad-punto">
+                2
+                <span class="unidad-tooltip">🧮 Unidad 2: Teoría de Números</span>
+            </a>
+            
+            <a href="{{ url_for('unidad3') }}" id="u3" class="unidad-punto">
+                3
+                <span class="unidad-tooltip">🎯 Unidad 3: Problemas y Conjuntos</span>
+            </a>
+            
+            <a href="{{ url_for('unidad4') }}" id="u4" class="unidad-punto">
+                4
+                <span class="unidad-tooltip">🍕 Unidad 4: Números Fraccionarios</span>
+            </a>
+            
+            <a href="{{ url_for('unidad5') }}" id="u5" class="unidad-punto">
+                5
+                <span class="unidad-tooltip">💯 Unidad 5: Números Decimales</span>
+            </a>
+            
+            <a href="{{ url_for('unidad6') }}" id="u6" class="unidad-punto">
+                6
+                <span class="unidad-tooltip">📐 Unidad 6: Medida y Geometría</span>
+            </a>
+            
+            <a href="{{ url_for('unidad7') }}" id="u7" class="unidad-punto">
+                7
+                <span class="unidad-tooltip">📊 Unidad 7: Razón y Proporción</span>
+            </a>
+            
+            <a href="{{ url_for('unidad8') }}" id="u8" class="unidad-punto">
+                8
+                <span class="unidad-tooltip">📈 Unidad 8: Estadística</span>
+            </a>
+        </div>
+
+        <!-- LISTA DE UNIDADES POR PERIODO -->
+        <div class="periodos-container">
+            <div class="periodo-card">
+                <h3>🌱 Primer Periodo</h3>
+                <ul class="unidad-lista">
+                    <li><a href="{{ url_for('unidad1') }}">📖 Unidad 1: Números Naturales</a></li>
+                    <li><a href="{{ url_for('unidad2') }}">🔍 Unidad 2: Teoría de Números</a></li>
+                    <li><a href="{{ url_for('unidad3') }}">🎲 Unidad 3: Problemas y Conjuntos</a></li>
+                    <li><a href="{{ url_for('unidad4') }}">🍰 Unidad 4: Números Fraccionarios</a></li>
+                </ul>
+            </div>
+
+            <div class="periodo-card">
+                <h3>🌻 Segundo Periodo</h3>
+                <ul class="unidad-lista">
+                    <li><a href="{{ url_for('unidad5') }}">💰 Unidad 5: Números Decimales</a></li>
+                    <li><a href="{{ url_for('unidad6') }}">🏗 Unidad 6: Medida y Geometría</a></li>
+                    <li><a href="{{ url_for('unidad7') }}">⚖ Unidad 7: Razón, Proporción y Porcentaje</a></li>
+                    <li><a href="{{ url_for('unidad8') }}">📉 Unidad 8: Estadística Descriptiva</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
     <footer>
-        <p>© 2025 RETOMATE - Aprende matemáticas jugando</p>
+        <p>© 2025 RETOMATE - Aprende matemáticas jugando 🦊📚✨</p>
     </footer>
+
+    <script>
+        // Animación de entrada para los puntos
+        document.addEventListener('DOMContentLoaded', function() {
+            const puntos = document.querySelectorAll('.unidad-punto');
+            puntos.forEach((punto, index) => {
+                setTimeout(() => {
+                    punto.style.animation = 'bounce 0.6s ease';
+                }, index * 100);
+            });
+        });
+
+        // Añadir animación de rebote
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes bounce {
+                0%, 100% { transform: scale(1) translateY(0); }
+                50% { transform: scale(1.2) translateY(-10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>
