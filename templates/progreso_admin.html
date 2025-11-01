@@ -5,18 +5,64 @@
   <title>Predicción de Rendimiento Académico (KNN)</title>
   <style>
   /* === Estilo general inspirado en RETÓMATE (Zorrito) === */
-  body { 
-    font-family: "Poppins", "Segoe UI", sans-serif;
-    background: linear-gradient(180deg, #fdfaf6 0%, #f2f8f5 100%);
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    color: #3b2c1a;
-  }
+  body {
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
+      background: linear-gradient(135deg, #ff9a56 0%, #ff6a00 50%, #ff9a56 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    main { max-width:1200px; margin:10px auto; padding:10px; }
+    #gameWrapper { display:flex; justify-content:center; }
+    canvas { image-rendering: pixelated; border:4px solid #111; background:#9cd1ff; }
+    /* HEADER */
+        header {
+            background: linear-gradient(135deg, #2c1810 0%, #5d4037 100%);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            flex-wrap: wrap;
+        }
+
+        header img {
+            height: 70px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        header h1 {
+            color: #ff9a56;
+            font-size: 2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-left: 15px;
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        nav a:hover {
+            background: #ff9a56;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
 
   h2 {
     margin-top: 30px;
-    color: #e26a2c; /* naranja zorrito */
+    color: #4b2e05; 
     text-shadow: 1px 1px #fcebd1;
     font-size: 26px;
   }
@@ -114,7 +160,7 @@
     display: inline-block; 
     margin: 30px 10px; 
     padding: 10px 18px; 
-    background: linear-gradient(135deg, #e26a2c, #c85018); 
+    background: linear-gradient(135deg, #2c1810, #2c1810); 
     color: #fff; 
     text-decoration: none; 
     border-radius: 10px; 
@@ -124,7 +170,7 @@
   }
 
   a.button:hover { 
-    background: linear-gradient(135deg, #f07c3d, #d86120); 
+    background: linear-gradient(135deg, #e26a2c, #c85018); 
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0,0,0,0.15);
   }
@@ -138,7 +184,23 @@
 
 </head>
 <body>
-
+<header>
+        <div style="display: flex; align-items: center;">
+            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE" height="80">
+            
+            <h1>RETOMATE</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">🏠 Inicio</a></li>
+                <li><a href="{{ url_for('tematicas') }}">📚 Temáticas</a></li>
+                <li><a href="{{ url_for('videos') }}">🎥 Videos</a></li>
+                <li><a href="{{ url_for('progreso') }}">📊 Progreso</a></li>
+                <li><a href="{{ url_for('login') }}">🔐 Iniciar Sesión</a></li>
+                <li><a href="{{ url_for('logout') }}">🚪 Cerrar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
   <h2>📊 Predicción de Rendimiento Académico (KNN)</h2>
 
   {% if grafico_knn %}
