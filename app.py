@@ -1,10 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 #import MySQLdb
-import psycopg2
-import psycopg2.extras
+import psycopg
+from psycopg.rows import dict_row
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import LabelEncoder
+from sklearn.neighbors import KNeighborsClassifier
 import io
 import base64
+import pandas as pd
 import numpy as np
 from flask_mail import Mail, Message
 import random
@@ -26,9 +29,9 @@ mail = Mail(app)
 
 # -------------------- Conexión a la base de datos --------------------
 def conectar():
-    conn = psycopg2.connect(
+    conn = psycopg.connect(
         host="dpg-d3so92h5pdvs73fp0460-a.oregon-postgres.render.com",
-        database="retomate_db",
+        dbname="retomate_db",
         user="retomate_db_user",
         password="miZj09YIgbDHOeWmL6OBUgmJ2hgj1kVX",
         port="5432",
@@ -58,7 +61,7 @@ def login():
             return render_template("login.html")
 
         db = conectar()
-        cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cur = db.cursor(row_factory=dict_row)
         cur.execute("SELECT * FROM usuarios WHERE correo=%s", (correo,))
         usuario = cur.fetchone()
         db.close()
@@ -105,21 +108,61 @@ def registro():
             flash("La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial.", "warning")
             return redirect(url_for('registro'))
 
-        # --- Encriptar ---
         hash_contrasena = generate_password_hash(contrasena, method='pbkdf2:sha256', salt_length=16)
 
-        # --- Guardar ---
         db = conectar()
         cur = db.cursor()
-        cur.execute("INSERT INTO usuarios (nombre, correo, contrasena, tipo) VALUES (%s, %s, %s, %s)",
+        cur.execute("INSERT INTO usuarios (nombre, correo, contrasena, tipo) VALUES (%s, %s, %s, %s) RETURNING id",
                     (nombre, correo, hash_contrasena, tipo))
+        usuario_id = cur.fetchone()[0]
         db.commit()
         db.close()
+
+        # Si es estudiante, pasar a llenar información adicional
+        if tipo == 'estudiante':
+            session['nuevo_usuario_id'] = usuario_id
+            flash("Por favor completa tu información académica.", "info")
+            return redirect(url_for('registro_estudiante'))
 
         flash("Usuario registrado correctamente.", "success")
         return redirect(url_for('login'))
 
     return render_template("registro.html")
+
+#-----------------------------------Registro_estudiante------------------------------------
+@app.route('/registro_estudiante', methods=['GET', 'POST'])
+def registro_estudiante():
+    if 'nuevo_usuario_id' not in session:
+        return redirect(url_for('registro'))
+
+    if request.method == 'POST':
+        data = request.form
+        db = conectar()
+        cur = db.cursor()
+        cur.execute("""
+            INSERT INTO informacion_estudiantes (
+                usuario_id, edad, genero, vive_con_padres, estrato, trabaja,
+                horas_estudio_dia, promedio_anterior, nivel_educativo_padres,
+                acceso_internet, dispositivo_estudio, distancia_colegio,
+                motivacion, estres, apoyo_familiar, satisfaccion_estudio, fecha_registro
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+        """, (
+            session['nuevo_usuario_id'], data['edad'], data['genero'], data['vive_con_padres'],
+            data['estrato'], data['trabaja'], data['horas_estudio_dia'], data['promedio_anterior'],
+            data['nivel_educativo_padres'], data['acceso_internet'], data['dispositivo_estudio'],
+            data['distancia_colegio'], data['motivacion'], data['estres'], data['apoyo_familiar'],
+            data['satisfaccion_estudio']
+        ))
+        db.commit()
+        db.close()
+
+        session.pop('nuevo_usuario_id', None)
+        flash("Información del estudiante registrada correctamente.", "success")
+        return redirect(url_for('login'))
+
+    return render_template('registro_estudiante.html')
+
 
 # -------------------- Menú de videos --------------------
 @app.route('/videos')
@@ -148,18 +191,47 @@ def unidad2():
     if 'id' not in session:
         return redirect(url_for('login'))
     return render_template('unidad2.html')
+
+# -------------------- Unidad 3 --------------------
+@app.route('/unidad3')
+def unidad3():
+    if 'id' not in session:
+        return redirect(url_for('login'))
+    return render_template('unidad3.html')
+
+
 # -------------------- Unidad 4 --------------------
 @app.route('/unidad4')
 def unidad4():
     if 'id' not in session:
         return redirect(url_for('login'))
     return render_template('unidad4.html')
+
+
+# -------------------- Unidad 5 --------------------
+@app.route('/unidad5')
+def unidad5():
+    if 'id' not in session:
+        return redirect(url_for('login'))
+    return render_template('unidad5.html')
+
 # -------------------- Unidad 6 --------------------
 @app.route('/unidad6')
 def unidad6():
     if 'id' not in session:
         return redirect(url_for('login'))
     return render_template('unidad6.html')
+
+
+# -------------------- Unidad 7 --------------------
+@app.route('/unidad7')
+def unidad7():
+    if 'id' not in session:
+        return redirect(url_for('login'))
+    return render_template('unidad7.html')
+
+
+
 # -------------------- Unidad 8 --------------------
 @app.route('/unidad8')
 def unidad8():
@@ -209,127 +281,137 @@ def progreso_estudiante():
     return render_template("progreso_estudiante.html", progreso=progreso)
 
 
-# -------------------- Progreso del administrador --------------------
+# -------------------- Progreso del administrador con KNN --------------------
+# -------------------- Progreso del administrador con predicción inteligente --------------------
 @app.route('/progreso')
 def progreso():
     if 'id' not in session:
         return redirect(url_for('login'))
 
-    db = conectar()
-    cur = db.cursor()
-
-    if session['tipo'] == 'administrador':
-        # traemos nombre, unidad, puntaje, fecha
-        cur.execute("""
-            SELECT u.nombre, p.unidad, p.puntaje, p.fecha
-            FROM progreso p
-            JOIN usuarios u ON p.usuario_id = u.id
-            ORDER BY p.fecha, u.nombre, p.unidad
-        """)
-        datos = cur.fetchall()  # lista de tuplas (nombre, unidad, puntaje, fecha)
-
-        grafico_general = None
-        graficos_individuales = []  # lista de dicts: {'nombre':..., 'img':...}
-
-        if datos:
-            # --- PREPARAR DATOS ORDENADOS POR FECHA PARA GRÁFICO GENERAL ---
-            # Convertir fecha a objeto datetime si es string
-            registros = []
-            for d in datos:
-                nombre, unidad, puntaje, fecha = d
-                # detectar tipo de fecha
-                if isinstance(fecha, str):
-                    try:
-                        fecha_dt = datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
-                    except Exception:
-                        # intento con ISO
-                        fecha_dt = datetime.fromisoformat(fecha)
-                else:
-                    fecha_dt = fecha  # ya es datetime
-                registros.append((fecha_dt, nombre, unidad, float(puntaje)))
-
-            # ordenar por fecha (aunque la query ya ordenó)
-            registros.sort(key=lambda x: x[0])
-
-            # X global será índice temporal 0,1,2,...
-            y_all = np.array([r[3] for r in registros], dtype=float)
-            x_all = np.arange(len(y_all))
-
-            # cálculo de regresión global (si hay al menos 2 puntos)
-            if len(x_all) >= 2:
-                m_all, b_all = np.polyfit(x_all, y_all, 1)
-                linea_all = m_all * x_all + b_all
-            else:
-                m_all = b_all = None
-                linea_all = None
-
-            # generar gráfico general
-            plt.figure(figsize=(6,4))
-            plt.scatter(x_all, y_all, label='Puntajes', s=30)
-            if linea_all is not None:
-                plt.plot(x_all, linea_all, color='red', label='Regresión lineal')
-            plt.xlabel('Registro (tiempo)')
-            plt.ylabel('Puntaje (%)')
-            plt.title('Rendimiento general')
-            plt.legend()
-            plt.tight_layout()
-
-            # pasar a base64
-            img = io.BytesIO()
-            plt.savefig(img, format='png', bbox_inches='tight')
-            img.seek(0)
-            grafico_general = base64.b64encode(img.getvalue()).decode()
-            plt.close()
-
-            # --- GRÁFICOS INDIVIDUALES (por estudiante) ---
-            # Agrupar por nombre
-            from collections import defaultdict
-            grupos = defaultdict(list)  # nombre -> list de (fecha, unidad, puntaje)
-            for fecha_dt, nombre, unidad, puntaje in registros:
-                grupos[nombre].append((fecha_dt, unidad, puntaje))
-
-            # Para cada estudiante generar su gráfico individual
-            for nombre, lista in grupos.items():
-                # ordenar por fecha
-                lista.sort(key=lambda x: x[0])
-                y = np.array([el[2] for el in lista], dtype=float)
-                x = np.arange(len(y))  # 0,1,2,...
-
-                plt.figure(figsize=(5,3))
-                plt.scatter(x, y, label='Puntajes', s=30)
-
-                # regresión por estudiante si tiene >=2 puntos
-                if len(x) >= 2:
-                    m, b = np.polyfit(x, y, 1)
-                    linea = m * x + b
-                    plt.plot(x, linea, color='red', label='Regresión')
-                plt.xlabel('Intentos / Tiempo')
-                plt.ylabel('Puntaje (%)')
-                plt.title(f'{nombre}')
-                plt.ylim(0, 105)
-                plt.legend()
-                plt.tight_layout()
-
-                img = io.BytesIO()
-                plt.savefig(img, format='png', bbox_inches='tight')
-                img.seek(0)
-                img_b64 = base64.b64encode(img.getvalue()).decode()
-                plt.close()
-
-                graficos_individuales.append({'nombre': nombre, 'img': img_b64})
-
-        db.close()
-        # renderizamos pasando la tabla 'datos' y las imágenes
-        return render_template("progreso_admin.html",
-                               datos=datos,
-                               grafico_general=grafico_general,
-                               graficos_individuales=graficos_individuales)
-
-    else:
+    if session['tipo'] != 'administrador':
+        db = conectar()
+        cur = db.cursor()
         cur.execute("SELECT unidad, puntaje, fecha FROM progreso WHERE usuario_id=%s", (session['id'],))
         progreso = cur.fetchall()
         db.close()
         return render_template("progreso_estudiante.html", progreso=progreso)
+
+    # === ADMINISTRADOR ===
+    db = conectar()
+    cur = db.cursor()
+    cur.execute("SELECT * FROM vista_datos_prediccion")
+    rows = cur.fetchall()
+    cols = [desc[0] for desc in cur.description]
+    db.close()
+
+    df = pd.DataFrame(rows, columns=cols)
+
+    if df.empty:
+        return render_template("progreso_admin.html", datos=[], grafico_knn=None)
+
+    df = df.fillna(value=np.nan)
+
+    # --- Normalizar acceso_internet ---
+    if 'acceso_internet' in df.columns:
+        df['acceso_internet_norm'] = df['acceso_internet'].astype(str).str.lower().map({
+            't': True, 'f': False, 'true': True, 'false': False,
+            '1': True, '0': False, 'yes': True, 'no': False
+        })
+        df['acceso_internet_norm'] = df['acceso_internet_norm'].fillna(False)
+    else:
+        df['acceso_internet_norm'] = False
+
+    # --- Asegurar numéricos ---
+    numeric_cols = ['edad', 'estrato', 'horas_estudio_dia', 'promedio_anterior',
+                    'motivacion', 'estres', 'apoyo_familiar', 'satisfaccion_estudio',
+                    'promedio_puntaje', 'progreso_general']
+    for c in numeric_cols:
+        df[c] = pd.to_numeric(df.get(c, 0), errors='coerce').fillna(0)
+
+    # --- Codificar rendimiento ---
+    if 'rendimiento_real' not in df.columns:
+        df['rendimiento_real'] = 'Sin datos'
+    le = LabelEncoder()
+    try:
+        df['rendimiento_label'] = le.fit_transform(df['rendimiento_real'].astype(str))
+    except Exception:
+        df['rendimiento_label'] = 0
+        le.classes_ = np.array([str(x) for x in df['rendimiento_real'].unique()])
+
+    X = df[numeric_cols].values
+    y = df['rendimiento_label'].values
+
+    # --- Entrenar KNN ---
+    if len(set(y.tolist())) > 1 and X.shape[0] > 1:
+        knn = KNeighborsClassifier(n_neighbors=3)
+        try:
+            knn.fit(X, y)
+            df['prediccion_label'] = knn.predict(X)
+        except Exception:
+            df['prediccion_label'] = y
+    else:
+        df['prediccion_label'] = y
+
+    # --- Decodificar etiquetas ---
+    try:
+        df['rendimiento_predicho'] = le.inverse_transform(df['prediccion_label'].astype(int))
+    except Exception:
+        df['rendimiento_predicho'] = df['rendimiento_real'].astype(str)
+
+    # === DESCRIPCIONES NATURALES ===
+    descripciones = []
+    for _, row in df.iterrows():
+        motivos = []
+        if not row['acceso_internet_norm']:
+            motivos.append("no cuenta con acceso estable a internet")
+        if row['horas_estudio_dia'] < 1:
+            motivos.append("dedica poco tiempo diario al estudio")
+        if row['motivacion'] <= 2:
+            motivos.append("muestra baja motivación académica")
+        if row['estres'] >= 4:
+            motivos.append("presenta altos niveles de estrés")
+        if row['apoyo_familiar'] <= 2:
+            motivos.append("recibe poco apoyo familiar")
+
+        if not motivos:
+            texto = "Demuestra un equilibrio saludable entre sus hábitos de estudio y bienestar personal."
+        else:
+            texto = "Su rendimiento podría mejorar, ya que " + ", ".join(motivos) + "."
+        descripciones.append(texto)
+    df['descripcion'] = descripciones
+
+    # === COLORES SEGÚN RENDIMIENTO ===
+    def color_por_rendimiento(valor):
+        valor = str(valor).lower()
+        if "alto" in valor:
+            return "#b6fcb6"  # verde claro
+        elif "medio" in valor:
+            return "#fff5ba"  # amarillo claro
+        elif "bajo" in valor:
+            return "#fcb6b6"  # rojo claro
+        else:
+            return "#ffffff"  # blanco por defecto
+    df['color_fila'] = df['rendimiento_predicho'].apply(color_por_rendimiento)
+
+    # === GRAFICO KNN ===
+    plt.figure(figsize=(6, 5))
+    plt.scatter(df['promedio_puntaje'], df['progreso_general'],
+                c=df['prediccion_label'], cmap='coolwarm', s=80, edgecolor='k')
+    plt.xlabel('Promedio de Puntaje (%)')
+    plt.ylabel('Progreso General (%)')
+    plt.title('Predicción de Rendimiento Académico (KNN)')
+
+    img = io.BytesIO()
+    plt.savefig(img, format='png', bbox_inches='tight')
+    img.seek(0)
+    grafico_knn = base64.b64encode(img.getvalue()).decode()
+    plt.close()
+
+    # === Enviar a plantilla ===
+    return render_template("progreso_admin.html",
+                           datos=df.to_dict(orient='records'),
+                           grafico_knn=grafico_knn)
+
 
 # -------------------- Recuperar contraseña --------------------
 

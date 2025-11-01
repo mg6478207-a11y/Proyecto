@@ -1,6 +1,6 @@
-// 🎮 RETOMATE - Unidad 1: Números Naturales
-// Versión Zorrito + Opciones móviles + Pausa + Sonidos + Envío de puntaje
-// Autores: Laura Nataly & Diego Andrés - 2025
+// 🎮 RETOMATE - Unidad 7: Razón, Proporción y Porcentaje
+// Versión Zorrito + Fondo N3-A (ciudad pixel-art colorida) + Pausa + Sonidos + Envío de puntaje
+// Autores: Laura Nataly & Diego Andrés - 2025 (adaptado para Unidad 7)
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -24,10 +24,11 @@ const sonidoSalto = new Audio("https://actions.google.com/sounds/v1/cartoon/cart
 const sonidoCorrecto = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
 const sonidoError = new Audio("https://actions.google.com/sounds/v1/cartoon/concussive_guitar_hit.ogg");
 
-// === MÚSICA DE FONDO ===
+// === MÚSICA DE FONDO (misma que Unidades 1 y 5) ===
 const musicaFondo = new Audio("/static/sounds/fondo.mp3");
-musicaFondo.volume = 0.4;
+musicaFondo.volume = 0.35;
 musicaFondo.loop = true;
+
 sonidoSalto.volume = 0.5;
 sonidoCorrecto.volume = 0.6;
 sonidoError.volume = 0.5;
@@ -40,26 +41,39 @@ let fox = {
   grounded: true
 };
 
-// === FONDO ===
-let sun = { x: 850, y: 100, r: 50, ang: 0 };
-let clouds = [
-  { x: 100, y: 80, r: 30 },
-  { x: 400, y: 120, r: 40 },
-  { x: 700, y: 90, r: 35 },
-];
+// === FONDO PIXEL-ART CIUDAD N3-A ===
+const bgImage = new Image();
+bgImage.src = "/static/img/city_pixel_n3a.jpg"; // coloca aquí la imagen pixel-art colorida (segunda imagen que elegiste)
+let parallaxX = 0;
 
-// === PREGUNTAS ===
+// edificios simplificados para parallax (dibujo por canvas en caso de no cargar imagen)
+const buildings = [];
+for (let i = 0; i < 12; i++) {
+  buildings.push({
+    x: i * 180,
+    w: 160,
+    h: 80 + Math.random() * 120,
+    color: `hsl(${Math.floor(180 + Math.random() * 60)}, 60%, ${40 + Math.random()*20}%)`
+  });
+}
+
+// === PREGUNTAS (10 preguntas: 4 Razón, 3 Proporción, 3 Porcentaje) ===
 const preguntas = [
-  { pregunta: "¿Cuál es el número natural más pequeño?", opciones: ["0", "1", "2"], correcta: 1 },
-  { pregunta: "¿Cuánto es 6 × 7?", opciones: ["36", "40", "42"], correcta: 2 },
-  { pregunta: "¿Cuál sigue después del 99?", opciones: ["100", "101", "98"], correcta: 0 },
-  { pregunta: "¿Cuál es la suma de 8 + 5?", opciones: ["12", "13", "14"], correcta: 1 },
-  { pregunta: "¿Qué número viene antes del 20?", opciones: ["19", "21", "18"], correcta: 0 },
-  { pregunta: "¿Cuál es la mitad de 10?", opciones: ["2", "5", "8"], correcta: 1 },
-  { pregunta: "¿Qué número es par?", opciones: ["7", "9", "10"], correcta: 2 },
-  { pregunta: "¿Qué número tiene dos cifras?", opciones: ["8", "12", "5"], correcta: 1 },
-  { pregunta: "¿Cuál es el doble de 4?", opciones: ["6", "8", "10"], correcta: 1 },
-  { pregunta: "¿Qué número viene después del 49?", opciones: ["48", "50", "51"], correcta: 1 },
+  // RAZÓN (4)
+  { pregunta: "En una caja hay 8 lápices rojos y 4 lápices azules. ¿Cuál es la razón rojo : azul?", opciones: ["2:1", "1:2", "8:4"], correcta: 0 },
+  { pregunta: "En un grupo de 12 estudiantes, 3 juegan fútbol y 9 juegan baloncesto. ¿Razón fútbol : baloncesto?", opciones: ["3:9", "1:3", "3:1"], correcta: 1 },
+  { pregunta: "Si hay 10 manzanas y 5 naranjas, ¿cuál es la razón manzanas : naranjas?", opciones: ["5:10", "2:1", "1:2"], correcta: 1 },
+  { pregunta: "En una bolsa hay 6 canicas verdes y 2 rojas. ¿Razón verde : rojo?", opciones: ["3:1", "1:3", "6:2"], correcta: 0 },
+
+  // PROPORCIÓN (3) — regla de 3 básica
+  { pregunta: "Si 2 cuadernos cuestan $8.000, ¿cuánto cuestan 6 cuadernos?", opciones: ["$24.000", "$14.000", "$16.000"], correcta: 0 },
+  { pregunta: "Si 3 vasos se llenan con 9 litros, ¿cuántos litros llenan 1 vaso?", opciones: ["3 litros", "27 litros", "0.33 litros"], correcta: 0 },
+  { pregunta: "Si 4 camisetas cuestan $60.000, ¿cuánto cuesta 1 camiseta?", opciones: ["$15.000", "$240.000", "$30.000"], correcta: 0 },
+
+  // PORCENTAJE (3)
+  { pregunta: "Un cuaderno cuesta $10.000 y tiene 50% de descuento. ¿Cuánto pagarás?", opciones: ["$5.000", "$15.000", "$8.000"], correcta: 0 },
+  { pregunta: "¿Cuál es el 25% de 200?", opciones: ["50", "25", "75"], correcta: 0 },
+  { pregunta: "Si una tienda aplica 10% a $20.000, ¿cuánto es el valor del 10%?", opciones: ["$2.000", "$200", "$20.000"], correcta: 0 }
 ];
 
 // === GENERAR BLOQUES DE OPCIONES ===
@@ -77,8 +91,8 @@ function generarBloquesPregunta() {
     bloques.push({
       x: 200 + i * separacion,
       y: startY,
-      w: 120,
-      h: 60,
+      w: 140,
+      h: 64,
       texto: opciones[i],
       correcta: i === preguntas[currentQuestion].correcta,
       vx: 2 * (Math.random() < 0.5 ? 1 : -1)
@@ -86,53 +100,57 @@ function generarBloquesPregunta() {
   }
 }
 
-// === DIBUJAR CIELO, SOL Y NUBES ===
-function drawSky() {
-  ctx.fillStyle = "#9cd1ff";
+// === DIBUJAR FONDO CIUDAD PIXEL-ART / PARALLAX ===
+function drawCityBackground() {
+  ctx.fillStyle = "#87CEEB";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  sun.ang += 0.01;
-  ctx.save();
-  ctx.translate(sun.x, sun.y);
-  ctx.rotate(sun.ang);
-  ctx.fillStyle = "#FFD700";
-  ctx.beginPath();
-  ctx.arc(0, 0, sun.r, 0, Math.PI * 2);
-  ctx.fill();
+  // si la imagen carga, la usamos (se estira para cubrir)
+  if (bgImage.complete && bgImage.naturalWidth !== 0) {
+    // parallax horizontal lento
+    parallaxX -= 0.3;
+    if (parallaxX < -canvas.width) parallaxX = 0;
+    // dibujar imagen dos veces para loop
+    ctx.drawImage(bgImage, parallaxX, 0, canvas.width, canvas.height);
+    ctx.drawImage(bgImage, parallaxX + canvas.width, 0, canvas.width, canvas.height);
+  } else {
+    // fallback: dibujar edificios simples (pixel-like)
+    ctx.fillStyle = "#061225";
+    ctx.fillRect(0, 0, canvas.width, 220);
 
-  ctx.strokeStyle = "#FFA500";
-  ctx.lineWidth = 4;
-  for (let i = 0; i < 12; i++) {
-    const angle = (i * Math.PI) / 6;
-    const x1 = Math.cos(angle) * sun.r;
-    const y1 = Math.sin(angle) * sun.r;
-    const x2 = Math.cos(angle) * (sun.r + 18);
-    const y2 = Math.sin(angle) * (sun.r + 18);
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
+    for (let i = 0; i < buildings.length; i++) {
+      const b = buildings[i];
+      const bx = (b.x + parallaxX * 0.5 * (i % 3 + 1)) % (canvas.width + 200);
+      ctx.fillStyle = b.color;
+      ctx.fillRect(bx - 40, canvas.height - b.h - 120, b.w, b.h);
+      // ventanas (pixel)
+      for (let wy = 20; wy < b.h; wy += 22) {
+        for (let wx = 8; wx < b.w - 8; wx += 22) {
+          if (Math.random() > 0.6) {
+            ctx.fillStyle = "#fff5a8";
+            ctx.fillRect(bx - 40 + wx, canvas.height - b.h - 120 + wy, 10, 10);
+          }
+        }
+      }
+    }
+    parallaxX -= 0.2;
   }
-  ctx.restore();
 
-  clouds.forEach(c => {
-    c.x -= 0.3;
-    c.y += Math.sin(Date.now() / 1000 + c.x / 100) * 0.15;
-    if (c.x < -80) c.x = 1080;
-    ctx.fillStyle = "white";
-    ctx.beginPath();
-    ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
-    ctx.arc(c.x + 35, c.y + 10, c.r * 0.8, 0, Math.PI * 2);
-    ctx.arc(c.x - 35, c.y + 10, c.r * 0.8, 0, Math.PI * 2);
-    ctx.fill();
-  });
+  // suelo / calle
+  ctx.fillStyle = "#2b2b2b";
+  ctx.fillRect(0, floorY, canvas.width, canvas.height - floorY);
+  // línea amarilla
+  for (let i = 0; i < canvas.width; i += 40) {
+    ctx.fillStyle = "#ffd12a";
+    ctx.fillRect(i + (Date.now() / 50 % 40), floorY + 28, 24, 6);
+  }
 }
 
-// === DIBUJAR SUELO ===
+// === DIBUJAR SUELO (oscuro sobre ciudad) ===
 function drawGround() {
-  ctx.fillStyle = "#3d9435";
-  ctx.fillRect(0, floorY, canvas.width, 50);
-  ctx.fillStyle = "#7c4a2d";
+  ctx.fillStyle = "#173b2b";
+  ctx.fillRect(0, floorY, canvas.width, 60);
+  ctx.fillStyle = "#0f291d";
   ctx.fillRect(0, floorY + 40, canvas.width, 60);
 }
 
@@ -197,31 +215,68 @@ function drawFox() {
 
 // === DIBUJAR BLOQUES ===
 function drawBlock(b) {
-  ctx.fillStyle = b.correcta ? "#b07a4a" : "#b07a4a";
+  ctx.fillStyle = b.correcta ? "#8fbf9e" : "#8fbf9e";
   ctx.fillRect(b.x, b.y, b.w, b.h);
   ctx.strokeStyle = "#000";
+  ctx.lineWidth = 2;
   ctx.strokeRect(b.x, b.y, b.w, b.h);
   ctx.fillStyle = "#000";
-  ctx.font = "20px Minecraftia";
+  ctx.font = "18px Minecraftia";
   ctx.textAlign = "center";
-  ctx.fillText(b.texto, b.x + b.w / 2, b.y + 35);
+  const lines = ("" + b.texto).split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    ctx.fillText(lines[i], b.x + b.w / 2, b.y + 30 + i * 20);
+  }
   ctx.textAlign = "left";
 }
 
-// === HUD ===
+// === HUD (wrap para preguntas largas) ===
 function drawHUD() {
-  ctx.fillStyle = "#000";
+  ctx.fillStyle = "#fff";
   ctx.font = "20px Minecraftia";
   ctx.textAlign = "left";
   ctx.fillText(`⭐ Aciertos: ${aciertos}`, 30, 50);
   ctx.fillText(`Pregunta ${Math.min(currentQuestion + 1, preguntas.length)}/${preguntas.length}`, 30, 80);
-  if (!juegoTerminado && currentQuestion < preguntas.length)
-    ctx.fillText(preguntas[currentQuestion].pregunta, 50, 150);
+
+  if (!juegoTerminado && currentQuestion < preguntas.length) {
+    const pregunta = preguntas[currentQuestion].pregunta;
+    ctx.fillStyle = "#fff";
+    ctx.font = "26px Minecraftia";
+    ctx.textAlign = "center";
+    
+    const px = canvas.width / 2;
+    const maxW = 820;
+    if (pregunta.includes("\n")) {
+      const lines = pregunta.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], px, 150 + i * 34);
+      }
+    } else {
+      // automatic wrap
+      const words = pregunta.split(' ');
+      let line = '';
+      let lines = [];
+      for (let i = 0; i < words.length; i++) {
+        const test = line + words[i] + ' ';
+        if (ctx.measureText(test).width > maxW && line.length > 0) {
+          lines.push(line.trim());
+          line = words[i] + ' ';
+        } else {
+          line = test;
+        }
+      }
+      lines.push(line.trim());
+      for (let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], px, 130 + i * 34);
+      }
+    }
+    ctx.textAlign = "left";
+  }
 }
 
 // === PARTÍCULAS ===
 function crearParticulas(x, y, color) {
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 16; i++) {
     particulas.push({
       x, y,
       vx: (Math.random() * 4) - 2,
@@ -259,7 +314,7 @@ function update() {
 
   bloques.forEach(b => {
     b.x += b.vx;
-    if (b.x <= 50 || b.x + b.w >= canvas.width - 50) b.vx *= -1;
+    if (b.x <= 20 || b.x + b.w >= canvas.width - 20) b.vx *= -1;
   });
 
   for (let b of bloques) {
@@ -332,7 +387,7 @@ function siguientePregunta() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        unidad: 1,
+        unidad: 7,
         aciertos: aciertos,
         total: totalPreguntas,
         puntaje: puntaje
@@ -349,7 +404,7 @@ function siguientePregunta() {
 // === DIBUJAR ESCENA ===
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawSky();
+  drawCityBackground();
   drawGround();
   drawHUD();
   bloques.forEach(drawBlock);
@@ -393,6 +448,7 @@ function draw() {
     ctx.fillStyle = "#FFD700";
     ctx.font = "42px Minecraftia";
     ctx.textAlign = "center";
+    // Mensaje final (opción A seleccionada previamente)
     ctx.fillText("🎉 ¡Juego Completado!", canvas.width / 2, py + 70);
     ctx.font = "28px Minecraftia";
     ctx.fillText(`⭐ Aciertos: ${aciertos}/${preguntas.length}`, canvas.width / 2, py + 120);
