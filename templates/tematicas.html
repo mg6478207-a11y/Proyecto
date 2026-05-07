@@ -1,400 +1,394 @@
-<!DOCTYPE html> 
+antiguo abajo <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RETOMATE - Mapa de Temáticas</title>
+    <title>RETOMATE - Elige tu Grado</title>
+    <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Comic Sans MS', 'Arial', sans-serif;
-            background: linear-gradient(135deg, #ff9a56 0%, #ff6a00 50%, #ff9a56 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* HEADER */
-        header {
-            background: linear-gradient(135deg, #2c1810 0%, #5d4037 100%);
-            padding: 15px 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            flex-wrap: wrap;
-        }
-
-        header img {
-            height: 70px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        header h1 {
-            color: #ff9a56;
-            font-size: 2em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            margin-left: 15px;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            transition: all 0.3s;
-            font-weight: bold;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        nav a:hover {
-            background: #ff9a56;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        /* CONTENEDOR PRINCIPAL */
-        .container {
-            max-width: 1400px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        .page-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .page-title {
-            color: white;
-            font-size: 3em;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
-            margin-bottom: 10px;
-        }
-
-        .page-subtitle {
-            color: #fff3e0;
-            font-size: 1.3em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        /* MAPA CON IMAGEN DE FONDO */
-        .mapa-container {
-            position: relative;
-            width: 100%;
-            max-width: 1000px;
-            min-height: 650px;
-            margin: 0 auto 50px;
-           background: url("{{ url_for('static', filename='img/mapa_tesoro.png') }}") no-repeat center/cover;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            border: 12px solid #6d4c41;
-            border-radius: 30px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-        }
-
-        /* PUNTOS DE UNIDADES */
-        .unidad-punto {
-            position: absolute;
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #ff9a56 0%, #ff6a00 100%);
-            border: 5px solid white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8em;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-            text-decoration: none;
-            z-index: 10;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .unidad-punto:hover {
-            transform: scale(1.4) rotate(10deg);
-            box-shadow: 0 12px 30px rgba(255,106,0,0.6);
-            background: linear-gradient(135deg, #ffeb3b 0%, #ff6a00 100%);
-        }
-
-        .unidad-tooltip {
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%) translateY(-10px);
-            background: rgba(44, 24, 16, 0.95);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 10px;
-            font-size: 0.5em;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            font-weight: normal;
-        }
-
-        .unidad-punto:hover .unidad-tooltip {
-            opacity: 1;
-            transform: translateX(-50%) translateY(-5px);
-        }
-
-        .unidad-tooltip::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 8px solid transparent;
-            border-top-color: rgba(44, 24, 16, 0.95);
-        }
-
-        /* Posiciones de las unidades en el mapa */
-        #u1 { top: 72%; left: 17%; }
-        #u2 { top: 80%; left: 32%; }
-        #u3 { top: 75%; left: 55%; }
-        #u4 { top: 53%; left: 65%; }
-        #u5 { top: 40%; left: 85%; }
-        #u6 { top: 18%; left: 65%; }
-        #u7 { top: 18%; left: 30%; }
-        #u8 { top: 48%; left: 12%; }
-
-        /* LISTA DE UNIDADES */
-        .periodos-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 30px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .periodo-card {
-            background: white;
-            border-radius: 25px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            border: 5px solid #ff9a56;
-        }
-
-        .periodo-card h3 {
-            color: #ff6a00;
-            font-size: 2em;
-            margin-bottom: 20px;
-            text-align: center;
-            padding-bottom: 15px;
-            border-bottom: 3px solid #ff9a56;
-        }
-
-        .unidad-lista {
-            list-style: none;
-        }
-
-        .unidad-lista li {
-            margin: 15px 0;
-        }
-
-        .unidad-lista a {
-            display: block;
-            padding: 15px 20px;
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-            border-left: 6px solid #ff6a00;
-            border-radius: 15px;
-            color: #5d4037;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.1em;
-            transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .unidad-lista a:hover {
-            background: linear-gradient(135deg, #ff9a56 0%, #ff6a00 100%);
-            color: white;
-            transform: translateX(10px);
-            box-shadow: 0 6px 20px rgba(255,106,0,0.4);
-        }
-
-        /* FOOTER */
-        footer {
-            text-align: center;
-            padding: 25px;
-            background: linear-gradient(135deg, #2c1810 0%, #5d4037 100%);
-            color: white;
-            font-size: 1.1em;
-            margin-top: 50px;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.3);
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .page-title {
-                font-size: 2em;
-            }
-
-            .periodos-container {
-                grid-template-columns: 1fr;
-            }
-
-            .mapa-container {
-                min-height: 500px;
-            }
-
-            .unidad-punto {
-                width: 55px;
-                height: 55px;
-                font-size: 1.4em;
-            }
-
-            header {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            header h1 {
-                margin-left: 0;
-            }
-
-            nav ul {
-                justify-content: center;
-            }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Comic Sans MS',Arial,sans-serif; min-height:100vh; overflow-x:hidden; transition:background 0.5s; }
+        body.g0 { background:linear-gradient(135deg,#ff9a56,#ff6a00,#ff9a56); }
+        body.g1 { background:linear-gradient(135deg,#bbf7d0,#4ade80,#16a34a); }
+        body.g2 { background:linear-gradient(135deg,#bae6fd,#38bdf8,#0369a1); }
+        body.g3 { background:linear-gradient(135deg,#fde68a,#fbbf24,#b45309); }
+        body.g4 { background:linear-gradient(135deg,#fecaca,#f87171,#b91c1c); }
+        body.g5 { background:linear-gradient(135deg,#ddd6fe,#a78bfa,#6d28d9); }
+        body.g6 { background:linear-gradient(135deg,#ff9a56,#ff6a00,#ff9a56); }
+        header { background:rgba(0,0,0,0.35); padding:15px 30px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 15px rgba(0,0,0,0.3); flex-wrap:wrap; backdrop-filter:blur(6px); }
+        header img { height:70px; border-radius:10px; }
+        header h1 { color:white; font-size:2em; text-shadow:2px 2px 4px rgba(0,0,0,0.5); margin-left:15px; }
+        nav ul { list-style:none; display:flex; gap:20px; flex-wrap:wrap; }
+        nav a { color:white; text-decoration:none; padding:10px 20px; border-radius:20px; transition:all 0.3s; font-weight:bold; background:rgba(255,255,255,0.15); }
+        nav a:hover { background:rgba(255,255,255,0.35); transform:translateY(-2px); }
+        .container { max-width:1100px; margin:30px auto; padding:0 20px; }
+        #panelGrados { display:block; }
+        #panelModulos { display:none; }
+        .page-header { text-align:center; margin-bottom:32px; }
+        .page-title { color:white; font-size:2.6em; text-shadow:3px 3px 6px rgba(0,0,0,0.3); margin-bottom:8px; }
+        .page-sub { color:rgba(255,255,255,0.9); font-size:1.15em; }
+        .grados-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:20px; max-width:860px; margin:0 auto; }
+        .grado-btn { background:rgba(255,255,255,0.92); border-radius:22px; padding:24px 14px; text-align:center; cursor:pointer; transition:all 0.3s; box-shadow:0 8px 24px rgba(0,0,0,0.18); border:4px solid transparent; }
+        .grado-btn:hover { transform:translateY(-8px) scale(1.06); box-shadow:0 18px 36px rgba(0,0,0,0.25); }
+        .grado-btn .emoji { font-size:2.8em; display:block; margin-bottom:8px; }
+        .grado-btn .numero { font-size:1.8em; font-weight:bold; margin-bottom:3px; }
+        .grado-btn .label { font-size:0.82em; color:#666; }
+        .g1-btn{border-color:#4ade80;} .g1-btn .numero{color:#16a34a;}
+        .g2-btn{border-color:#38bdf8;} .g2-btn .numero{color:#0369a1;}
+        .g3-btn{border-color:#fbbf24;} .g3-btn .numero{color:#b45309;}
+        .g4-btn{border-color:#f87171;} .g4-btn .numero{color:#b91c1c;}
+        .g5-btn{border-color:#a78bfa;} .g5-btn .numero{color:#6d28d9;}
+        .g6-btn{border-color:#fb923c;} .g6-btn .numero{color:#c2410c;}
+        .back-btn { display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.9); color:#333; border:none; padding:10px 22px; border-radius:20px; font-size:1em; font-family:'Comic Sans MS',Arial,sans-serif; font-weight:bold; cursor:pointer; margin-bottom:20px; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition:all 0.2s; }
+        .back-btn:hover { transform:translateX(-4px); background:white; }
+        .grado-titulo-mod { text-align:center; color:white; font-size:1.9em; margin-bottom:20px; text-shadow:2px 2px 4px rgba(0,0,0,0.3); }
+        .mapa-wrap { position:relative; width:100%; max-width:900px; margin:0 auto 30px; border-radius:24px; overflow:hidden; border:10px solid rgba(0,0,0,0.25); box-shadow:0 15px 40px rgba(0,0,0,0.4); }
+        .mapa-wrap canvas { display:block; width:100%; height:auto; }
+        footer { text-align:center; padding:22px; background:rgba(0,0,0,0.3); color:white; font-size:1em; margin-top:40px; }
+        @media(max-width:768px){
+            .page-title{font-size:1.8em;}
+            .grados-grid{grid-template-columns:repeat(3,1fr);gap:12px;}
+            .grado-btn{padding:16px 8px;}
+            .grado-btn .emoji{font-size:2em;}
+            .grado-btn .numero{font-size:1.4em;}
+            header{flex-direction:column;gap:12px;}
+            header h1{margin-left:0;}
+            nav ul{justify-content:center;}
         }
     </style>
 </head>
-<body>
-    <header>
-        <div style="display: flex; align-items: center;">
-            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE" height="80">
-            
-            <h1>RETOMATE</h1>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="{{ url_for('home') }}">🏠 Inicio</a></li>
-                <li><a href="{{ url_for('tematicas') }}">📚 Temáticas</a></li>
-                <li><a href="{{ url_for('videos') }}">🎥 Videos</a></li>
-                <li><a href="{{ url_for('progreso') }}">📊 Progreso</a></li>
-                <li><a href="{{ url_for('login') }}">🔐 Iniciar Sesión</a></li>
-                <li><a href="{{ url_for('logout') }}">🚪 Cerrar Sesión</a></li>
-
-            </ul>
-        </nav>
-    </header>
-
-    <div class="container">
+<body class="g0">
+<header>
+    <div style="display:flex;align-items:center;">
+        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE">
+        <h1>RETOMATE</h1>
+    </div>
+    <nav><ul>
+        <li><a href="{{ url_for('home') }}">🏠 Inicio</a></li>
+        <li><a href="{{ url_for('tematicas') }}">📚 Temáticas</a></li>
+        <li><a href="{{ url_for('videos') }}">🎥 Videos</a></li>
+        <li><a href="{{ url_for('progreso') }}">📊 Progreso</a></li>
+        <li><a href="{{ url_for('logout') }}">🚪 Cerrar Sesión</a></li>
+    </ul></nav>
+</header>
+<div class="container">
+    <div id="panelGrados">
         <div class="page-header">
-            <h1 class="page-title">🗺 Mapa de Aventuras Matemáticas 🦊</h1>
-            <p class="page-subtitle">¡Explora las 8 unidades y conviértete en un maestro de las matemáticas!</p>
+            <h1 class="page-title">🦊 ¿En qué grado estás?</h1>
+            <p class="page-sub">Elige tu grado para comenzar la aventura matemática</p>
         </div>
-
-        <!-- MAPA INTERACTIVO CON TU IMAGEN DE FONDO -->
-        <div class="mapa-container">
-            <a href="{{ url_for('unidad1') }}" id="u1" class="unidad-punto">
-                1
-                <span class="unidad-tooltip">🔢 Unidad 1: Números Naturales</span>
-            </a>
-            
-            <a href="{{ url_for('unidad2') }}" id="u2" class="unidad-punto">
-                2
-                <span class="unidad-tooltip">🧮 Unidad 2: Teoría de Números</span>
-            </a>
-            
-            <a href="{{ url_for('unidad3') }}" id="u3" class="unidad-punto">
-                3
-                <span class="unidad-tooltip">🎯 Unidad 3: Problemas y Conjuntos</span>
-            </a>
-            
-            <a href="{{ url_for('unidad4') }}" id="u4" class="unidad-punto">
-                4
-                <span class="unidad-tooltip">🍕 Unidad 4: Números Fraccionarios</span>
-            </a>
-            
-            <a href="{{ url_for('unidad5') }}" id="u5" class="unidad-punto">
-                5
-                <span class="unidad-tooltip">💯 Unidad 5: Números Decimales</span>
-            </a>
-            
-            <a href="{{ url_for('unidad6') }}" id="u6" class="unidad-punto">
-                6
-                <span class="unidad-tooltip">📐 Unidad 6: Medida y Geometría</span>
-            </a>
-            
-            <a href="{{ url_for('unidad7') }}" id="u7" class="unidad-punto">
-                7
-                <span class="unidad-tooltip">📊 Unidad 7: Razón y Proporción</span>
-            </a>
-            
-            <a href="{{ url_for('unidad8') }}" id="u8" class="unidad-punto">
-                8
-                <span class="unidad-tooltip">📈 Unidad 8: Estadística</span>
-            </a>
-        </div>
-
-        <!-- LISTA DE UNIDADES POR PERIODO -->
-        <div class="periodos-container">
-            <div class="periodo-card">
-                <h3>🌱 Primer Periodo</h3>
-                <ul class="unidad-lista">
-                    <li><a href="{{ url_for('unidad1') }}">📖 Unidad 1: Números Naturales</a></li>
-                    <li><a href="{{ url_for('unidad2') }}">🔍 Unidad 2: Teoría de Números</a></li>
-                    <li><a href="{{ url_for('unidad3') }}">🎲 Unidad 3: Problemas y Conjuntos</a></li>
-                    <li><a href="{{ url_for('unidad4') }}">🍰 Unidad 4: Números Fraccionarios</a></li>
-                </ul>
-            </div>
-
-            <div class="periodo-card">
-                <h3>🌻 Segundo Periodo</h3>
-                <ul class="unidad-lista">
-                    <li><a href="{{ url_for('unidad5') }}">💰 Unidad 5: Números Decimales</a></li>
-                    <li><a href="{{ url_for('unidad6') }}">🏗 Unidad 6: Medida y Geometría</a></li>
-                    <li><a href="{{ url_for('unidad7') }}">⚖ Unidad 7: Razón, Proporción y Porcentaje</a></li>
-                    <li><a href="{{ url_for('unidad8') }}">📉 Unidad 8: Estadística Descriptiva</a></li>
-                </ul>
-            </div>
+        <div class="grados-grid">
+            <div class="grado-btn g1-btn" onclick="mostrarModulos(1)"><span class="emoji">🌿</span><div class="numero">1°</div><div class="label">Selva Mágica</div></div>
+            <div class="grado-btn g2-btn" onclick="mostrarModulos(2)"><span class="emoji">🌊</span><div class="numero">2°</div><div class="label">Fondo del Mar</div></div>
+            <div class="grado-btn g3-btn" onclick="mostrarModulos(3)"><span class="emoji">🏗️</span><div class="numero">3°</div><div class="label">Ciudad en Construcción</div></div>
+            <div class="grado-btn g4-btn" onclick="mostrarModulos(4)"><span class="emoji">🚀</span><div class="numero">4°</div><div class="label">Planeta Aventura</div></div>
+            <div class="grado-btn g5-btn" onclick="mostrarModulos(5)"><span class="emoji">🔬</span><div class="numero">5°</div><div class="label">Laboratorio Secreto</div></div>
+            <div class="grado-btn g6-btn" onclick="mostrarModulos(6)"><span class="emoji">🗺️</span><div class="numero">6°</div><div class="label">Mapa del Tesoro</div></div>
         </div>
     </div>
+    <div id="panelModulos">
+        <button class="back-btn" onclick="volverGrados()">← Cambiar grado</button>
+        <h2 class="grado-titulo-mod" id="tituloGrado"></h2>
+        <div class="mapa-wrap"><canvas id="mapaCanvas" width="900" height="580"></canvas></div>
+    </div>
+</div>
+<footer><p>© 2025 RETOMATE - Aprende matemáticas jugando 🦊📚✨</p></footer>
+<script>
+const DATOS={
+    1:{titulo:'🌿 Grado 1 — Selva Mágica',modulos:[
+        {nombre:'🍎 Contemos juntos',url:'/grado1/modulo1',listo:true},
+        {nombre:'➕ Sumas divertidas',url:'/grado1/modulo2',listo:true},
+        {nombre:'➖ Restas con el zorrito',url:'/grado1/modulo3',listo:true},
+        {nombre:'🔷 Figuras y formas',url:'/grado1/modulo4',listo:true},
+        {nombre:'📏 ¿Cuánto mide?',url:'/grado1/modulo5',listo:true},
+        {nombre:'🔢 Números hasta 100',url:'/grado1/modulo6',listo:true},
+        {nombre:'🔄 Patrones y series',url:'/grado1/modulo7',listo:true},
+        {nombre:'⚖️ Comparar cantidades',url:'/grado1/modulo8',listo:true},
+    ],pos:[{x:.14,y:.72},{x:.30,y:.82},{x:.52,y:.76},{x:.68,y:.55},{x:.82,y:.38},{x:.68,y:.20},{x:.34,y:.18},{x:.14,y:.42}]},
+    2:{titulo:'🌊 Grado 2 — Fondo del Mar',modulos:[
+        {nombre:'➕ Sumas con lleva',url:'#',listo:false},{nombre:'➖ Restas con presta',url:'#',listo:false},
+        {nombre:'✖️ Tablas del 2 y 5',url:'#',listo:false},{nombre:'🔢 Decenas y unidades',url:'#',listo:false},
+        {nombre:'💯 Números hasta 1000',url:'#',listo:false},{nombre:'🔄 Patrones y series',url:'#',listo:false},
+        {nombre:'📐 Figuras planas',url:'#',listo:false},{nombre:'📅 Tiempo y calendario',url:'#',listo:false},
+    ],pos:[{x:.12,y:.75},{x:.28,y:.85},{x:.50,y:.78},{x:.66,y:.58},{x:.80,y:.40},{x:.66,y:.22},{x:.32,y:.16},{x:.12,y:.40}]},
+    3:{titulo:'🏗️ Grado 3 — Ciudad en Construcción',modulos:[
+        {nombre:'✖️ Multiplicación',url:'#',listo:false},{nombre:'➗ División exacta',url:'#',listo:false},
+        {nombre:'📋 Todas las tablas',url:'#',listo:false},{nombre:'🍕 Fracciones simples',url:'#',listo:false},
+        {nombre:'🔢 Hasta 10.000',url:'#',listo:false},{nombre:'📏 Perímetro',url:'#',listo:false},
+        {nombre:'📊 Datos y gráficos',url:'#',listo:false},{nombre:'🧩 Problemas 2 pasos',url:'#',listo:false},
+    ],pos:[{x:.14,y:.74},{x:.30,y:.84},{x:.52,y:.77},{x:.68,y:.56},{x:.82,y:.39},{x:.68,y:.21},{x:.34,y:.17},{x:.14,y:.43}]},
+    4:{titulo:'🚀 Grado 4 — Planeta Aventura',modulos:[
+        {nombre:'🔢 Múltiplos y divisores',url:'#',listo:false},{nombre:'🍕 Fracciones equiv.',url:'#',listo:false},
+        {nombre:'💯 Decimales',url:'#',listo:false},{nombre:'📐 Área y perímetro',url:'#',listo:false},
+        {nombre:'📐 Ángulos',url:'#',listo:false},{nombre:'📊 Estadística básica',url:'#',listo:false},
+        {nombre:'🧩 Problemas 3 pasos',url:'#',listo:false},{nombre:'🔢 Números negativos',url:'#',listo:false},
+    ],pos:[{x:.13,y:.73},{x:.29,y:.83},{x:.51,y:.76},{x:.67,y:.55},{x:.81,y:.38},{x:.67,y:.20},{x:.33,y:.16},{x:.13,y:.41}]},
+    5:{titulo:'🔬 Grado 5 — Laboratorio Secreto',modulos:[
+        {nombre:'🍕 Números Naturales y Sistema Decimal',url:'/Grado5_modulo1',listo:true},{nombre:'💯 Porcentajes',url:'/Grado5_modulo2',listo:true},
+        {nombre:'⚖️ Razón y proporción',url:'/Grado5_modulo3',listo:true},{nombre:'📦 Geometría 3D',url:'/Grado5_modulo4',listo:true},
+        {nombre:'📊 Estadística',url:'/Grado5_modulo5',listo:true},{nombre:'🔢 Potencias',url:'/Grado5_modulo6',listo:true},
+        {nombre:'🔠 Álgebra',url:'/Grado5_modulo7',listo:true},{nombre:'🧩 Problemas complejos',url:'/Grado5_modulo8',listo:true},
+    ],pos:[{x:.14,y:.72},{x:.30,y:.82},{x:.52,y:.75},{x:.68,y:.54},{x:.82,y:.37},{x:.68,y:.19},{x:.34,y:.15},{x:.14,y:.40}]},
+    6:{titulo:'🗺️ Grado 6 — Mapa del Tesoro',modulos:[
+        {nombre:'🔢 Números Naturales',url:'/unidad1',listo:true},{nombre:'🧮 Teoría de Números',url:'/unidad2',listo:true},
+        {nombre:'🎯 Problemas y Conjuntos',url:'/unidad3',listo:true},{nombre:'🍕 Fraccionarios',url:'/unidad4',listo:true},
+        {nombre:'💯 Decimales',url:'/unidad5',listo:true},{nombre:'📐 Medida y Geometría',url:'/unidad6',listo:true},
+        {nombre:'📊 Razón y Proporción',url:'/unidad7',listo:true},{nombre:'📈 Estadística',url:'/unidad8',listo:true},
+    ],pos:[{x:.17,y:.72},{x:.32,y:.80},{x:.55,y:.75},{x:.65,y:.53},{x:.85,y:.40},{x:.65,y:.18},{x:.30,y:.18},{x:.12,y:.48}]},
+};
 
-    <footer>
-        <p>© 2025 RETOMATE - Aprende matemáticas jugando 🦊📚✨</p>
-    </footer>
+let gradoActual=0,animFrame=null,tooltipActivo=-1,tick=0;
 
-    <script>
-        // Animación de entrada para los puntos
-        document.addEventListener('DOMContentLoaded', function() {
-            const puntos = document.querySelectorAll('.unidad-punto');
-            puntos.forEach((punto, index) => {
-                setTimeout(() => {
-                    punto.style.animation = 'bounce 0.6s ease';
-                }, index * 100);
-            });
-        });
+function mostrarModulos(g){
+    gradoActual=g;
+    document.getElementById('panelGrados').style.display='none';
+    document.getElementById('panelModulos').style.display='block';
+    document.getElementById('tituloGrado').textContent=DATOS[g].titulo;
+    document.body.className='g'+g;
+    if(animFrame)cancelAnimationFrame(animFrame);
+    tooltipActivo=-1;
+    loop();
+    configurarClics(g);
+}
+function volverGrados(){
+    if(animFrame)cancelAnimationFrame(animFrame);
+    document.getElementById('panelGrados').style.display='block';
+    document.getElementById('panelModulos').style.display='none';
+    document.body.className='g0';
+    gradoActual=0;
+}
+function loop(){
+    tick++;
+    const canvas=document.getElementById('mapaCanvas');
+    const ctx=canvas.getContext('2d');
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const P={1:pintarSelva,2:pintarMar,3:pintarCiudad,4:pintarPlaneta,5:pintarLab,6:pintarTesoro};
+    P[gradoActual](ctx,canvas.width,canvas.height,tick);
+    dibujarCamino(ctx,canvas.width,canvas.height,gradoActual);
+    dibujarPuntos(ctx,canvas.width,canvas.height,gradoActual,tick);
+    animFrame=requestAnimationFrame(loop);
+}
+function dibujarCamino(ctx,w,h,g){
+    const pos=DATOS[g].pos;
+    ctx.save();ctx.setLineDash([14,10]);ctx.lineWidth=5;
+    ctx.strokeStyle='rgba(255,255,255,0.55)';ctx.lineJoin='round';ctx.lineCap='round';
+    ctx.beginPath();
+    pos.forEach((p,i)=>i===0?ctx.moveTo(p.x*w,p.y*h):ctx.lineTo(p.x*w,p.y*h));
+    ctx.stroke();ctx.restore();
+}
+function dibujarPuntos(ctx,w,h,g,tick){
+    const data=DATOS[g];
+    const cols={1:['#15803d','#16a34a'],2:['#0c4a6e','#075985'],3:['#92400e','#b45309'],4:['#991b1b','#b91c1c'],5:['#4c1d95','#5b21b6'],6:['#9a3412','#c2410c']};
+    data.pos.forEach((p,i)=>{
+        const m=data.modulos[i];
+        const px=p.x*w,py=p.y*h;
+        const bounce=Math.sin(tick*0.04+i*0.8)*4;
+        const r=tooltipActivo===i?36:30;
+        ctx.save();ctx.translate(px,py+bounce);
+        ctx.beginPath();ctx.arc(3,4,r,0,Math.PI*2);
+        ctx.fillStyle='rgba(0,0,0,0.22)';ctx.fill();
+        ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);
+        ctx.fillStyle=m.listo?cols[g][i%2]:'rgba(80,80,80,0.75)';ctx.fill();
+        ctx.strokeStyle='white';ctx.lineWidth=4;ctx.stroke();
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        if(m.listo){
+            ctx.font='bold 20px Comic Sans MS';ctx.fillStyle='white';
+            ctx.shadowColor='rgba(0,0,0,0.4)';ctx.shadowBlur=4;
+            ctx.fillText(i+1,0,0);
+        }else{
+            ctx.font='18px serif';ctx.fillText('🔒',0,0);
+        }
+        ctx.shadowBlur=0;
+        if(tooltipActivo===i){
+            const txt=m.nombre;ctx.font='bold 13px Comic Sans MS';
+            const tw=ctx.measureText(txt).width+20,th=30;
+            const tx=-tw/2,ty=-r-th-10;
+            ctx.fillStyle='rgba(10,10,10,0.88)';
+            ctx.beginPath();ctx.roundRect(tx,ty,tw,th,8);ctx.fill();
+            ctx.beginPath();ctx.moveTo(-8,ty+th);ctx.lineTo(8,ty+th);ctx.lineTo(0,ty+th+8);ctx.closePath();ctx.fill();
+            ctx.fillStyle='white';ctx.fillText(txt,0,ty+th/2);
+        }
+        ctx.restore();
+    });
+}
+function configurarClics(g){
+    const canvas=document.getElementById('mapaCanvas');
+    canvas.onclick=(e)=>click(e,g,false);
+    canvas.onmousemove=(e)=>click(e,g,true);
+    canvas.ontouchend=(e)=>{e.preventDefault();click(e.changedTouches[0],g,false);};
+}
+function click(e,g,hover){
+    const canvas=document.getElementById('mapaCanvas');
+    const r=canvas.getBoundingClientRect();
+    const sx=canvas.width/r.width,sy=canvas.height/r.height;
+    const mx=(e.clientX-r.left)*sx,my=(e.clientY-r.top)*sy;
+    tooltipActivo=-1;
+    DATOS[g].pos.forEach((p,i)=>{
+        if(Math.hypot(mx-p.x*canvas.width,my-p.y*canvas.height)<36){
+            tooltipActivo=i;
+            if(!hover&&DATOS[g].modulos[i].listo)window.location.href=DATOS[g].modulos[i].url;
+        }
+    });
+    canvas.style.cursor=tooltipActivo>=0?'pointer':'default';
+}
 
-        // Añadir animación de rebote
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes bounce {
-                0%, 100% { transform: scale(1) translateY(0); }
-                50% { transform: scale(1.2) translateY(-10px); }
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
+// ── GRADO 1: SELVA ────────────────────────────────────────
+function pintarSelva(ctx,w,h,t){
+    ctx.fillStyle='#bbf7d0';ctx.fillRect(0,0,w,h);
+    const sx=w*.85,sy=h*.12;
+    ctx.save();ctx.fillStyle='#fde047';
+    for(let i=0;i<8;i++){const a=(i/8)*Math.PI*2+t*.01;ctx.beginPath();ctx.moveTo(sx+Math.cos(a)*28,sy+Math.sin(a)*28);ctx.lineTo(sx+Math.cos(a+.2)*40,sy+Math.sin(a+.2)*40);ctx.lineTo(sx+Math.cos(a+.4)*28,sy+Math.sin(a+.4)*28);ctx.closePath();ctx.fill();}
+    ctx.beginPath();ctx.arc(sx,sy,26,0,Math.PI*2);ctx.fillStyle='#facc15';ctx.fill();ctx.restore();
+    ctx.fillStyle='#4ade80';ctx.fillRect(0,h*.88,w,h*.12);
+    ctx.fillStyle='#16a34a';ctx.fillRect(0,h*.90,w,h*.10);
+    [{x:.05,s:1.1},{x:.18,s:.9},{x:.38,s:1.2},{x:.56,s:.85},{x:.70,s:1.0},{x:.86,s:1.1},{x:.94,s:.8}].forEach(a=>arbol(ctx,a.x*w,h*.88,a.s,t));
+    for(let i=0;i<5;i++){const bx=w*(.1+i*.18)+Math.sin(t*.03+i*2)*18,by=h*(.35+Math.sin(t*.02+i*1.5)*.1);mariposa(ctx,bx,by,t+i*20);}
+    const cf=['#f87171','#fbbf24','#a78bfa','#34d399','#f472b6'];
+    [.08,.22,.36,.50,.64,.78,.92].forEach((fx,i)=>flor(ctx,fx*w,h*.89,cf[i%cf.length]));
+}
+function arbol(ctx,x,y,s,t){
+    const sw=Math.sin(t*.02)*2*s;ctx.save();ctx.translate(x,y);
+    ctx.fillStyle='#92400e';ctx.fillRect(-6*s,-40*s,12*s,40*s);
+    ctx.fillStyle='#15803d';ctx.beginPath();ctx.arc(sw,-55*s,32*s,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#16a34a';ctx.beginPath();ctx.arc(sw-8*s,-70*s,22*s,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(sw+10*s,-68*s,20*s,0,Math.PI*2);ctx.fill();ctx.restore();
+}
+function mariposa(ctx,x,y,t){
+    const f=Math.sin(t*.15)*.5;ctx.save();ctx.translate(x,y);
+    ctx.fillStyle='#f9a8d4';
+    ctx.beginPath();ctx.ellipse(-8,0,10,6+f*4,-.4,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(8,0,10,6+f*4,.4,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#222';ctx.beginPath();ctx.ellipse(0,0,2,5,0,0,Math.PI*2);ctx.fill();ctx.restore();
+}
+function flor(ctx,x,y,c){
+    ctx.save();ctx.translate(x,y);ctx.fillStyle=c;
+    for(let i=0;i<5;i++){const a=(i/5)*Math.PI*2;ctx.beginPath();ctx.ellipse(Math.cos(a)*7,Math.sin(a)*7,5,5,a,0,Math.PI*2);ctx.fill();}
+    ctx.fillStyle='#fef08a';ctx.beginPath();ctx.arc(0,0,4,0,Math.PI*2);ctx.fill();ctx.restore();
+}
+
+// ── GRADO 2: MAR ─────────────────────────────────────────
+function pintarMar(ctx,w,h,t){
+    const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#7dd3fc');g.addColorStop(1,'#0c4a6e');
+    ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+    for(let i=0;i<12;i++){const bx=w*(.05+(i*.08)%.95),by=h-((t*.8+i*50)%(h+20));ctx.save();ctx.globalAlpha=.4;ctx.strokeStyle='white';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(bx,by,4+(i%4)*2,0,Math.PI*2);ctx.stroke();ctx.restore();}
+    ctx.fillStyle='#fbbf24';ctx.fillRect(0,h*.88,w,h*.12);
+    ctx.fillStyle='#fde68a';ctx.beginPath();ctx.ellipse(w/2,h,w*.6,h*.18,0,0,Math.PI);ctx.fill();
+    [{x:.08,c:'#f87171'},{x:.25,c:'#a78bfa'},{x:.60,c:'#f87171'},{x:.78,c:'#fb923c'},{x:.92,c:'#a78bfa'}].forEach(o=>coral(ctx,o.x*w,h*.88,o.c,t));
+    [.15,.40,.55,.70,.85].forEach((ax,i)=>alga(ctx,ax*w,h*.88,t+i*12));
+    for(let i=0;i<4;i++){const px=(t*(.6+i*.2)+i*200)%(w+100)-50,py=h*(.25+i*.12)+Math.sin(t*.03+i)*12;pez(ctx,px,py,i);}
+}
+function coral(ctx,x,y,c,t){
+    ctx.save();ctx.translate(x,y);ctx.strokeStyle=c;ctx.lineWidth=4;ctx.lineCap='round';
+    const sw=Math.sin(t*.02)*3;
+    for(let i=-2;i<=2;i++){ctx.beginPath();ctx.moveTo(i*10,0);ctx.quadraticCurveTo(i*10+sw,-20,i*8+sw,-35);ctx.stroke();ctx.beginPath();ctx.arc(i*8+sw,-36,5,0,Math.PI*2);ctx.fillStyle=c;ctx.fill();}
+    ctx.restore();
+}
+function alga(ctx,x,y,t){
+    ctx.save();ctx.translate(x,y);ctx.strokeStyle='#4ade80';ctx.lineWidth=3;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(0,0);
+    for(let i=0;i<5;i++){const sw=Math.sin(t*.025+i)*10;ctx.quadraticCurveTo(sw,-12-i*10,0,-20-i*10);}
+    ctx.stroke();ctx.restore();
+}
+function pez(ctx,x,y,t){
+    const c=['#fb923c','#f87171','#fbbf24','#34d399'][t];
+    ctx.save();ctx.translate(x,y);ctx.fillStyle=c;
+    ctx.beginPath();ctx.ellipse(0,0,18,10,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.moveTo(-18,0);ctx.lineTo(-28,-10);ctx.lineTo(-28,10);ctx.closePath();ctx.fill();
+    ctx.fillStyle='white';ctx.beginPath();ctx.arc(10,-3,4,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#111';ctx.beginPath();ctx.arc(11,-3,2,0,Math.PI*2);ctx.fill();ctx.restore();
+}
+
+// ── GRADO 3: CIUDAD ───────────────────────────────────────
+function pintarCiudad(ctx,w,h,t){
+    ctx.fillStyle='#fde68a';ctx.fillRect(0,0,w,h);
+    ctx.fillStyle='rgba(255,255,255,0.7)';
+    [[100,60,80],[350,40,100],[650,70,70],[830,50,85]].forEach(([cx,cy,r])=>{ctx.beginPath();ctx.arc(cx,cy,r*.6,0,Math.PI*2);ctx.arc(cx+r*.4,cy-r*.2,r*.4,0,Math.PI*2);ctx.arc(cx-r*.4,cy-r*.1,r*.35,0,Math.PI*2);ctx.fill();});
+    [{x:.02,w:.10,h:.55,c:'#d1d5db'},{x:.13,w:.08,h:.45,c:'#e5e7eb'},{x:.22,w:.12,h:.65,c:'#d1d5db'},{x:.55,w:.10,h:.50,c:'#e5e7eb'},{x:.66,w:.14,h:.60,c:'#d1d5db'},{x:.81,w:.09,h:.42,c:'#e5e7eb'},{x:.91,w:.08,h:.55,c:'#d1d5db'}].forEach(e=>{
+        ctx.fillStyle=e.c;ctx.fillRect(e.x*w,h*(1-e.h),e.w*w,e.h*h);
+        ctx.fillStyle='#fbbf24';
+        for(let wy=h*(1-e.h)+15;wy<h*.88;wy+=22)for(let wx=e.x*w+8;wx<(e.x+e.w)*w-10;wx+=18)ctx.fillRect(wx,wy,10,14);
+    });
+    const gx=w*.35,gy=h*.05;
+    ctx.strokeStyle='#f59e0b';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(gx,h*.88);ctx.lineTo(gx,gy);ctx.lineTo(gx+w*.18,gy);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(gx,gy+20);ctx.lineTo(gx-w*.04,gy+20);ctx.stroke();
+    const cy2=h*.25+Math.sin(t*.02)*15;
+    ctx.strokeStyle='#374151';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(gx+w*.12,gy);ctx.lineTo(gx+w*.12,cy2);ctx.stroke();
+    ctx.fillStyle='#b45309';ctx.fillRect(gx+w*.09,cy2,28,22);
+    ctx.fillStyle='#6b7280';ctx.fillRect(0,h*.88,w,h*.12);
+    for(let rx=0;rx<w;rx+=36){ctx.fillStyle='#f59e0b';ctx.fillRect(rx,h*.88,18,h*.12);}
+    ctx.fillStyle='rgba(0,0,0,0.2)';for(let rx=0;rx<w;rx+=36)ctx.fillRect(rx+18,h*.88,18,h*.12);
+}
+
+// ── GRADO 4: PLANETA ──────────────────────────────────────
+function pintarPlaneta(ctx,w,h,t){
+    ctx.fillStyle='#0f0a1e';ctx.fillRect(0,0,w,h);
+    for(let i=0;i<60;i++){const sx=(i*137.5)%w,sy=(i*97.3)%(h*.8),br=.5+.5*Math.sin(t*.05+i);ctx.globalAlpha=br;ctx.fillStyle='white';ctx.beginPath();ctx.arc(sx,sy,1.2,0,Math.PI*2);ctx.fill();}
+    ctx.globalAlpha=1;
+    ctx.fillStyle='#dc2626';ctx.beginPath();ctx.arc(w*.78,h*.22,70,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#b91c1c';ctx.beginPath();ctx.ellipse(w*.78,h*.22+10,70,20,0,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='rgba(251,191,36,.6)';ctx.lineWidth=6;ctx.beginPath();ctx.ellipse(w*.78,h*.22,95,22,-.3,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle='#7f1d1d';ctx.fillRect(0,h*.82,w,h*.18);
+    [[.1,.87,22],[.35,.91,16],[.60,.85,28],[.82,.90,18]].forEach(([cx,cy,r])=>{ctx.fillStyle='#991b1b';ctx.beginPath();ctx.ellipse(cx*w,cy*h,r,r*.4,0,0,Math.PI*2);ctx.fill();});
+    volcan(ctx,w*.18,h*.82,50,t);volcan(ctx,w*.75,h*.82,38,t+30);
+    [[.42,.80],[.55,.78],[.48,.76]].forEach(([cx,cy])=>{ctx.fillStyle='#a78bfa';ctx.beginPath();ctx.moveTo(cx*w,cy*h);ctx.lineTo(cx*w-12,h*.82);ctx.lineTo(cx*w+12,h*.82);ctx.closePath();ctx.fill();});
+}
+function volcan(ctx,x,y,s,t){
+    ctx.save();ctx.translate(x,y);ctx.fillStyle='#450a0a';ctx.beginPath();ctx.moveTo(0,-s*1.2);ctx.lineTo(-s,0);ctx.lineTo(s,0);ctx.closePath();ctx.fill();
+    if(Math.sin(t*.04)>0){ctx.fillStyle='#f97316';ctx.beginPath();ctx.ellipse(0,-s*1.1,10,6,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fbbf24';for(let i=0;i<3;i++){const lx=Math.sin(t*.1+i*2)*8,ly=-s*1.1-(t*.5+i*15)%30;ctx.beginPath();ctx.arc(lx,ly,3,0,Math.PI*2);ctx.fill();}}
+    ctx.restore();
+}
+
+// ── GRADO 5: LABORATORIO ─────────────────────────────────
+function pintarLab(ctx,w,h,t){
+    ctx.fillStyle='#1e1b4b';ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle='rgba(139,92,246,.3)';ctx.lineWidth=1;
+    for(let gx=0;gx<w;gx+=40)for(let gy=0;gy<h;gy+=40)if((gx+gy)%80===0){ctx.beginPath();ctx.moveTo(gx,gy);ctx.lineTo(gx+40,gy);ctx.lineTo(gx+40,gy+40);ctx.stroke();ctx.beginPath();ctx.arc(gx,gy,3,0,Math.PI*2);ctx.fillStyle='rgba(167,139,250,.4)';ctx.fill();}
+    [{x:.08,c:'#f87171'},{x:.20,c:'#34d399'},{x:.72,c:'#60a5fa'},{x:.84,c:'#fbbf24'}].forEach(o=>tubo(ctx,o.x*w,h*.78,o.c,t));
+    engranaje(ctx,w*.45,h*.30,45,t*.02,'#a78bfa');
+    engranaje(ctx,w*.56,h*.42,28,-t*.04,'#7c3aed');
+    engranaje(ctx,w*.33,h*.42,32,t*.03,'#6d28d9');
+    ctx.fillStyle='#312e81';ctx.fillRect(0,h*.82,w,h*.18);
+    ctx.fillStyle='#4338ca';ctx.fillRect(0,h*.82,w,8);
+    ctx.strokeStyle=`rgba(167,139,250,${.3+.3*Math.sin(t*.05)})`;ctx.lineWidth=2;
+    for(let nx=0;nx<w;nx+=60){ctx.beginPath();ctx.moveTo(nx,0);ctx.lineTo(nx+30,h);ctx.stroke();}
+}
+function tubo(ctx,x,y,c,t){
+    ctx.save();ctx.translate(x,y);const n=.4+.3*Math.sin(t*.03+x);
+    ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=2;ctx.strokeRect(-12,-60,24,60);
+    ctx.fillStyle=c;ctx.globalAlpha=.8;ctx.fillRect(-11,-60*n,22,60*n);ctx.globalAlpha=1;
+    if(Math.sin(t*.08+x)>.5){ctx.fillStyle='rgba(255,255,255,.7)';ctx.beginPath();ctx.arc(0,-60*n*.5,3,0,Math.PI*2);ctx.fill();}
+    ctx.fillStyle='#6d28d9';ctx.fillRect(-16,0,32,8);ctx.restore();
+}
+function engranaje(ctx,x,y,r,a,c){
+    ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.fillStyle=c;
+    const d=8;ctx.beginPath();
+    for(let i=0;i<d*2;i++){const ang=(i/(d*2))*Math.PI*2,rr=i%2===0?r:r*.7;i===0?ctx.moveTo(Math.cos(ang)*rr,Math.sin(ang)*rr):ctx.lineTo(Math.cos(ang)*rr,Math.sin(ang)*rr);}
+    ctx.closePath();ctx.fill();ctx.fillStyle='#1e1b4b';ctx.beginPath();ctx.arc(0,0,r*.35,0,Math.PI*2);ctx.fill();ctx.restore();
+}
+
+// ── GRADO 6: TESORO ───────────────────────────────────────
+function pintarTesoro(ctx,w,h,t){
+    ctx.fillStyle='#fef3c7';ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle='rgba(180,130,60,.15)';ctx.lineWidth=1;
+    for(let gx=0;gx<w;gx+=35){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,h);ctx.stroke();}
+    for(let gy=0;gy<h;gy+=35){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(w,gy);ctx.stroke();}
+    [[.1,.2,60],[.85,.75,45],[.5,.5,80]].forEach(([cx,cy,r])=>{ctx.fillStyle='rgba(180,130,60,.07)';ctx.beginPath();ctx.ellipse(cx*w,cy*h,r,r*.7,.3,0,Math.PI*2);ctx.fill();});
+    ctx.fillStyle='#d97706';ctx.beginPath();ctx.moveTo(0,h*.6);ctx.quadraticCurveTo(w*.25,h*.3,w*.5,h*.55);ctx.quadraticCurveTo(w*.75,h*.8,w,h*.5);ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#bae6fd';ctx.beginPath();ctx.moveTo(0,h*.6);ctx.quadraticCurveTo(w*.25,h*.3,w*.5,h*.55);ctx.quadraticCurveTo(w*.75,h*.8,w,h*.5);ctx.lineTo(w,0);ctx.lineTo(0,0);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.5)';ctx.lineWidth=2;
+    for(let i=0;i<4;i++){const oy=h*(.1+i*.08)+Math.sin(t*.03+i)*5;ctx.beginPath();for(let ox=0;ox<w;ox+=40)ctx.quadraticCurveTo(ox+20,oy-8,ox+40,oy);ctx.stroke();}
+    palmera(ctx,w*.15,h*.62,t);palmera(ctx,w*.82,h*.58,t+20);
+    ctx.font='32px serif';ctx.fillText('💀',w*.62,h*.35);
+    ctx.font='24px serif';ctx.fillText('⚓',w*.78,h*.20);
+    const br=.5+.5*Math.sin(t*.06);ctx.globalAlpha=br*.8;ctx.font='28px serif';ctx.fillText('✨',w*.50,h*.50);ctx.globalAlpha=1;
+}
+function palmera(ctx,x,y,t){
+    ctx.save();ctx.translate(x,y);ctx.strokeStyle='#92400e';ctx.lineWidth=8;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(10,-30,5,-65);ctx.stroke();
+    const sw=Math.sin(t*.02)*4;ctx.fillStyle='#15803d';
+    [[-30,-5],[-15,-15],[5,-18],[20,-10],[25,0]].forEach(([lx,ly])=>{ctx.beginPath();ctx.ellipse(5+lx+sw,-65+ly,22,8,Math.atan2(ly,lx),0,Math.PI*2);ctx.fill();});
+    ctx.fillStyle='#78350f';ctx.beginPath();ctx.arc(2+sw*.3,-62,5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(10+sw*.3,-58,5,0,Math.PI*2);ctx.fill();ctx.restore();
+}
+</script>
 </body>
 </html>

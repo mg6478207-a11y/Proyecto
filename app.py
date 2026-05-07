@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 #import MySQLdb
-import psycopg
+#import psycopg
+import pyodbc
 from psycopg.rows import dict_row
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
@@ -29,19 +30,13 @@ mail = Mail(app)
 
 # -------------------- Conexión a la base de datos --------------------
 def conectar():
-    conn = psycopg.connect(
-        host="dpg-d3so92h5pdvs73fp0460-a.oregon-postgres.render.com",
-        dbname="retomate_db",
-        user="retomate_db_user",
-        password="miZj09YIgbDHOeWmL6OBUgmJ2hgj1kVX",
-        port="5432",
-        sslmode="require"
+    conn = pyodbc.connect(
+        "DRIVER={ODBC Driver 17 for SQL Server};"
+        "SERVER=localhost\\SQLEXPRESS;"
+        "DATABASE=retomate;"
+        "Trusted_Connection=yes;"
     )
-    # fijar la zona horaria de la sesión a Colombia (America/Bogota)
-    with conn.cursor() as cur:
-        cur.execute("SET TIME ZONE 'America/Bogota';")
     return conn
-
 # -------------------- Página principal --------------------
 @app.route('/')
 def home():
@@ -61,12 +56,23 @@ def login():
             return render_template("login.html")
 
         db = conectar()
-        cur = db.cursor(row_factory=dict_row)
-        cur.execute("SELECT * FROM usuarios WHERE correo=%s", (correo,))
-        usuario = cur.fetchone()
+        cur = db.cursor()
+
+        # 🔹 Traer datos específicos (mejor práctica)
+        cur.execute("SELECT id, nombre, correo, contrasena, tipo FROM usuarios WHERE correo=?", (correo,))
+        row = cur.fetchone()
         db.close()
 
-        if usuario:
+        if row:
+            # 🔹 Convertir a diccionario manualmente
+            usuario = {
+                "id": row[0],
+                "nombre": row[1],
+                "correo": row[2],
+                "contrasena": row[3],
+                "tipo": row[4]
+            }
+
             if check_password_hash(usuario['contrasena'], contrasena):
                 session['id'] = usuario['id']
                 session['nombre'] = usuario['nombre']
@@ -85,8 +91,6 @@ def login():
             flash("El correo no está registrado.", "danger")
 
     return render_template("login.html")
-
-
 # -------------------- Registro --------------------
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
@@ -108,19 +112,41 @@ def registro():
             flash("La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial.", "warning")
             return redirect(url_for('registro'))
 
-        hash_contrasena = generate_password_hash(contrasena, method='pbkdf2:sha256', salt_length=16)
+        # 🔐 Encriptar contraseña
+        contrasena_hash = generate_password_hash(contrasena)
 
         db = conectar()
         cur = db.cursor()
-        cur.execute("INSERT INTO usuarios (nombre, correo, contrasena, tipo) VALUES (%s, %s, %s, %s) RETURNING id",
-                    (nombre, correo, hash_contrasena, tipo))
-        usuario_id = cur.fetchone()[0]
+
+        # 🔍 Validar si el correo ya existe (MUY IMPORTANTE)
+        cur.execute("SELECT id FROM usuarios WHERE correo = ?", (correo,))
+        if cur.fetchone():
+            db.close()
+            flash("El correo ya está registrado.", "warning")
+            return redirect(url_for('registro'))
+
+        # ✅ Insertar usuario + obtener ID (FORMA PRO)
+        cur.execute("""
+            INSERT INTO usuarios (nombre, correo, contrasena, tipo)
+            OUTPUT INSERTED.id
+            VALUES (?, ?, ?, ?)
+        """, (nombre, correo, contrasena_hash, tipo))
+
+        row = cur.fetchone()
+
+        if row and row[0]:
+            user_id = int(row[0])
+        else:
+            db.close()
+            flash("Error al obtener el ID del usuario.", "danger")
+            return redirect(url_for('registro'))
+
         db.commit()
         db.close()
 
-        # Si es estudiante, pasar a llenar información adicional
+        # Si es estudiante → guardar ID en sesión
         if tipo == 'estudiante':
-            session['nuevo_usuario_id'] = usuario_id
+            session['nuevo_usuario_id'] = user_id
             flash("Por favor completa tu información académica.", "info")
             return redirect(url_for('registro_estudiante'))
 
@@ -129,7 +155,8 @@ def registro():
 
     return render_template("registro.html")
 
-#-----------------------------------Registro_estudiante------------------------------------
+
+# ----------------------------------- Registro_estudiante ------------------------------------
 @app.route('/registro_estudiante', methods=['GET', 'POST'])
 def registro_estudiante():
     if 'nuevo_usuario_id' not in session:
@@ -137,8 +164,10 @@ def registro_estudiante():
 
     if request.method == 'POST':
         data = request.form
+
         db = conectar()
         cur = db.cursor()
+
         cur.execute("""
             INSERT INTO informacion_estudiantes (
                 usuario_id, edad, genero, vive_con_padres, estrato, trabaja,
@@ -146,24 +175,35 @@ def registro_estudiante():
                 acceso_internet, dispositivo_estudio, distancia_colegio,
                 motivacion, estres, apoyo_familiar, satisfaccion_estudio, fecha_registro
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())
         """, (
-            session['nuevo_usuario_id'], data['edad'], data['genero'], data['vive_con_padres'],
-            data['estrato'], data['trabaja'], data['horas_estudio_dia'], data['promedio_anterior'],
-            data['nivel_educativo_padres'], data['acceso_internet'], data['dispositivo_estudio'],
-            data['distancia_colegio'], data['motivacion'], data['estres'], data['apoyo_familiar'],
+            session['nuevo_usuario_id'],
+            data['edad'],
+            data['genero'],
+            data['vive_con_padres'],
+            data['estrato'],
+            data['trabaja'],
+            data['horas_estudio_dia'],
+            data['promedio_anterior'],
+            data['nivel_educativo_padres'],
+            data['acceso_internet'],
+            data['dispositivo_estudio'],
+            data['distancia_colegio'],
+            data['motivacion'],
+            data['estres'],
+            data['apoyo_familiar'],
             data['satisfaccion_estudio']
         ))
+
         db.commit()
         db.close()
 
         session.pop('nuevo_usuario_id', None)
+
         flash("Información del estudiante registrada correctamente.", "success")
         return redirect(url_for('login'))
 
     return render_template('registro_estudiante.html')
-
-
 # -------------------- Menú de videos --------------------
 @app.route('/videos')
 def videos():
@@ -238,6 +278,36 @@ def unidad8():
     if 'id' not in session:
         return redirect(url_for('login'))
     return render_template('unidad8.html')
+
+# -------------------- Grado 5 | Módulo 1 --------------------
+@app.route('/Grado5_modulo1')
+def Grado5_modulo1():
+    if 'id' not in session:
+        return redirect(url_for('login'))
+    return render_template('Grado5_modulo1.html')
+
+# -------------------- Grado 5 | Módulo 2 --------------------
+@app.route('/Grado5_modulo2')
+def Grado5_modulo2():
+    if 'id' not in session:
+        return redirect(url_for('login'))
+    return render_template('Grado5_modulo2.html')
+
+# -------------------- Grado 5 | Módulo 3 --------------------
+@app.route('/Grado5_modulo3')
+def Grado5_modulo3():
+    if 'id' not in session:
+        return redirect(url_for('login'))
+    return render_template('Grado5_modulo3.html')
+
+# -------------------- Grado 5 | Módulo 4 --------------------
+@app.route('/Grado5_modulo4')
+def Grado5_modulo4():
+    if 'id' not in session:
+        return redirect(url_for('login'))
+    return render_template('Grado5_modulo4.html')
+
+
 # -------------------- Guardar progreso --------------------
 @app.route('/guardar_progreso', methods=['POST'])
 def guardar_progreso():
@@ -254,7 +324,7 @@ def guardar_progreso():
     cur = db.cursor()
     cur.execute("""
         INSERT INTO progreso (usuario_id, unidad, aciertos, total, puntaje, fecha)
-        VALUES (%s, %s, %s, %s, %s, NOW())
+        VALUES (?, ?, ?, ?, ?, GETDATE())
     """, (session['id'], unidad, aciertos, total, puntaje))
     db.commit()
     db.close()
@@ -272,7 +342,7 @@ def progreso_estudiante():
     cur.execute("""
         SELECT unidad, puntaje, fecha
         FROM progreso
-        WHERE usuario_id = %s
+        WHERE usuario_id = ?
         ORDER BY fecha DESC
     """, (session['id'],))
     progreso = cur.fetchall()
@@ -291,7 +361,7 @@ def progreso():
     if session['tipo'] != 'administrador':
         db = conectar()
         cur = db.cursor()
-        cur.execute("SELECT unidad, puntaje, fecha FROM progreso WHERE usuario_id=%s", (session['id'],))
+        cur.execute("SELECT unidad, puntaje, fecha FROM progreso WHERE usuario_id=?", (session['id'],))
         progreso = cur.fetchall()
         db.close()
         return render_template("progreso_estudiante.html", progreso=progreso)
@@ -304,7 +374,10 @@ def progreso():
     cols = [desc[0] for desc in cur.description]
     db.close()
 
-    df = pd.DataFrame(rows, columns=cols)
+    print("Columnas:", cols)
+    print("Primer row:", rows[0] if rows else "Sin datos")
+
+    df = pd.DataFrame.from_records(rows, columns=cols)
 
     if df.empty:
         return render_template("progreso_admin.html", datos=[], grafico_knn=None)
@@ -422,7 +495,7 @@ def recuperar():
 
         conexion = conectar()
         cursor = conexion.cursor()
-        cursor.execute("SELECT id FROM usuarios WHERE correo = %s", (correo,))
+        cursor.execute("SELECT id FROM usuarios WHERE correo = ?", (correo,))
         usuario = cursor.fetchone()
         conexion.close()
 
@@ -471,7 +544,7 @@ def nueva_contrasena():
 
             conexion = conectar()
             cursor = conexion.cursor()
-            cursor.execute("UPDATE usuarios SET contrasena = %s WHERE correo = %s", (hashed, correo))
+            cursor.execute("UPDATE usuarios SET contrasena = ? WHERE correo = ?", (hashed, correo))
             conexion.commit()
             conexion.close()
 
