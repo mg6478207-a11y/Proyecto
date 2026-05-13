@@ -30,13 +30,18 @@ mail = Mail(app)
 
 # -------------------- Conexión a la base de datos --------------------
 def conectar():
-    conn = pyodbc.connect(
-        "DRIVER={ODBC Driver 17 for SQL Server};"
-        "SERVER=localhost\\SQLEXPRESS;"
-        "DATABASE=retomate;"
-        "Trusted_Connection=yes;"
+    # Cadena de conexión para Azure SQL
+    conn_str = (
+        "Driver={ODBC Driver 18 for SQL Server};"
+        "Server=servidor-nataly-udec.database.windows.net,1433;"
+        "Database=retomate_DB;"
+        "Uid=nataly_admin;"
+        "Pwd=ServiNata.07;"
+        "Encrypt=yes;"
+        "TrustServerCertificate=no;"
+        "Connection Timeout=30;"
     )
-    return conn
+    return pyodbc.connect(conn_str)
 # -------------------- Página principal --------------------
 @app.route('/')
 def home():
