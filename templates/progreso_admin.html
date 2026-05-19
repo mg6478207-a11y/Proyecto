@@ -2,253 +2,138 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Predicción de Rendimiento Académico (KNN)</title>
+  <title>Panel Administrador - RETOMATE</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-  /* === Estilo general inspirado en RETÓMATE (Zorrito) === */
-  body {
-      font-family: 'Comic Sans MS', 'Arial', sans-serif;
-      background: linear-gradient(135deg, #ff9a56 0%, #ff6a00 50%, #ff9a56 100%);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-    main { max-width:1200px; margin:10px auto; padding:10px; }
-    #gameWrapper { display:flex; justify-content:center; }
-    canvas { image-rendering: pixelated; border:4px solid #111; background:#9cd1ff; }
-    /* HEADER */
-        header {
-            background: linear-gradient(135deg, #2c1810 0%, #5d4037 100%);
-            padding: 15px 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            flex-wrap: wrap;
-        }
-
-        header img {
-            height: 70px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        header h1 {
-            color: #ff9a56;
-            font-size: 2em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            margin-left: 15px;
-        }
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            transition: all 0.3s;
-            font-weight: bold;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        nav a:hover {
-            background: #ff9a56;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-  h2 {
-    margin-top: 30px;
-    color: #4b2e05; 
-    text-shadow: 1px 1px #fcebd1;
-    font-size: 26px;
-  }
-
-  h3 {
-    color: #4b2e05; 
-    margin-top: 15px;
-  }
-
-  /* === Tarjeta general === */
-  .gral { 
-    margin: 25px auto; 
-    width: 900px; 
-    background: #fffdf9; 
-    padding: 20px; 
-    border-radius: 16px; 
-    box-shadow: 0 4px 12px rgba(90, 60, 20, 0.15);
-    border: 2px solid #f7d3a0;
-  }
-
-  /* === Gráfico === */
-  img { 
-    max-width: 100%; 
-    height: auto; 
-    display: block; 
-    margin: 20px auto; 
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  }
-
-  p {
-    font-size: 14px;
-    color: #5a4b38;
-  }
-
-  /* === Tabla de datos === */
-  table { 
-    margin: 25px auto; 
-    border-collapse: collapse; 
-    background: #fffdf9; 
-    width: 950px; 
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 4px 10px rgba(90, 60, 20, 0.1);
-  }
-
-  th, td { 
-    padding: 12px 14px; 
-    border-bottom: 1px solid #f0e6da; 
-    font-size: 14px; 
-    text-align: center;
-  }
-
-  th { 
-    background: #e26a2c; 
-    color: #fff; 
-    font-size: 15px;
-    letter-spacing: 0.5px;
-  }
-
-  tr:last-child td { border-bottom: none; }
-
-  /* === Colores según rendimiento === */
-  .alto { 
-    background-color: #d8f8d0; 
-    color: #226622; 
-    font-weight: bold;
-    border-radius: 6px;
-  }
-
-  .medio { 
-    background-color: #fff3c4; 
-    color: #8a6500; 
-    font-weight: bold;
-    border-radius: 6px;
-  }
-
-  .bajo { 
-    background-color: #ffd9d9; 
-    color: #a02727; 
-    font-weight: bold;
-    border-radius: 6px;
-  }
-
-  td.descripcion {
-    text-align: left;
-    font-size: 13px;
-    line-height: 1.4em;
-    color: #3d2d19;
-    background-color: #fffaf3;
-  }
-
-  /* === Botón estilo Retómate === */
-  a.button { 
-    display: inline-block; 
-    margin: 30px 10px; 
-    padding: 10px 18px; 
-    background: linear-gradient(135deg, #2c1810, #2c1810); 
-    color: #fff; 
-    text-decoration: none; 
-    border-radius: 10px; 
-    font-weight: bold;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-  }
-
-  a.button:hover { 
-    background: linear-gradient(135deg, #e26a2c, #c85018); 
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-  }
-
-  /* === Animación ligera === */
-  tr:hover {
-    background-color: #fff7ec;
-    transition: background-color 0.2s ease;
-  }
-</style>
-
+    body { font-family:'Comic Sans MS',Arial,sans-serif; background:linear-gradient(135deg,#ff9a56 0%,#ff6a00 50%,#ff9a56 100%); min-height:100vh; }
+    header { background:linear-gradient(135deg,#2c1810,#5d4037); padding:15px 30px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 15px rgba(0,0,0,0.3); flex-wrap:wrap; }
+    header img { height:70px; border-radius:10px; }
+    header h1 { color:#ff9a56; font-size:2em; text-shadow:2px 2px 4px rgba(0,0,0,0.5); margin-left:15px; }
+    nav ul { list-style:none; display:flex; gap:20px; flex-wrap:wrap; margin:0; padding:0; }
+    nav a { color:white; text-decoration:none; padding:10px 20px; border-radius:20px; transition:all 0.3s; font-weight:bold; background:rgba(255,255,255,0.1); }
+    nav a:hover { background:#ff9a56; transform:translateY(-2px); }
+    main { max-width:1200px; margin:20px auto; padding:10px; }
+    h2 { color:#4b2e05; text-shadow:1px 1px #fcebd1; font-size:24px; margin-top:20px; }
+    /* Filtro de cursos */
+    .filtro-wrap { background:#fff9f0; border-radius:20px; padding:18px 24px; margin-bottom:22px; border:2px solid #f7d3a0; }
+    .filtro-btn { display:inline-block; padding:8px 20px; border-radius:20px; margin:4px; background:#f0e0c8; color:#4b2e05; font-weight:bold; text-decoration:none; transition:all 0.2s; border:2px solid transparent; font-size:0.92em; }
+    .filtro-btn:hover { background:#ff9933; color:#fff; }
+    .filtro-btn.activo { background:#e26a2c; color:#fff; border-color:#fff; }
+    /* Gráfico */
+    .grafico-card { background:#fffdf9; border-radius:16px; padding:20px; margin-bottom:25px; border:2px solid #f7d3a0; box-shadow:0 4px 12px rgba(90,60,20,0.1); text-align:center; }
+    /* Tabla */
+    table { width:100%; border-collapse:collapse; background:#fffdf9; border-radius:16px; overflow:hidden; box-shadow:0 4px 10px rgba(90,60,20,0.1); margin-bottom:30px; }
+    th { background:#e26a2c; color:#fff; padding:11px 12px; font-size:13px; text-align:center; }
+    td { padding:10px 12px; border-bottom:1px solid #f0e6da; font-size:13px; text-align:center; vertical-align:middle; }
+    tr:last-child td { border-bottom:none; }
+    tr:hover { background:#fff7ec; }
+    td.descripcion { text-align:left; font-size:12px; line-height:1.4; color:#3d2d19; background:#fffaf3; max-width:220px; }
+    .badge-alto  { background:#d8f8d0; color:#226622; font-weight:bold; border-radius:8px; padding:3px 10px; }
+    .badge-medio { background:#fff3c4; color:#8a6500; font-weight:bold; border-radius:8px; padding:3px 10px; }
+    .badge-bajo  { background:#ffd9d9; color:#a02727; font-weight:bold; border-radius:8px; padding:3px 10px; }
+    .badge-curso { background:#ff9933; color:#fff; border-radius:12px; padding:2px 10px; font-size:0.82em; }
+    .num-ok  { color:#2e7d32; font-weight:bold; font-size:1.1em; }
+    .num-err { color:#c62828; font-weight:bold; font-size:1.1em; }
+    a.button { display:inline-block; margin:10px 8px; padding:10px 18px; background:linear-gradient(135deg,#2c1810,#2c1810); color:#fff; text-decoration:none; border-radius:10px; font-weight:bold; transition:all 0.3s; }
+    a.button:hover { background:linear-gradient(135deg,#e26a2c,#c85018); transform:translateY(-2px); }
+  </style>
 </head>
 <body>
 <header>
-        <div style="display: flex; align-items: center;">
-            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE" height="80">
-            
-            <h1>RETOMATE</h1>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="{{ url_for('home') }}">🏠 Inicio</a></li>
-                <li><a href="{{ url_for('tematicas') }}">📚 Temáticas</a></li>
-                <li><a href="{{ url_for('videos') }}">🎥 Videos</a></li>
-                <li><a href="{{ url_for('progreso') }}">📊 Progreso</a></li>
-                <li><a href="{{ url_for('login') }}">🔐 Iniciar Sesión</a></li>
-                <li><a href="{{ url_for('logout') }}">🚪 Cerrar Sesión</a></li>
-            </ul>
-        </nav>
-    </header>
-  <h2>📊 Predicción de Rendimiento Académico (KNN)</h2>
-
+  <div style="display:flex;align-items:center;">
+    <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE">
+    <h1>RETOMATE</h1>
+  </div>
+  <nav><ul>
+    <li><a href="{{ url_for('home') }}">🏠 Inicio</a></li>
+    <li><a href="{{ url_for('tematicas') }}">📚 Temáticas</a></li>
+    <li><a href="{{ url_for('videos') }}">🎥 Videos</a></li>
+    <li><a href="{{ url_for('progreso') }}">📊 Progreso</a></li>
+    <li><a href="{{ url_for('logout') }}">🚪 Cerrar Sesión</a></li>
+  </ul></nav>
+</header>
+ 
+<main>
+  <h2>📊 Panel de Rendimiento Académico — Administrador</h2>
+ 
+  <!-- ── FILTRO POR CURSO ── -->
+  <div class="filtro-wrap">
+    <strong>🎓 Filtrar por curso:</strong><br><br>
+    <a href="{{ url_for('progreso', curso='Todos') }}"
+       class="filtro-btn {% if curso_filtro == 'Todos' %}activo{% endif %}">
+      📋 Todos los cursos
+    </a>
+    {% for c in cursos %}
+    <a href="{{ url_for('progreso', curso=c) }}"
+       class="filtro-btn {% if curso_filtro == c %}activo{% endif %}">
+      {{ c }}
+    </a>
+    {% endfor %}
+  </div>
+ 
+  <!-- ── GRÁFICO KNN ── -->
   {% if grafico_knn %}
-    <div class="gral">
-      <h3>📈 Clasificación de rendimiento</h3>
-      <img src="data:image/png;base64,{{ grafico_knn }}" alt="Gráfico KNN">
-      <p style="color:#555; font-size:14px;">
-        Este gráfico muestra la clasificación de los estudiantes según su <b>promedio</b> y <b>progreso general</b>.<br>
-        Los colores reflejan el nivel de rendimiento estimado por el modelo KNN.
-      </p>
-    </div>
+  <div class="grafico-card">
+    <h3 style="color:#4b2e05;">📈 Clasificación KNN — {{ curso_filtro }}</h3>
+    <img src="data:image/png;base64,{{ grafico_knn }}" alt="Gráfico KNN"
+         style="max-width:700px;width:100%;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+    <p style="color:#555;font-size:13px;margin-top:10px;">
+      Cada punto representa un estudiante. El color indica el nivel de rendimiento predicho por el modelo KNN.<br>
+      <span style="color:#2e7d32;font-weight:bold;">■ Alto</span> &nbsp;
+      <span style="color:#f9a825;font-weight:bold;">■ Medio</span> &nbsp;
+      <span style="color:#c62828;font-weight:bold;">■ Bajo</span>
+    </p>
+  </div>
   {% else %}
-    <p>No hay suficientes datos para generar el gráfico KNN.</p>
+    <div class="grafico-card"><p>No hay suficientes datos para generar el gráfico KNN con este filtro.</p></div>
   {% endif %}
-
+ 
+  <!-- ── TABLA DE ESTUDIANTES ── -->
   {% if datos %}
-    <h3>📋 Rendimiento por Estudiante</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Promedio (%)</th>
-          <th>Progreso (%)</th>
-          <th>Rendimiento Real</th>
-          <th>Predicción del Modelo</th>
-          <th>Descripción</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for fila in datos %}
-        {% set clase_real = 'alto' if fila.rendimiento_real|lower == 'alto' else 'medio' if fila.rendimiento_real|lower == 'medio' else 'bajo' %}
-        {% set clase_pred = 'alto' if fila.rendimiento_predicho|lower == 'alto' else 'medio' if fila.rendimiento_predicho|lower == 'medio' else 'bajo' %}
-        <tr>
-          <td>{{ fila.nombre }}</td>
-          <td>{{ "%.2f"|format(fila.promedio_puntaje) }}</td>
-          <td>{{ "%.2f"|format(fila.progreso_general) }}</td>
-          <td class="{{ clase_real }}">{{ fila.rendimiento_real }}</td>
-          <td class="{{ clase_pred }}">{{ fila.rendimiento_predicho }}</td>
-          <td class="descripcion">{{ fila.descripcion }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <h3 style="color:#4b2e05;">📋 Detalle por Estudiante — {{ curso_filtro }}</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Curso</th>
+        <th>✅ Aciertos</th>
+        <th>❌ Fallos</th>
+        <th>Partidas</th>
+        <th>Promedio (%)</th>
+        <th>Progreso (%)</th>
+        <th>Rendimiento Real</th>
+        <th>Predicción KNN</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in datos %}
+      {% set cr = f.rendimiento_real | lower %}
+      {% set cp = f.rendimiento_predicho | lower %}
+      {% set clase_r = 'alto' if 'alto' in cr else 'medio' if 'medio' in cr else 'bajo' %}
+      {% set clase_p = 'alto' if 'alto' in cp else 'medio' if 'medio' in cp else 'bajo' %}
+      <tr style="background-color: {{ f.color_fila | default('#ffffff') }};">
+        <td style="font-weight:bold;text-align:left;">{{ f.nombre }}</td>
+        <td><span class="badge-curso">{{ f.curso if f.curso else '—' }}</span></td>
+        <td class="num-ok">{{ f.total_aciertos }}</td>
+        <td class="num-err">{{ f.total_fallos }}</td>
+        <td>{{ f.partidas }}</td>
+        <td>{{ "%.1f"|format(f.promedio_puntaje) }}</td>
+        <td>{{ "%.1f"|format(f.progreso_general) }}</td>
+        <td><span class="badge-{{ clase_r }}">{{ f.rendimiento_real }}</span></td>
+        <td><span class="badge-{{ clase_p }}">{{ f.rendimiento_predicho }}</span></td>
+        <td class="descripcion">{{ f.descripcion }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
   {% else %}
-    <p>No hay registros de rendimiento disponibles.</p>
+    <p style="color:#4b2e05;margin-top:10px;">No hay registros para el curso seleccionado.</p>
   {% endif %}
-
-  <a class="button" href="/tematicas">Volver al menú</a>
-
+ 
+  <a class="button" href="{{ url_for('tematicas') }}">📚 Temáticas</a>
+  <a class="button" href="{{ url_for('home') }}">🏠 Inicio</a>
+</main>
 </body>
 </html>
+ 

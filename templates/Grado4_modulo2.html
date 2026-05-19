@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RETOMATE - Grado 4 | Unidad 2: Fracciones Equivalentes</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
+      background: linear-gradient(135deg, #3498db 0%, #2980b9 50%, #1c5980 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    main { max-width:1200px; margin:10px auto; padding:10px; }
+    #gameWrapper { display:flex; justify-content:center; }
+    canvas {
+      image-rendering: pixelated;
+      border: 4px solid #f1c40f; /* Borde dorado como las monedas de oro */
+      border-radius: 12px;
+      box-shadow: 0 10px 35px rgba(241,196,15,0.25), 0 0 60px rgba(41,128,185,0.4);
+      background: #3498db;
+    }
+    header {
+      background: linear-gradient(135deg, #1f618d 0%, #2980b9 100%);
+      padding: 15px 30px;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      flex-wrap: wrap;
+    }
+    header img { height:70px; border-radius:10px; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
+    header h1 { color:#ffffff; font-size:2em; text-shadow:0 2px 4px rgba(0,0,0,0.2); margin-left:15px; }
+    nav ul { list-style:none; display:flex; gap:20px; flex-wrap:wrap; }
+    nav a {
+      color:white; text-decoration:none; padding:10px 20px;
+      border-radius:20px; transition:all 0.3s; font-weight:bold;
+      background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2);
+    }
+    nav a:hover { background:#f1c40f; color:#1f618d; transform:translateY(-2px); box-shadow:0 4px 15px rgba(241,196,15,0.4); }
+    #hudMsg { text-align:center; font-family:'Minecraftia',monospace; margin-top:10px; color:#ffeaa7; text-shadow:0 1px 3px rgba(0,0,0,0.5); }
+    #usuario { text-align:center; font-family:'Minecraftia'; margin-bottom:10px; color:#ffeaa7; }
+    h2,h3 { color:#f1c40f; text-shadow:0 2px 4px rgba(0,0,0,0.3); }
+    p { color:#ffffff; font-size: 1.1em; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+    strong { color:#f1c40f; background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="display:flex;align-items:center;">
+      <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE">
+      <h1>RETOMATE</h1>
+    </div>
+    <nav><ul>
+      <li><a href="{{ url_for('home') }}">🏠 Inicio</a></li>
+      <li><a href="{{ url_for('tematicas') }}">📚 Temáticas</a></li>
+      <li><a href="{{ url_for('videos') }}">🎥 Videos</a></li>
+      <li><a href="{{ url_for('progreso') }}">📊 Progreso</a></li>
+      <li><a href="{{ url_for('login') }}">🔐 Iniciar Sesión</a></li>
+      <li><a href="{{ url_for('logout') }}">🚪 Cerrar Sesión</a></li>
+    </ul></nav>
+  </header>
+
+  <main>
+    <h2>🏴‍☠️ Unidad 2: Fracciones Equivalentes (Grado 4)</h2>
+    <div id="usuario">¡Capitán <strong>{{ session['nombre'] }}</strong> a la vista! 👋</div>
+    <p>
+      Las <strong>fracciones equivalentes</strong> son aquellas que representan la misma cantidad, aunque tengan números diferentes en el numerador y el denominador. ¡Vamos a descubrir los cofres ocultos en la isla!
+    </p>
+    <h3>⚓ Juego: ¡El Barco Pirata del Zorro!</h3>
+    <p>
+      Navega por las olas controlando la balsa hacia arriba o hacia abajo con las flechas <strong>↑ ↓</strong>. Mira la fracción del mapa en la parte superior y presiona la <strong>Barra Espaciadora</strong> para lanzar tu gancho de abordaje en línea recta y atrapar el cofre que tenga la fracción equivalente.
+    </p>
+    <div id="gameWrapper">
+      <canvas id="gameCanvas" width="1000" height="600"></canvas>
+    </div>
+    <p id="hudMsg">
+      <strong>↑ ↓</strong> Mover Balsa &nbsp;|&nbsp;
+      <strong>Espacio</strong> Lanzar Gancho &nbsp;|&nbsp;
+      <strong>P</strong> Pausar Juego
+    </p>
+    <input type="hidden" id="usuario_id" value="{{ session['id'] }}">
+  </main>
+
+  <script src="{{ url_for('static', filename='js/Grado4_modulo2.js') }}"></script>
+</body>
+</html>

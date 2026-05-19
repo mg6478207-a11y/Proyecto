@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RETOMATE - Grado 5 | Unidad 8: Problemas Complejos</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
+      background: linear-gradient(135deg, #1a252f 0%, #2c3e50 50%, #111a24 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    main { max-width:1200px; margin:10px auto; padding:10px; }
+    #gameWrapper { display:flex; justify-content:center; }
+    canvas {
+      image-rendering: pixelated;
+      border: 4px solid #ffcc00; /* Borde amarillo industrial a juego con la grúa y engranajes */
+      border-radius: 8px;
+      box-shadow: 0 0 35px rgba(255,204,0,0.25), 0 0 70px rgba(255,204,0,0.1);
+      background: #1a252f;
+    }
+    header {
+      background: linear-gradient(135deg, #111a24 0%, #1a252f 100%);
+      padding: 15px 30px;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(255,204,0,0.15);
+      flex-wrap: wrap;
+    }
+    header img { height:70px; border-radius:10px; box-shadow: 0 0 15px rgba(255,204,0,0.2); }
+    header h1 { color:#ffcc00; font-size:2em; text-shadow:0 0 15px rgba(255,204,0,0.4); margin-left:15px; }
+    nav ul { list-style:none; display:flex; gap:20px; flex-wrap:wrap; }
+    nav a {
+      color:white; text-decoration:none; padding:10px 20px;
+      border-radius:20px; transition:all 0.3s; font-weight:bold;
+      background:rgba(255,204,0,0.05); border:1px solid rgba(255,204,0,0.2);
+    }
+    nav a:hover { background:#ffcc00; color:#000; transform:translateY(-2px); box-shadow:0 4px 15px rgba(255,204,0,0.35); }
+    #hudMsg { text-align:center; font-family:'Minecraftia',monospace; margin-top:10px; color:#ffcc00; text-shadow:0 0 8px rgba(255,204,0,0.2); }
+    #usuario { text-align:center; font-family:'Minecraftia'; margin-bottom:10px; color:#ffeaa7; }
+    h2,h3 { color:#ffcc00; text-shadow:0 0 10px rgba(255,204,0,0.2); }
+    p { color:#e2e8f0; }
+    strong { color:#ffff44; }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="display:flex;align-items:center;">
+      <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE">
+      <h1>RETOMATE</h1>
+    </div>
+    <nav><ul>
+      <li><a href="{{ url_for('home') }}">🏠 Inicio</a></li>
+      <li><a href="{{ url_for('tematicas') }}">📚 Temáticas</a></li>
+      <li><a href="{{ url_for('videos') }}">🎥 Videos</a></li>
+      <li><a href="{{ url_for('progreso') }}">📊 Progreso</a></li>
+      <li><a href="{{ url_for('login') }}">🔐 Iniciar Sesión</a></li>
+      <li><a href="{{ url_for('logout') }}">🚪 Cerrar Sesión</a></li>
+    </ul></nav>
+  </header>
+
+  <main>
+    <h2>⚙️ Unidad 8: Resolución de Problemas Complejos</h2>
+    <div id="usuario">Bienvenido, <strong>{{ session['nombre'] }}</strong> 👋</div>
+    <p>
+      ¡Llegaste al gran desafío final! Los <strong>problemas complejos</strong> combinan todo lo que has aprendido: 
+      operaciones combinadas, fracciones, lógica y cálculo mental para llegar a una solución paso a paso.
+    </p>
+    <h3>🦊 Juego: ¡La Fábrica de Dirigibles del Zorro!</h3>
+    <p>
+      El zorro ingeniero está operando la grúa de ensamblaje en el techo. Lee el problema y muévete horizontalmente con 
+      <strong>← →</strong>. Calcula muy bien el movimiento de las vagonetas inferiores y presiona <strong>↓ (Flecha Abajo)</strong> 
+      para soltar un pesado engranaje industrial sobre la vagoneta que transporte el resultado correcto.
+    </p>
+    <div id="gameWrapper">
+      <canvas id="gameCanvas" width="1000" height="600"></canvas>
+    </div>
+    <p id="hudMsg">
+      <strong>← →</strong> Mover Grúa &nbsp;|&nbsp;
+      <strong>↓</strong> Soltar Engranaje &nbsp;|&nbsp;
+      <strong>P</strong> Pausar Juego
+    </p>
+    <input type="hidden" id="usuario_id" value="{{ session['id'] }}">
+  </main>
+
+  <script src="{{ url_for('static', filename='js/Grado5_modulo8.js') }}"></script>
+</body>
+</html>

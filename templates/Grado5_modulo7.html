@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RETOMATE - Grado 5 | Unidad 7: Álgebra</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
+      background: linear-gradient(135deg, #120a1c 0%, #1c122c 50%, #0d0714 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    main { max-width:1200px; margin:10px auto; padding:10px; }
+    #gameWrapper { display:flex; justify-content:center; }
+    canvas {
+      image-rendering: pixelated;
+      border: 4px solid #00ffcc; /* Cambiado a verde místico para combinar con los tótems del templo */
+      border-radius: 8px;
+      box-shadow: 0 0 35px rgba(0,255,200,0.3), 0 0 70px rgba(0,255,200,0.1);
+      background: #0d0a12;
+    }
+    header {
+      background: linear-gradient(135deg, #0d0a12 0%, #1a1226 100%);
+      padding: 15px 30px;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(0,255,200,0.15);
+      flex-wrap: wrap;
+    }
+    header img { height:70px; border-radius:10px; box-shadow: 0 0 15px rgba(0,255,200,0.2); }
+    header h1 { color:#00ffcc; font-size:2em; text-shadow:0 0 15px rgba(0,255,200,0.5); margin-left:15px; }
+    nav ul { list-style:none; display:flex; gap:20px; flex-wrap:wrap; }
+    nav a {
+      color:white; text-decoration:none; padding:10px 20px;
+      border-radius:20px; transition:all 0.3s; font-weight:bold;
+      background:rgba(0,255,200,0.05); border:1px solid rgba(0,255,200,0.2);
+    }
+    nav a:hover { background:#00ffcc; color:#000; transform:translateY(-2px); box-shadow:0 4px 15px rgba(0,255,200,0.4); }
+    #hudMsg { text-align:center; font-family:'Minecraftia',monospace; margin-top:10px; color:#00ffcc; text-shadow:0 0 8px rgba(0,255,200,0.3); }
+    #usuario { text-align:center; font-family:'Minecraftia'; margin-bottom:10px; color:#aafff0; }
+    h2,h3 { color:#00ffcc; text-shadow:0 0 10px rgba(0,255,200,0.3); }
+    p { color:#cbd5e1; }
+    strong { color:#ffff44; }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="display:flex;align-items:center;">
+      <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE">
+      <h1>RETOMATE</h1>
+    </div>
+    <nav><ul>
+      <li><a href="{{ url_for('home') }}">🏠 Inicio</a></li>
+      <li><a href="{{ url_for('tematicas') }}">📚 Temáticas</a></li>
+      <li><a href="{{ url_for('videos') }}">🎥 Videos</a></li>
+      <li><a href="{{ url_for('progreso') }}">📊 Progreso</a></li>
+      <li><a href="{{ url_for('login') }}">🔐 Iniciar Sesión</a></li>
+      <li><a href="{{ url_for('logout') }}">🚪 Cerrar Sesión</a></li>
+    </ul></nav>
+  </header>
+
+  <main>
+    <h2>🏛️ Unidad 7: Introducción al Álgebra</h2>
+    <div id="usuario">Bienvenido, <strong>{{ session['nombre'] }}</strong> 👋</div>
+    <p>
+      El <strong>álgebra</strong> nos ayuda a descubrir números ocultos siguiendo patrones o resolviendo igualdades. 
+      ¡El zorro arqueólogo necesita activar la energía de las ruinas descifrando el valor correcto de las incógnitas!
+    </p>
+    <h3>🦊 Juego: ¡El Templo de los Patrones Místicos!</h3>
+    <p>
+      Mueve al zorro explorador con <strong>← →</strong> y presiona <strong>↑</strong> para lanzar 
+      tu antorcha mística hacia el tótem flotante que tenga la respuesta que completa el patrón o la ecuación.
+    </p>
+    <div id="gameWrapper">
+      <canvas id="gameCanvas" width="1000" height="600"></canvas>
+    </div>
+    <p id="hudMsg">
+      <strong>← →</strong> Mover Zorro &nbsp;|&nbsp;
+      <strong>↑</strong> Lanzar Antorcha Mística &nbsp;|&nbsp;
+      <strong>P</strong> Pausar
+    </p>
+    <input type="hidden" id="usuario_id" value="{{ session['id'] }}">
+  </main>
+
+  <script src="{{ url_for('static', filename='js/Grado5_modulo7.js') }}"></script>
+</body>
+</html>
