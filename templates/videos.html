@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RETOMATE - Videos Educativos</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <style>
+    <style
         body {
             background: linear-gradient(135deg, #ff9a56 0%, #ff6a00 50%, #ff9a56 100%);
             font-family: 'Comic Sans MS', 'Arial', sans-serif;
@@ -238,6 +238,7 @@
                 <li><a href="{{ url_for('tematicas') }}">📚 Temáticas</a></li>
                 <li><a href="{{ url_for('videos') }}">🎥 Videos</a></li>
                 <li><a href="{{ url_for('progreso') }}">📊 Progreso</a></li>
+                <li><a href="{{ url_for('planes') }}">💎 Planes</a></li>
                 
                 {% if 'user_id' in session %}
                     <li><a href="{{ url_for('logout') }}" class="logout-btn">🚪 Cerrar Sesión</a></li>
@@ -568,5 +569,29 @@
             }
         });
     </script>
+    <!-- ── Smartsupp Live Chat ── -->
+<script type="text/javascript">
+  var _smartsupp = _smartsupp || {};
+  _smartsupp.key = 'dc68ffdd55d786d000505c6677df5ce9aa57e49d';
+  _smartsupp.language = 'es';
+
+  {% if session.get('nombre') %}
+  _smartsupp.name  = '{{ session["nombre"] }}';
+  _smartsupp.variables = {
+    curso: { label: 'Curso', value: '{{ session.get("curso", "Sin asignar") }}' },
+    plan:  { label: 'Plan',  value: '{{ session.get("plan",  "gratuito") }}' }
+  };
+  {% endif %}
+
+  window.smartsupp||(function(d) {
+    var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
+    s=d.getElementsByTagName('script')[0];
+    c=d.createElement('script');
+    c.type='text/javascript';c.charset='utf-8';c.async=true;
+    c.src='https://www.smartsuppchat.com/loader.js?';
+    s.parentNode.insertBefore(c,s);
+  })(document);
+</script>
+<!-- ── Fin Smartsupp ── -->
 </body>
 </html>
