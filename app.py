@@ -288,6 +288,29 @@ for _n in range(1, 9):
         endpoint=f'unidad{_n}',
         view_func=ruta_modulo(f'unidad{_n}', f'unidad{_n}.html')
     )
+# ─── MÓDULOS GRADO 1 ──────────────────────────────────────────────────────────
+for _n in range(1, 9):
+    app.add_url_rule(
+        f'/Grado1_modulo{_n}',
+        endpoint=f'Grado1_modulo{_n}',
+        view_func=ruta_modulo(f'Grado1_modulo{_n}', f'Grado1_modulo{_n}.html')
+    )
+
+# ─── MÓDULOS GRADO 2 ──────────────────────────────────────────────────────────
+for _n in range(1, 9):
+    app.add_url_rule(
+        f'/Grado2_modulo{_n}',
+        endpoint=f'Grado2_modulo{_n}',
+        view_func=ruta_modulo(f'Grado2_modulo{_n}', f'Grado2_modulo{_n}.html')
+    )
+
+# ─── MÓDULOS GRADO  3──────────────────────────────────────────────────────────
+for _n in range(1, 9):
+    app.add_url_rule(
+        f'/Grado3_modulo{_n}',
+        endpoint=f'Grado3_modulo{_n}',
+        view_func=ruta_modulo(f'Grado3_modulo{_n}', f'Grado3_modulo{_n}.html')
+    )
 
 # ─── MÓDULOS GRADO 4 ──────────────────────────────────────────────────────────
 for _n in range(1, 9):

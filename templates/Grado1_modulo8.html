@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RETOMATE - Grado 1 Módulo 8: Comparar Cantidades</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
+  <style>
+    body { font-family:'Comic Sans MS',Arial,sans-serif; background:linear-gradient(135deg,#fff7ed,#fed7aa,#fb923c); min-height:100vh; overflow-x:hidden; }
+    main { max-width:1200px; margin:10px auto; padding:10px; }
+    #gameWrapper { display:flex; justify-content:center; }
+    canvas { image-rendering:pixelated; border:4px solid #ea580c; touch-action:none; }
+    header { background:linear-gradient(135deg,#7c2d12,#ea580c); padding:15px 30px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 15px rgba(0,0,0,0.3); flex-wrap:wrap; }
+    header img { height:70px; border-radius:10px; }
+    header h1 { color:#fff7ed; font-size:2em; text-shadow:2px 2px 4px rgba(0,0,0,0.5); margin-left:15px; }
+    nav ul { list-style:none; display:flex; gap:20px; flex-wrap:wrap; }
+    nav a { color:white; text-decoration:none; padding:10px 20px; border-radius:20px; transition:all 0.3s; font-weight:bold; background:rgba(255,255,255,0.15); }
+    nav a:hover { background:rgba(255,255,255,0.35); transform:translateY(-2px); }
+    #hudMsg { text-align:center; font-family:'Minecraftia',monospace; margin-top:8px; color:#7c2d12; font-size:12px; }
+    #usuario { text-align:center; font-family:'Minecraftia'; margin-bottom:10px; color:#7c2d12; }
+    @media(max-width:768px){ canvas{width:100%!important;height:auto!important;} }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="display:flex;align-items:center;">
+      <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE">
+      <h1>RETOMATE</h1>
+    </div>
+    <nav><ul>
+      <li><a href="{{ url_for('home') }}">🏠 Inicio</a></li>
+      <li><a href="{{ url_for('tematicas') }}">📚 Temáticas</a></li>
+      <li><a href="{{ url_for('videos') }}">🎥 Videos</a></li>
+      <li><a href="{{ url_for('progreso') }}">📊 Progreso</a></li>
+      <li><a href="{{ url_for('logout') }}">🚪 Cerrar Sesión</a></li>
+    </ul></nav>
+  </header>
+  <main>
+    <h2>⚖️ Grado 1 - Módulo 8: ¡Comparar Cantidades!</h2>
+    <div id="usuario">¡Hola, 📊 Comparar cantidades nos ayuda a saber cuál es mayor o menor. <strong>{{ session['nombre'] }}</strong>! 🦊 ¿Cuál tiene más?</div>
+    <div id="gameWrapper">
+      <canvas id="gameCanvas" width="800" height="500"></canvas>
+    </div>
+    <p id="hudMsg">💻 Haz clic en tu respuesta &nbsp;|&nbsp; 📱 Toca la respuesta correcta</p>
+    <input type="hidden" id="usuario_id" value="{{ session['id'] }}">
+  </main>
+  <script src="{{ url_for('static', filename='js/sonidos.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/grado1_modulo8.js') }}"></script>
+</body>
+</html>

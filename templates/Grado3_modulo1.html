@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>RETOMATE · Grado 3 · Módulo 1: Multiplicación</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
+  <style>
+    /* ── Reset ─────────────────────────────────────────────── */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Minecraftia', monospace;
+      background: linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: white;
+    }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    header {
+      background: linear-gradient(90deg, #0f172a, #1e293b, #0f172a);
+      border-bottom: 3px solid #f59e0b;
+      padding: 12px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    header img {
+      height: 58px;
+      border-radius: 6px;
+      border: 2px solid #f59e0b;
+    }
+    header h1 {
+      font-family: 'Minecraftia', monospace;
+      font-size: 1.4em;
+      color: #fbbf24;
+      text-shadow: 2px 2px 0 #92400e, 0 0 16px rgba(251,191,36,0.4);
+      letter-spacing: 2px;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    nav a {
+      font-family: 'Minecraftia', monospace;
+      color: #94a3b8;
+      text-decoration: none;
+      padding: 7px 14px;
+      border-radius: 4px;
+      font-size: 0.65em;
+      transition: all 0.2s;
+      border: 1px solid rgba(245,158,11,0.2);
+      background: rgba(245,158,11,0.06);
+      letter-spacing: 1px;
+    }
+    nav a:hover {
+      background: rgba(245,158,11,0.2);
+      color: #fbbf24;
+      border-color: #f59e0b;
+      transform: translateY(-2px);
+    }
+
+    /* ── Layout principal ───────────────────────────────────── */
+    main {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 14px 16px 20px;
+    }
+
+    /* ── Bienvenida ─────────────────────────────────────────── */
+    .bienvenida {
+      font-family: 'Minecraftia', monospace;
+      font-size: 0.7em;
+      color: #94a3b8;
+      text-align: center;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+    .bienvenida strong { color: #fbbf24; }
+
+    /* ── Introducción al tema ────────────────────────────────── */
+    .intro {
+      background: rgba(245,158,11,0.07);
+      border: 2px solid rgba(245,158,11,0.3);
+      border-radius: 6px;
+      padding: 18px 22px;
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Franja de peligro decorativa */
+    .intro::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 6px; height: 100%;
+      background: repeating-linear-gradient(
+        135deg,
+        #f59e0b 0px, #f59e0b 10px,
+        #1e293b 10px, #1e293b 20px
+      );
+    }
+    .intro-inner { padding-left: 14px; }
+
+    .intro-title {
+      font-family: 'Minecraftia', monospace;
+      font-size: 0.95em;
+      color: #fbbf24;
+      text-shadow: 1px 1px 0 #92400e;
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+
+    .intro-body {
+      font-family: 'Minecraftia', monospace;
+      font-size: 0.62em;
+      color: #cbd5e1;
+      line-height: 2;
+      margin-bottom: 12px;
+    }
+    .intro-body strong { color: #fbbf24; }
+
+    /* Ejemplos en "bloques" estilo Minecraft */
+    .bloques-intro {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .bloque-ej {
+      background: linear-gradient(135deg, #374151, #1f2937);
+      border: 2px solid #f59e0b;
+      border-radius: 4px;
+      padding: 12px 18px;
+      min-width: 130px;
+      text-align: center;
+      position: relative;
+      box-shadow: 3px 3px 0 #92400e;
+    }
+    .bloque-ej::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px 2px 0 0;
+    }
+    .bloque-ej .ej-op {
+      font-family: 'Minecraftia', monospace;
+      font-size: 0.75em;
+      color: #fde68a;
+      display: block;
+      margin-bottom: 4px;
+      letter-spacing: 1px;
+    }
+    .bloque-ej .ej-res {
+      font-family: 'Minecraftia', monospace;
+      font-size: 1em;
+      color: #fbbf24;
+      font-weight: bold;
+      text-shadow: 1px 1px 0 #92400e;
+    }
+    .bloque-ej .ej-desc {
+      font-family: 'Minecraftia', monospace;
+      font-size: 0.55em;
+      color: #94a3b8;
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* Tip de juego */
+    .tip-juego {
+      margin-top: 14px;
+      background: rgba(30,41,59,0.8);
+      border-left: 3px solid #f59e0b;
+      padding: 8px 14px;
+      font-family: 'Minecraftia', monospace;
+      font-size: 0.6em;
+      color: #94a3b8;
+      line-height: 1.8;
+      letter-spacing: 0.5px;
+    }
+    .tip-juego strong { color: #fbbf24; }
+
+    /* ── Canvas ──────────────────────────────────────────────── */
+    #gameWrapper {
+      display: flex;
+      justify-content: center;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      max-width: 860px;
+      height: auto;
+      border: 3px solid #f59e0b;
+      border-radius: 4px;
+      box-shadow:
+        0 0 0 1px #92400e,
+        0 0 40px rgba(245,158,11,0.2),
+        0 20px 60px rgba(0,0,0,0.6);
+      touch-action: none;
+      image-rendering: pixelated;
+    }
+
+    /* ── Controles táctiles ─────────────────────────────────── */
+    #touchControls {
+      display: none;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .touchBtn {
+      width: 60px; height: 60px;
+      border-radius: 4px;
+      background: rgba(245,158,11,0.2);
+      color: #fbbf24;
+      font-size: 20px;
+      border: 2px solid rgba(245,158,11,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      font-family: 'Minecraftia', monospace;
+      box-shadow: 3px 3px 0 #92400e;
+    }
+    .touchBtn:active {
+      background: rgba(245,158,11,0.4);
+      transform: translate(2px,2px);
+      box-shadow: 1px 1px 0 #92400e;
+    }
+
+    /* ── Pie de página ──────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 16px;
+      font-family: 'Minecraftia', monospace;
+      font-size: 0.55em;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 1px;
+      margin-top: 8px;
+    }
+
+    /* ── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      #touchControls { display: flex; }
+      header h1 { font-size: 1em; }
+      .intro-title { font-size: 0.8em; }
+      .bloques-intro { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ═══════════════════════════════════════════════ -->
+<header>
+  <div class="header-brand">
+    <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE">
+    <h1>RETOMATE</h1>
+  </div>
+  <nav>
+    <ul>
+      <li><a href="{{ url_for('home') }}">🏠 INICIO</a></li>
+      <li><a href="{{ url_for('tematicas') }}">📚 TEMATICAS</a></li>
+      <li><a href="{{ url_for('videos') }}">🎥 VIDEOS</a></li>
+      <li><a href="{{ url_for('progreso') }}">📊 PROGRESO</a></li>
+      <li><a href="{{ url_for('logout') }}">🚪 SALIR</a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- ══ CONTENIDO ════════════════════════════════════════════ -->
+<main>
+
+  <p class="bienvenida">
+    🏗️ &nbsp; HOLA, <strong>{{ session['nombre'] }}</strong> &nbsp; — &nbsp; GRADO 3 · MODULO 1
+  </p>
+
+  <!-- ── INTRODUCCIÓN AL TEMA ──────────────────────────────── -->
+  <div class="intro">
+    <div class="intro-inner">
+
+      <div class="intro-title">🧱 MULTIPLICACION — CIUDAD EN CONSTRUCCION</div>
+
+      <p class="intro-body">
+        La <strong>multiplicación</strong> es una forma rápida de sumar el mismo número varias veces.<br>
+        Por ejemplo: <strong>3 × 4</strong> significa sumar 3 grupos de 4, lo que es igual a <strong>12</strong>.<br><br>
+        En la construcción se usa todo el tiempo: si necesitas <strong>5 pisos</strong> y cada piso
+        usa <strong>8 ladrillos</strong>, multiplicas para saber que necesitas <strong>40 ladrillos</strong> en total.<br><br>
+        Recuerda: <strong>factor × factor = producto</strong>
+      </p>
+
+      <div class="bloques-intro">
+        <div class="bloque-ej">
+          <span class="ej-op">2 × 3</span>
+          <span class="ej-res">= 6</span>
+          <span class="ej-desc">2 grupos de 3</span>
+        </div>
+        <div class="bloque-ej">
+          <span class="ej-op">4 × 5</span>
+          <span class="ej-res">= 20</span>
+          <span class="ej-desc">4 grupos de 5</span>
+        </div>
+        <div class="bloque-ej">
+          <span class="ej-op">6 × 6</span>
+          <span class="ej-res">= 36</span>
+          <span class="ej-desc">6 grupos de 6</span>
+        </div>
+        <div class="bloque-ej">
+          <span class="ej-op">7 × 5</span>
+          <span class="ej-res">= 35</span>
+          <span class="ej-desc">7 grupos de 5</span>
+        </div>
+      </div>
+
+      <div class="tip-juego">
+        🎮 &nbsp; <strong>CÓMO JUGAR:</strong> Lee la multiplicación en la pantalla y haz clic
+        en el <strong>bloque con el resultado correcto</strong>. Cada respuesta correcta
+        agrega un piso al rascacielos. ¡Construye el edificio más alto!<br>
+        ⌨️ &nbsp; <strong>P</strong> = pausar · <strong>CLIC</strong> en el bloque correcto
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── JUEGO ─────────────────────────────────────────────── -->
+  <div id="gameWrapper">
+    <canvas id="gameCanvas" width="860" height="540"></canvas>
+  </div>
+
+  <!-- ── CONTROLES TÁCTILES ────────────────────────────────── -->
+  <div id="touchControls">
+    <div class="touchBtn" id="btnPausa">⏸</div>
+  </div>
+
+  <input type="hidden" id="usuario_id" value="{{ session['id'] }}">
+</main>
+
+<footer>© 2025 RETOMATE · APRENDE MATEMATICAS JUGANDO 🦊🏗️</footer>
+
+<!-- ── SCRIPTS ───────────────────────────────────────────────── -->
+<script src="{{ url_for('static', filename='js/sonidos.js') }}"></script>
+<script src="{{ url_for('static', filename='js/grado3_modulo1.js') }}"></script>
+
+<!-- Botón de pausa táctil -->
+<script>
+  const btnPausa = document.getElementById('btnPausa');
+  if (btnPausa) {
+    btnPausa.addEventListener('click', () => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'p', bubbles: true }));
+    });
+  }
+</script>
+
+</body>
+</html>
