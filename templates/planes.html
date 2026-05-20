@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>RETOMATE - Planes y Suscripción</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { font-family:'Comic Sans MS',Arial,sans-serif;
+           background:linear-gradient(135deg,#ff9a56 0%,#ff6a00 50%,#ff9a56 100%);
+           min-height:100vh; }
+    header { background:linear-gradient(135deg,#2c1810,#5d4037); padding:15px 30px;
+             display:flex; align-items:center; justify-content:space-between;
+             box-shadow:0 4px 15px rgba(0,0,0,0.3); flex-wrap:wrap; }
+    header img  { height:70px; border-radius:10px; }
+    header h1   { color:#ff9a56; font-size:2em; text-shadow:2px 2px 4px rgba(0,0,0,0.5); margin-left:15px; }
+    nav ul      { list-style:none; display:flex; gap:20px; flex-wrap:wrap; margin:0; padding:0; }
+    nav a       { color:white; text-decoration:none; padding:10px 20px; border-radius:20px;
+                  transition:all 0.3s; font-weight:bold; background:rgba(255,255,255,0.1); }
+    nav a:hover { background:#ff9a56; transform:translateY(-2px); }
+
+    main { max-width:1000px; margin:30px auto; padding:0 15px; }
+
+    .page-title { text-align:center; color:#fff; font-size:2em;
+                  text-shadow:2px 2px 6px rgba(0,0,0,0.3); margin-bottom:6px; }
+    .page-sub   { text-align:center; color:rgba(255,255,255,0.9); margin-bottom:30px; font-size:1.05em; }
+
+    /* Badge plan actual */
+    .plan-actual-banner { background:#fff9f3; border-radius:14px; padding:14px 22px;
+                          margin-bottom:28px; border:2px solid #f7d3a0; text-align:center; }
+    .plan-actual-banner span { font-weight:bold; color:#e26a2c; font-size:1.1em; }
+
+    /* Grid de planes */
+    .planes-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+                   gap:24px; margin-bottom:30px; }
+
+    .plan-card { background:#fff9f3; border-radius:22px; padding:30px 25px;
+                 border:3px solid #f7d3a0; box-shadow:0 8px 24px rgba(90,60,20,0.15);
+                 display:flex; flex-direction:column; transition:transform 0.2s; }
+    .plan-card:hover { transform:translateY(-6px); }
+    .plan-card.gratis  { border-color:#a8d5a2; }
+    .plan-card.premium { border-color:#ff9933; }
+    .plan-card.instit  { border-color:#7c4dff; }
+
+    .plan-card .icono { font-size:2.8em; text-align:center; margin-bottom:10px; }
+    .plan-card h3     { text-align:center; font-size:1.25em; margin-bottom:4px; color:#4b2e05; }
+    .plan-card .precio { text-align:center; font-size:2em; font-weight:bold;
+                         margin:10px 0; color:#e26a2c; }
+    .plan-card .precio small { font-size:0.45em; color:#7a5230; display:block; }
+    .plan-card ul      { list-style:none; padding:0; margin:12px 0 20px; flex:1; }
+    .plan-card ul li   { padding:6px 0; border-bottom:1px dashed #f0e0c8;
+                         font-size:0.9em; color:#4b2e05; }
+    .plan-card ul li:last-child { border-bottom:none; }
+    .plan-card ul li::before { content:"✔ "; color:#2e7d32; font-weight:bold; }
+    .plan-card ul li.no::before { content:"✘ "; color:#c62828; }
+    .plan-card ul li.no { color:#9e9e9e; }
+
+    .btn-plan { display:block; text-align:center; padding:12px; border-radius:14px;
+                font-weight:bold; font-size:1em; border:none; cursor:pointer;
+                transition:all 0.3s; text-decoration:none; }
+    .btn-gratis  { background:#a8d5a2; color:#1b5e20; pointer-events:none; }
+    .btn-premium { background:linear-gradient(90deg,#ff9933,#f77f00); color:white; }
+    .btn-premium:hover { background:linear-gradient(90deg,#f77f00,#d65a00);
+                         box-shadow:0 6px 15px rgba(247,127,0,0.35); color:white; }
+    .btn-instit  { background:linear-gradient(90deg,#7c4dff,#512da8); color:white; }
+    .btn-instit:hover  { background:linear-gradient(90deg,#512da8,#311b92);
+                         box-shadow:0 6px 15px rgba(124,77,255,0.35); color:white; }
+    .btn-activo  { background:#c8e6c9; color:#2e7d32; pointer-events:none; border:2px solid #81c784; }
+
+    /* Comparativa módulos */
+    .modulos-card { background:#fff9f3; border-radius:16px; padding:22px 28px;
+                    border:2px solid #f7d3a0; box-shadow:0 4px 10px rgba(90,60,20,0.1);
+                    margin-bottom:30px; }
+    .modulos-card h3 { color:#4b2e05; margin-bottom:16px; font-size:1.1em; }
+    .mod-grid { display:grid; grid-template-columns:repeat(8,1fr); gap:8px; }
+    .mod-item { border-radius:10px; padding:10px 4px; text-align:center;
+                font-size:0.78em; font-weight:bold; }
+    .mod-libre  { background:#d8f8d0; color:#226622; border:2px solid #a5d6a7; }
+    .mod-lock   { background:#ffe0b2; color:#e65100; border:2px dashed #ffb74d; }
+
+    /* Nota de demo */
+    .demo-nota { background:#e3f2fd; border-radius:12px; padding:14px 18px;
+                 border:1px solid #90caf9; color:#1565c0; font-size:0.88em;
+                 margin-bottom:20px; text-align:center; }
+  </style>
+</head>
+<body>
+<header>
+  <div style="display:flex;align-items:center;">
+    <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE">
+    <h1>RETOMATE</h1>
+  </div>
+  <nav><ul>
+    <li><a href="{{ url_for('home') }}">🏠 Inicio</a></li>
+    <li><a href="{{ url_for('tematicas') }}">📚 Temáticas</a></li>
+    <li><a href="{{ url_for('videos') }}">🎥 Videos</a></li>
+    <li><a href="{{ url_for('progreso') }}">📊 Progreso</a></li>
+    <li><a href="{{ url_for('logout') }}">🚪 Cerrar Sesión</a></li>
+  </ul></nav>
+</header>
+
+<main>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show"
+             role="alert" style="border-radius:14px;margin-bottom:16px;">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <h1 class="page-title">🦊 Planes de Acceso</h1>
+  <p class="page-sub">Los primeros 4 módulos de tu grado son <strong>siempre gratuitos</strong>. ¡Suscríbete para desbloquear los 4 restantes!</p>
+
+  <!-- Plan actual -->
+  <div class="plan-actual-banner">
+    {% if plan_actual == 'gratuito' %}
+      Actualmente tienes el plan <span>Gratuito</span> — acceso a módulos 1 al 4.
+    {% elif plan_actual == 'premium_estudiante' %}
+      ✅ Tienes el plan <span>Premium Estudiante</span> activo — acceso completo a los 8 módulos.
+    {% else %}
+      ✅ Tienes el plan <span>Institucional</span> activo — acceso completo a los 8 módulos.
+    {% endif %}
+  </div>
+
+  <!-- Nota demo -->
+  <div class="demo-nota">
+    💡 <strong>Modo demostración:</strong> El botón de suscripción activa el plan directamente
+    sin pasarela de pago. En producción se integrará con PSE / Wompi.
+  </div>
+
+  <!-- Tarjetas de planes -->
+  <div class="planes-grid">
+
+    <!-- PLAN GRATUITO -->
+    <div class="plan-card gratis">
+      <div class="icono">🆓</div>
+      <h3>Gratuito</h3>
+      <div class="precio">$0<small>sin costo</small></div>
+      <ul>
+        <li>Módulos 1 al 4 de tu grado</li>
+        <li>Seguimiento de progreso básico</li>
+        <li>Registro académico</li>
+        <li class="no">Módulos 5 al 8</li>
+        <li class="no">Certificado de completitud</li>
+      </ul>
+      <span class="btn-plan btn-gratis">Plan actual base</span>
+    </div>
+
+    <!-- PLAN PREMIUM ESTUDIANTE -->
+    <div class="plan-card premium">
+      <div class="icono">⭐</div>
+      <h3>Premium Estudiante</h3>
+      <div class="precio">$20.000<small>COP / mes · por estudiante</small></div>
+      <ul>
+        <li>Todos los 8 módulos de tu grado</li>
+        <li>Seguimiento completo de progreso</li>
+        <li>Registro académico</li>
+        <li>Acceso desde cualquier dispositivo</li>
+        <li>Certificado de completitud</li>
+      </ul>
+      {% if plan_actual == 'premium_estudiante' %}
+        <span class="btn-plan btn-activo">✅ Plan activo</span>
+      {% else %}
+        <form method="POST" action="{{ url_for('activar_plan') }}">
+          <input type="hidden" name="plan" value="premium_estudiante">
+          <button type="submit" class="btn-plan btn-premium w-100">
+            Activar plan — $20.000/mes
+          </button>
+        </form>
+      {% endif %}
+    </div>
+
+    <!-- PLAN INSTITUCIONAL -->
+    <div class="plan-card instit">
+      <div class="icono">🏫</div>
+      <h3>Institucional</h3>
+      <div class="precio">$25.000<small>COP / mes · por institución</small></div>
+      <ul>
+        <li>Todos los 8 módulos de tu grado</li>
+        <li>Gestión de múltiples estudiantes</li>
+        <li>Panel de rendimiento KNN</li>
+        <li>Reportes por curso y grado</li>
+        <li>Certificado de completitud</li>
+      </ul>
+      {% if plan_actual == 'institucional' %}
+        <span class="btn-plan btn-activo">✅ Plan activo</span>
+      {% else %}
+        <form method="POST" action="{{ url_for('activar_plan') }}">
+          <input type="hidden" name="plan" value="institucional">
+          <button type="submit" class="btn-plan btn-instit w-100">
+            Activar plan — $25.000/mes
+          </button>
+        </form>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- Comparativa visual de módulos -->
+  <div class="modulos-card">
+    <h3>📦 ¿Qué módulos puedes jugar?</h3>
+    <div class="mod-grid">
+      {% for i in range(1, 9) %}
+        {% if i <= 4 %}
+          <div class="mod-item mod-libre">Módulo {{ i }}<br>🔓 Gratis</div>
+        {% else %}
+          {% if plan_actual in ('premium_estudiante', 'institucional') %}
+            <div class="mod-item mod-libre">Módulo {{ i }}<br>✅ Activo</div>
+          {% else %}
+            <div class="mod-item mod-lock">Módulo {{ i }}<br>🔒 Premium</div>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <div style="text-align:center;">
+    <a href="{{ url_for('tematicas') }}"
+       style="display:inline-block;margin:8px 6px;padding:12px 28px;
+              background:linear-gradient(135deg,#2c1810,#2c1810);color:#fff;
+              text-decoration:none;border-radius:12px;font-weight:bold;transition:all 0.3s;">
+      📚 Volver a Temáticas
+    </a>
+  </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

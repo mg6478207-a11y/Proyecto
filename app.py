@@ -102,7 +102,7 @@ def login():
                 session['nombre'] = usuario['nombre']
                 session['tipo']   = usuario['tipo']
 
-                # ── Cargar curso del estudiante desde informacion_estudiantes ──
+                # ── Cargar curso y plan del estudiante ──
                 if usuario['tipo'] == 'estudiante':
                     db2  = conectar()
                     cur2 = db2.cursor()
@@ -113,6 +113,19 @@ def login():
                     fila_curso = cur2.fetchone()
                     db2.close()
                     session['curso'] = fila_curso[0] if fila_curso else None
+
+                    # Verificar si tiene suscripción activa vigente
+                    db3  = conectar()
+                    cur3 = db3.cursor()
+                    cur3.execute("""
+                        SELECT plan FROM suscripciones
+                        WHERE usuario_id = ?
+                          AND activa = 1
+                          AND fecha_fin >= CAST(GETDATE() AS DATE)
+                    """, (usuario['id'],))
+                    fila_plan = cur3.fetchone()
+                    db3.close()
+                    session['plan'] = fila_plan[0] if fila_plan else 'gratuito'
 
                 flash(f"Bienvenido {session['nombre']} ({session['tipo']})", "success")
 
@@ -253,17 +266,19 @@ def _curso_esperado(prefijo):
     return []
 
 def ruta_modulo(ruta, template):
-    """Crea una ruta de módulo que verifica el curso del estudiante."""
+    """Crea una ruta de módulo que verifica el curso y el plan del estudiante."""
     def vista():
         if 'id' not in session:
             return redirect(url_for('login'))
 
-        # Los administradores tienen acceso libre
+        # Administradores tienen acceso libre a todo
         if session.get('tipo') == 'administrador':
             return render_template(template)
 
         import re as _re
-        match  = _re.match(r'^(.*?modulo)', ruta)
+
+        # 1. Verificar que el módulo corresponde al curso del estudiante
+        match   = _re.match(r'^(.*?modulo)', ruta)
         prefijo = match.group(1) if match else ruta
 
         curso_estudiante = session.get('curso', '')
@@ -279,9 +294,24 @@ def ruta_modulo(ruta, template):
             )
             return redirect(url_for('tematicas'))
 
+        # 2. Verificar límite freemium: módulos 5-8 requieren suscripción
+        num_match  = _re.search(r'(\d+)$', ruta)
+        num_modulo = int(num_match.group(1)) if num_match else 0
+
+        if num_modulo > 4:
+            plan = session.get('plan', 'gratuito')
+            if plan == 'gratuito':
+                flash(
+                    "🔒 Este módulo requiere una suscripción activa. "
+                    "Los módulos 1 al 4 son gratuitos. "
+                    "¡Suscríbete para desbloquear los módulos 5 al 8!",
+                    "warning"
+                )
+                return redirect(url_for('planes'))
+
         return render_template(template)
 
-    vista.__name__ = ruta  # Flask necesita nombres únicos
+    vista.__name__ = ruta
     return vista
 
 # ─── UNIDADES GRADO 1-3 (legado) ─────────────────────────────────────────────
@@ -669,6 +699,55 @@ def nueva_contrasena():
             flash('Error en la sesión, vuelve a intentarlo.', 'danger')
             return redirect(url_for('recuperar'))
     return render_template('nueva_contrasena.html')
+
+
+# ─── PLANES / SUSCRIPCIÓN ────────────────────────────────────────────────────
+@app.route('/planes')
+def planes():
+    if 'id' not in session:
+        return redirect(url_for('login'))
+    plan_actual = session.get('plan', 'gratuito')
+    return render_template('planes.html', plan_actual=plan_actual)
+
+@app.route('/activar_plan', methods=['POST'])
+def activar_plan():
+    """
+    Simula la activación de un plan. En producción real aquí
+    iría la integración con pasarela de pago (PSE, Wompi, etc.).
+    """
+    if 'id' not in session:
+        return redirect(url_for('login'))
+
+    plan = request.form.get('plan')
+    if plan not in ('premium_estudiante', 'institucional'):
+        flash("Plan no válido.", "danger")
+        return redirect(url_for('planes'))
+
+    usuario_id = session['id']
+    db  = conectar()
+    cur = db.cursor()
+
+    # Desactivar planes anteriores del mismo usuario
+    cur.execute(
+        "UPDATE suscripciones SET activa = 0 WHERE usuario_id = ?",
+        (usuario_id,)
+    )
+
+    # Insertar nueva suscripción activa por 30 días
+    cur.execute("""
+        INSERT INTO suscripciones (usuario_id, plan, fecha_inicio, fecha_fin, activa)
+        VALUES (?, ?, CAST(GETDATE() AS DATE),
+                DATEADD(DAY, 30, CAST(GETDATE() AS DATE)), 1)
+    """, (usuario_id, plan))
+
+    db.commit()
+    db.close()
+
+    # Actualizar sesión
+    session['plan'] = plan
+    nombre_plan = "Premium Estudiante" if plan == 'premium_estudiante' else "Institucional"
+    flash(f"✅ ¡Plan {nombre_plan} activado! Tienes acceso completo a los 8 módulos de tu grado.", "success")
+    return redirect(url_for('tematicas'))
 
 @app.route('/politicas')
 def politicas():
