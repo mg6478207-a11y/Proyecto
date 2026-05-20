@@ -29,12 +29,12 @@ mail = Mail(app)
 # ─── CURSOS DISPONIBLES ───────────────────────────────────────────────────────
 # Mapeo curso → qué grados/rutas puede ver
 CURSOS_DISPONIBLES = {
-    'Primero':   {'grado': 1,  'rutas': ['unidad']},
-    'Segundo':   {'grado': 2,  'rutas': ['unidad']},
-    'Tercero':   {'grado': 3,  'rutas': ['unidad']},
+    'Primero':   {'grado': 1,  'rutas': ['Grado1_modulo']},
+    'Segundo':   {'grado': 2,  'rutas': ['Grado2_modulo']},
+    'Tercero':   {'grado': 3,  'rutas': ['Grado3_modulo']},
     'Cuarto':    {'grado': 4,  'rutas': ['Grado4_modulo']},
     'Quinto':    {'grado': 5,  'rutas': ['Grado5_modulo']},
-    'Sexto':     {'grado': 6,  'rutas': ['Grado6_modulo']},
+    'Sexto':     {'grado': 6,  'rutas': ['Grado6_modulo', 'unidad']},
 }
 
 # ─── HELPER: verificar que el estudiante pertenece al curso de esa ruta ───────
@@ -236,10 +236,13 @@ def tematicas():
 # ─── DECORATOR GENÉRICO PARA MÓDULOS CON CONTROL DE ACCESO ───────────────────
 # Mapeo de prefijo de ruta → nombre de curso legible
 _PREFIJO_A_CURSO = {
-    'unidad':        ['Primero', 'Segundo', 'Tercero'],
+    'Grado1_modulo': ['Primero'],
+    'Grado2_modulo': ['Segundo'],
+    'Grado3_modulo': ['Tercero'],
     'Grado4_modulo': ['Cuarto'],
     'Grado5_modulo': ['Quinto'],
     'Grado6_modulo': ['Sexto'],
+    'unidad':        ['Sexto'],   # rutas legado de grado 6
 }
 
 def _curso_esperado(prefijo):
