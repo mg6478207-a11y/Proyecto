@@ -2,134 +2,205 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>RETÓMATE - Información del Estudiante</title>
+  <title>Mi Progreso - RETOMATE</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body { background:linear-gradient(135deg,#f9e4c8,#f6d6ad,#ffd8a8); min-height:100vh; display:flex; align-items:center; justify-content:center; font-family:'Poppins',sans-serif; }
-    .card { width:100%; max-width:700px; background:#fff9f3; border:none; border-radius:25px; box-shadow:0 10px 25px rgba(0,0,0,0.1); padding:35px 45px; animation:fadeIn 0.8s ease-in-out; }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-    h4 { text-align:center; font-weight:700; color:#4b2e05; margin-bottom:25px; }
-    h4::before { content:"🦊 "; }
-    label { font-weight:500; color:#4b2e05; }
-    .form-control,.form-select { border-radius:12px; border:1px solid #e0b98f; background:#fffdf9; transition:all 0.2s; }
-    .form-control:focus,.form-select:focus { border-color:#ff9933; box-shadow:0 0 0 0.2rem rgba(255,153,51,0.25); }
-    button { background:linear-gradient(90deg,#ff9933,#f77f00); border:none; border-radius:15px; color:white; font-size:17px; font-weight:600; padding:12px; margin-top:10px; transition:all 0.3s; }
-    button:hover { transform:translateY(-2px); background:linear-gradient(90deg,#f77f00,#d65a00); box-shadow:0 6px 15px rgba(247,127,0,0.3); }
-    .curso-badge { display:inline-block; background:#ff9933; color:white; border-radius:20px; padding:4px 14px; font-size:0.85em; margin:2px; cursor:pointer; transition:all 0.2s; border:2px solid transparent; }
-    .curso-badge:hover,.curso-badge.selected { background:#d65a00; border-color:#fff; transform:scale(1.05); }
-    #curso-seleccionado { font-weight:bold; color:#4b2e05; font-size:1.05em; }
+    body { font-family:'Comic Sans MS', Arial, sans-serif; background:linear-gradient(135deg,#ff9a56 0%,#ff6a00 50%,#ff9a56 100%); min-height:100vh; }
+    header { background:linear-gradient(135deg,#2c1810,#5d4037); padding:15px 30px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 15px rgba(0,0,0,0.3); flex-wrap:wrap; }
+    header img { height:70px; border-radius:10px; }
+    header h1 { color:#ff9a56; font-size:2em; text-shadow:2px 2px 4px rgba(0,0,0,0.5); margin-left:15px; }
+    nav ul { list-style:none; display:flex; gap:20px; flex-wrap:wrap; margin:0; padding:0; }
+    nav a { color:white; text-decoration:none; padding:10px 20px; border-radius:20px; transition:all 0.3s; font-weight:bold; background:rgba(255,255,255,0.1); }
+    nav a:hover { background:#ff9a56; transform:translateY(-2px); }
+ 
+    main { max-width:1000px; margin:30px auto; padding:10px; }
+ 
+    /* ── Tarjeta de bienvenida ── */
+    .bienvenida { background:#fff9f3; border-radius:20px; padding:25px 30px; margin-bottom:25px;
+                  border:2px solid #f7d3a0; box-shadow:0 6px 16px rgba(90,60,20,0.12); }
+    .bienvenida h2 { color:#4b2e05; margin:0 0 6px; font-size:1.5em; }
+    .badge-curso { background:#e26a2c; color:#fff; border-radius:12px; padding:4px 14px; font-size:0.88em; font-weight:bold; }
+ 
+    /* ── Tarjetas de estadísticas ── */
+    .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; margin-bottom:25px; }
+    .stat-card { background:#fff9f3; border-radius:16px; padding:20px 15px; text-align:center;
+                 border:2px solid #f7d3a0; box-shadow:0 4px 10px rgba(90,60,20,0.1); }
+    .stat-card .num { font-size:2.2em; font-weight:bold; line-height:1.1; }
+    .stat-card .lbl { color:#7a5230; font-size:0.82em; margin-top:4px; }
+    .num-verde  { color:#2e7d32; }
+    .num-rojo   { color:#c62828; }
+    .num-azul   { color:#1565c0; }
+    .num-naranja{ color:#e65100; }
+ 
+    /* ── Barra de progreso de módulos ── */
+    .modulos-card { background:#fff9f3; border-radius:16px; padding:20px 25px; margin-bottom:25px;
+                    border:2px solid #f7d3a0; box-shadow:0 4px 10px rgba(90,60,20,0.1); }
+    .modulos-card h3 { color:#4b2e05; font-size:1.1em; margin-bottom:12px; }
+    .progress { height:22px; border-radius:12px; background:#f0e0c8; }
+    .progress-bar { background:linear-gradient(90deg,#ff9933,#e26a2c); border-radius:12px;
+                    font-weight:bold; font-size:0.85em; transition:width 0.6s; }
+    .completado-banner { background:#d8f8d0; color:#226622; border-radius:12px; padding:12px 18px;
+                         font-weight:bold; margin-top:14px; font-size:0.95em; border:1px solid #a5d6a7; }
+    .pendiente-banner  { background:#fff3c4; color:#8a6500; border-radius:12px; padding:12px 18px;
+                         font-weight:bold; margin-top:14px; font-size:0.95em; border:1px solid #ffe082; }
+ 
+    /* ── Tabla de partidas ── */
+    .tabla-card { background:#fff9f3; border-radius:16px; padding:20px 25px; margin-bottom:30px;
+                  border:2px solid #f7d3a0; box-shadow:0 4px 10px rgba(90,60,20,0.1); overflow-x:auto; }
+    .tabla-card h3 { color:#4b2e05; font-size:1.1em; margin-bottom:14px; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th { background:#e26a2c; color:#fff; padding:10px 12px; text-align:center; }
+    td { padding:9px 12px; border-bottom:1px solid #f0e6da; text-align:center; vertical-align:middle; }
+    tr:last-child td { border-bottom:none; }
+    tr:hover { background:#fff7ec; }
+    .puntaje-alto  { color:#2e7d32; font-weight:bold; }
+    .puntaje-medio { color:#f57f17; font-weight:bold; }
+    .puntaje-bajo  { color:#c62828; font-weight:bold; }
+ 
+    /* ── Sin datos ── */
+    .sin-datos { text-align:center; color:#7a5230; padding:30px; font-size:1em; }
+ 
+    /* ── Botones ── */
+    a.button { display:inline-block; margin:8px 6px; padding:10px 20px;
+               background:linear-gradient(135deg,#2c1810,#2c1810); color:#fff;
+               text-decoration:none; border-radius:10px; font-weight:bold; transition:all 0.3s; }
+    a.button:hover { background:linear-gradient(135deg,#e26a2c,#c85018); transform:translateY(-2px); }
   </style>
 </head>
 <body>
-<div class="card">
-  <h4>Información del Estudiante</h4>
-  <form method="POST">
  
-    <!-- ══ NUEVO: Selección de curso al que pasa ══ -->
-    <div class="mb-4 p-3" style="background:#fff3e0;border-radius:16px;border:2px solid #ff9933;">
-      <label class="mb-2" style="font-size:1.05em;">📚 ¿A qué curso vas a pasar?</label>
-      <div id="cursos-container" class="mb-2">
-        {% for c in cursos %}
-          <span class="curso-badge" onclick="seleccionarCurso(this, '{{ c }}')">{{ c }}</span>
+<header>
+  <div style="display:flex;align-items:center;">
+    <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE">
+    <h1>RETOMATE</h1>
+  </div>
+  <nav><ul>
+    <li><a href="{{ url_for('home') }}">🏠 Inicio</a></li>
+    <li><a href="{{ url_for('tematicas') }}">📚 Temáticas</a></li>
+    <li><a href="{{ url_for('videos') }}">🎥 Videos</a></li>
+    <li><a href="{{ url_for('progreso') }}">📊 Progreso</a></li>
+    <li><a href="{{ url_for('logout') }}">🚪 Cerrar Sesión</a></li>
+  </ul></nav>
+</header>
+ 
+<main>
+ 
+  <!-- ── Mensajes flash ── -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert" style="border-radius:14px;margin-bottom:16px;">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+ 
+  <!-- ── Bienvenida ── -->
+  <div class="bienvenida">
+    <h2>📊 Mi Progreso Académico</h2>
+    <p style="margin:0;color:#7a5230;">
+      Hola, <strong>{{ session['nombre'] }}</strong> 👋 &nbsp;|&nbsp;
+      Curso registrado: <span class="badge-curso">{{ curso }}</span>
+    </p>
+  </div>
+ 
+  <!-- ── Estadísticas resumen ── -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="num num-azul">{{ total_jugadas }}</div>
+      <div class="lbl">🎮 Partidas jugadas</div>
+    </div>
+    <div class="stat-card">
+      <div class="num num-verde">{{ total_aciertos }}</div>
+      <div class="lbl">✅ Total aciertos</div>
+    </div>
+    <div class="stat-card">
+      <div class="num num-rojo">{{ total_fallos }}</div>
+      <div class="lbl">❌ Total fallos</div>
+    </div>
+    <div class="stat-card">
+      <div class="num num-naranja">{{ promedio }}%</div>
+      <div class="lbl">⭐ Promedio de puntaje</div>
+    </div>
+  </div>
+ 
+  <!-- ── Progreso de módulos ── -->
+  <div class="modulos-card">
+    <h3>📦 Módulos completados en <strong>{{ curso }}</strong></h3>
+    {% set pct = ((modulos_completados / total_modulos) * 100) | int | string %}
+    <div class="progress">
+      <div class="progress-bar" role="progressbar"
+           style="width: {{ pct + '%' }};"
+           aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100">
+        {{ modulos_completados }} / {{ total_modulos }}
+      </div>
+    </div>
+    {% if curso_completado %}
+      <div class="completado-banner">
+        🎉 ¡Felicitaciones! Has completado todos los módulos de <strong>{{ curso }}</strong>.
+        Ya puedes intentar acceder a otro curso desde Temáticas.
+      </div>
+    {% else %}
+      <div class="pendiente-banner">
+        📌 Te faltan <strong>{{ total_modulos - modulos_completados }}</strong> módulo(s) por completar en <strong>{{ curso }}</strong>.
+        Debes terminar todos los módulos de tu curso para acceder a otros cursos.
+      </div>
+    {% endif %}
+  </div>
+ 
+  <!-- ── Tabla de historial ── -->
+  <div class="tabla-card">
+    <h3>🗂️ Historial de partidas</h3>
+    {% if progreso %}
+    <table>
+      <thead>
+        <tr>
+          <th>Grado</th>
+          <th>Unidad / Módulo</th>
+          <th>✅ Aciertos</th>
+          <th>❌ Fallos</th>
+          <th>Total preguntas</th>
+          <th>Puntaje (%)</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in progreso %}
+          {% if p.puntaje >= 70 %}
+            {% set cls = 'puntaje-alto' %}
+          {% elif p.puntaje >= 40 %}
+            {% set cls = 'puntaje-medio' %}
+          {% else %}
+            {% set cls = 'puntaje-bajo' %}
+          {% endif %}
+          <tr>
+            <td>{{ p.grado if p.grado else '—' }}</td>
+            <td>{{ p.unidad if p.unidad else '—' }}</td>
+            <td style="color:#2e7d32;font-weight:bold;">{{ p.aciertos }}</td>
+            <td style="color:#c62828;font-weight:bold;">{{ p.fallos }}</td>
+            <td>{{ p.total }}</td>
+            <td class="{{ cls }}">{{ p.puntaje }}%</td>
+            <td style="font-size:12px;color:#7a5230;">
+              {{ p.fecha.strftime('%d/%m/%Y %H:%M') if p.fecha else '—' }}
+            </td>
+          </tr>
         {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <div class="sin-datos">
+        🦊 Aún no has jugado ningún módulo. ¡Anímate a empezar desde <a href="{{ url_for('tematicas') }}">Temáticas</a>!
       </div>
-      <div>Curso seleccionado: <span id="curso-seleccionado">Ninguno</span></div>
-      <input type="hidden" name="curso" id="curso-hidden" required>
-    </div>
+    {% endif %}
+  </div>
  
-    <div class="row">
-      <div class="col-md-4 mb-3">
-        <label>Edad</label>
-        <input type="number" name="edad" class="form-control" required>
-      </div>
-      <div class="col-md-8 mb-3">
-        <label>Género</label>
-        <select name="genero" class="form-select" required>
-          <option value="">Selecciona...</option>
-          <option>Femenino</option><option>Masculino</option><option>Otro</option>
-        </select>
-      </div>
-    </div>
+  <a class="button" href="{{ url_for('tematicas') }}">📚 Ir a Temáticas</a>
+  <a class="button" href="{{ url_for('home') }}">🏠 Inicio</a>
  
-    <div class="mb-3">
-      <label>¿Vive con sus padres?</label>
-      <select name="vive_con_padres" class="form-select" required>
-        <option value="t">Sí</option><option value="f">No</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label>Estrato socioeconómico</label>
-      <input type="number" name="estrato" min="1" max="6" class="form-control" required>
-    </div>
-    <div class="mb-3">
-      <label>¿Trabaja actualmente?</label>
-      <select name="trabaja" class="form-select" required>
-        <option value="f">No</option><option value="t">Sí</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label>Horas de estudio al día</label>
-      <input type="number" step="0.1" name="horas_estudio_dia" class="form-control" required>
-    </div>
-    <div class="mb-3">
-      <label>Promedio anterior</label>
-      <input type="number" name="promedio_anterior" min="0" max="100" class="form-control" required>
-    </div>
-    <div class="mb-3">
-      <label>Nivel educativo de los padres</label>
-      <select name="nivel_educativo_padres" class="form-select" required>
-        <option value="">Selecciona...</option>
-        <option>Primaria</option><option>Secundaria</option>
-        <option>Bachiller</option><option>Universitario</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label>¿Tiene acceso a internet?</label>
-      <select name="acceso_internet" class="form-select" required>
-        <option value="t">Sí</option><option value="f">No</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label>Dispositivo principal de estudio</label>
-      <select name="dispositivo_estudio" class="form-select" required>
-        <option>Celular</option><option>Tablet</option>
-        <option>Portátil</option><option>Computador de escritorio</option>
-        <option>Ninguno</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label>Distancia al colegio (km)</label>
-      <input type="number" step="0.1" name="distancia_colegio" class="form-control" required>
-    </div>
-    <div class="mb-3">
-      <label>Nivel de motivación (1-5)</label>
-      <input type="number" name="motivacion" min="1" max="5" class="form-control" required>
-    </div>
-    <div class="mb-3">
-      <label>Nivel de estrés (1-5)</label>
-      <input type="number" name="estres" min="1" max="5" class="form-control" required>
-    </div>
-    <div class="mb-3">
-      <label>Apoyo familiar (1-5)</label>
-      <input type="number" name="apoyo_familiar" min="1" max="5" class="form-control" required>
-    </div>
-    <div class="mb-3">
-      <label>Satisfacción con el estudio (1-5)</label>
-      <input type="number" name="satisfaccion_estudio" min="1" max="5" class="form-control" required>
-    </div>
+</main>
  
-    <button type="submit" class="w-100">Guardar información 🦊</button>
-  </form>
-</div>
- 
-<script>
-function seleccionarCurso(el, nombre) {
-  document.querySelectorAll('.curso-badge').forEach(b => b.classList.remove('selected'));
-  el.classList.add('selected');
-  document.getElementById('curso-seleccionado').textContent = nombre;
-  document.getElementById('curso-hidden').value = nombre;
-}
-</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
- 

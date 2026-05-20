@@ -234,19 +234,50 @@ def tematicas():
     return render_template("tematicas.html", curso=session.get('curso'), tipo=session.get('tipo'))
 
 # ─── DECORATOR GENÉRICO PARA MÓDULOS CON CONTROL DE ACCESO ───────────────────
+# Mapeo de prefijo de ruta → nombre de curso legible
+_PREFIJO_A_CURSO = {
+    'unidad':        ['Primero', 'Segundo', 'Tercero'],
+    'Grado4_modulo': ['Cuarto'],
+    'Grado5_modulo': ['Quinto'],
+    'Grado6_modulo': ['Sexto'],
+}
+
+def _curso_esperado(prefijo):
+    """Devuelve los cursos que corresponden a un prefijo de ruta."""
+    for p, cursos in _PREFIJO_A_CURSO.items():
+        if prefijo.startswith(p):
+            return cursos
+    return []
+
 def ruta_modulo(ruta, template):
     """Crea una ruta de módulo que verifica el curso del estudiante."""
     def vista():
         if 'id' not in session:
             return redirect(url_for('login'))
-        # Extraer prefijo de ruta (ej: 'Grado5_modulo' de 'Grado5_modulo1')
+
+        # Los administradores tienen acceso libre
+        if session.get('tipo') == 'administrador':
+            return render_template(template)
+
         import re as _re
-        match = _re.match(r'^(.*?modulo)', ruta)
+        match  = _re.match(r'^(.*?modulo)', ruta)
         prefijo = match.group(1) if match else ruta
-        if not verificar_acceso_curso(prefijo):
-            flash(f"No tienes acceso a este módulo. Tu curso es: {session.get('curso', 'no asignado')}.", "warning")
+
+        curso_estudiante = session.get('curso', '')
+        cursos_validos   = _curso_esperado(prefijo)
+
+        if curso_estudiante not in cursos_validos:
+            cursos_str = ', '.join(cursos_validos) if cursos_validos else 'otro curso'
+            flash(
+                f"⚠️ Este módulo corresponde a {cursos_str}. "
+                f"Tú estás registrado en '{curso_estudiante}'. "
+                f"Solo puedes acceder a los módulos de tu curso.",
+                "danger"
+            )
             return redirect(url_for('tematicas'))
+
         return render_template(template)
+
     vista.__name__ = ruta  # Flask necesita nombres únicos
     return vista
 
@@ -313,6 +344,29 @@ def progreso_estudiante():
     if 'id' not in session:
         return redirect(url_for('login'))
 
+    usuario_id = session['id']
+
+    # ── 1. Verificar que el estudiante ya completó su registro académico ──
+    db  = conectar()
+    cur = db.cursor()
+    cur.execute(
+        "SELECT curso FROM informacion_estudiantes WHERE usuario_id = ?",
+        (usuario_id,)
+    )
+    fila_info = cur.fetchone()
+    db.close()
+
+    if not fila_info:
+        # El estudiante aún no llenó su información → redirigir al formulario
+        session['nuevo_usuario_id'] = usuario_id
+        flash("Debes completar tu información académica antes de ver tu progreso.", "warning")
+        return redirect(url_for('registro_estudiante'))
+
+    curso_registrado = fila_info[0]
+    # Asegurar que la sesión tenga el curso actualizado
+    session['curso'] = curso_registrado
+
+    # ── 2. Obtener el progreso del estudiante ──
     db  = conectar()
     cur = db.cursor()
     cur.execute("""
@@ -320,7 +374,7 @@ def progreso_estudiante():
         FROM progreso
         WHERE usuario_id = ?
         ORDER BY fecha DESC
-    """, (session['id'],))
+    """, (usuario_id,))
     filas = cur.fetchall()
     db.close()
 
@@ -336,20 +390,31 @@ def progreso_estudiante():
             "fecha":    f[6]
         })
 
-    # Estadísticas resumen
+    # ── 3. Estadísticas resumen ──
     total_jugadas  = len(progreso)
     total_aciertos = sum(p['aciertos'] or 0 for p in progreso)
     total_fallos   = sum(p['fallos']   or 0 for p in progreso)
     promedio       = round(sum(p['puntaje'] for p in progreso) / total_jugadas, 1) if total_jugadas else 0
 
+    # ── 4. Calcular módulos completados vs total del curso ──
+    info_curso     = CURSOS_DISPONIBLES.get(curso_registrado, {})
+    total_modulos  = 8   # cada curso tiene 8 módulos/unidades
+    # Unidades únicas jugadas que pertenecen al curso actual
+    unidades_jugadas = set(p['unidad'] for p in progreso if p['unidad'])
+    modulos_completados = len(unidades_jugadas)
+    curso_completado    = modulos_completados >= total_modulos
+
     return render_template(
         "progreso_estudiante.html",
         progreso=progreso,
-        curso=session.get('curso', ''),
+        curso=curso_registrado,
         total_jugadas=total_jugadas,
         total_aciertos=total_aciertos,
         total_fallos=total_fallos,
-        promedio=promedio
+        promedio=promedio,
+        modulos_completados=modulos_completados,
+        total_modulos=total_modulos,
+        curso_completado=curso_completado,
     )
 
 # ─── PROGRESO ADMINISTRADOR CON KNN + FILTRO POR CURSO ────────────────────────
