@@ -5,48 +5,69 @@
   <title>Mi Progreso - RETOMATE</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body { font-family:'Comic Sans MS', Arial, sans-serif; background:linear-gradient(135deg,#ff9a56 0%,#ff6a00 50%,#ff9a56 100%); min-height:100vh; }
+    body { font-family:'Comic Sans MS', Arial, sans-serif;
+    font-variant-emoji: emoji; background:linear-gradient(135deg,#ff9a56 0%,#ff6a00 50%,#ff9a56 100%); min-height:100vh; }
     header { background:linear-gradient(135deg,#2c1810,#5d4037); padding:15px 30px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 15px rgba(0,0,0,0.3); flex-wrap:wrap; }
-    header img { height:70px; border-radius:10px; }
-    header h1 { color:#ff9a56; font-size:2em; text-shadow:2px 2px 4px rgba(0,0,0,0.5); margin-left:15px; }
-    nav ul { list-style:none; display:flex; gap:20px; flex-wrap:wrap; margin:0; padding:0; }
-    nav a { color:white; text-decoration:none; padding:10px 20px; border-radius:20px; transition:all 0.3s; font-weight:bold; background:rgba(255,255,255,0.1); }
+    header img  { height:70px; border-radius:10px; }
+    header h1   { color:#ff9a56; font-size:2em; text-shadow:2px 2px 4px rgba(0,0,0,0.5); margin-left:15px; }
+    nav ul      { list-style:none; display:flex; gap:20px; flex-wrap:wrap; margin:0; padding:0; }
+    nav a       { color:white; text-decoration:none; padding:10px 20px; border-radius:20px; transition:all 0.3s; font-weight:bold; background:rgba(255,255,255,0.1); }
     nav a:hover { background:#ff9a56; transform:translateY(-2px); }
- 
+
     main { max-width:1000px; margin:30px auto; padding:10px; }
- 
-    /* ── Tarjeta de bienvenida ── */
-    .bienvenida { background:#fff9f3; border-radius:20px; padding:25px 30px; margin-bottom:25px;
-                  border:2px solid #f7d3a0; box-shadow:0 6px 16px rgba(90,60,20,0.12); }
+
+    .bienvenida { background:#fff9f3; border-radius:20px; padding:25px 30px; margin-bottom:25px; border:2px solid #f7d3a0; box-shadow:0 6px 16px rgba(90,60,20,0.12); }
     .bienvenida h2 { color:#4b2e05; margin:0 0 6px; font-size:1.5em; }
     .badge-curso { background:#e26a2c; color:#fff; border-radius:12px; padding:4px 14px; font-size:0.88em; font-weight:bold; }
- 
-    /* ── Tarjetas de estadísticas ── */
+
     .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; margin-bottom:25px; }
-    .stat-card { background:#fff9f3; border-radius:16px; padding:20px 15px; text-align:center;
-                 border:2px solid #f7d3a0; box-shadow:0 4px 10px rgba(90,60,20,0.1); }
+    .stat-card  { background:#fff9f3; border-radius:16px; padding:20px 15px; text-align:center; border:2px solid #f7d3a0; box-shadow:0 4px 10px rgba(90,60,20,0.1); }
     .stat-card .num { font-size:2.2em; font-weight:bold; line-height:1.1; }
     .stat-card .lbl { color:#7a5230; font-size:0.82em; margin-top:4px; }
-    .num-verde  { color:#2e7d32; }
-    .num-rojo   { color:#c62828; }
-    .num-azul   { color:#1565c0; }
-    .num-naranja{ color:#e65100; }
- 
-    /* ── Barra de progreso de módulos ── */
-    .modulos-card { background:#fff9f3; border-radius:16px; padding:20px 25px; margin-bottom:25px;
-                    border:2px solid #f7d3a0; box-shadow:0 4px 10px rgba(90,60,20,0.1); }
+    .num-verde   { color:#2e7d32; }
+    .num-rojo    { color:#c62828; }
+    .num-azul    { color:#1565c0; }
+    .num-naranja { color:#e65100; }
+
+    .modulos-card { background:#fff9f3; border-radius:16px; padding:20px 25px; margin-bottom:25px; border:2px solid #f7d3a0; box-shadow:0 4px 10px rgba(90,60,20,0.1); }
     .modulos-card h3 { color:#4b2e05; font-size:1.1em; margin-bottom:12px; }
-    .progress { height:22px; border-radius:12px; background:#f0e0c8; }
-    .progress-bar { background:linear-gradient(90deg,#ff9933,#e26a2c); border-radius:12px;
-                    font-weight:bold; font-size:0.85em; transition:width 0.6s; }
-    .completado-banner { background:#d8f8d0; color:#226622; border-radius:12px; padding:12px 18px;
-                         font-weight:bold; margin-top:14px; font-size:0.95em; border:1px solid #a5d6a7; }
-    .pendiente-banner  { background:#fff3c4; color:#8a6500; border-radius:12px; padding:12px 18px;
-                         font-weight:bold; margin-top:14px; font-size:0.95em; border:1px solid #ffe082; }
- 
-    /* ── Tabla de partidas ── */
-    .tabla-card { background:#fff9f3; border-radius:16px; padding:20px 25px; margin-bottom:30px;
-                  border:2px solid #f7d3a0; box-shadow:0 4px 10px rgba(90,60,20,0.1); overflow-x:auto; }
+    .progress     { height:22px; border-radius:12px; background:#f0e0c8; }
+    .progress-bar { background:linear-gradient(90deg,#ff9933,#e26a2c); border-radius:12px; font-weight:bold; font-size:0.85em; transition:width 0.6s; }
+    .completado-banner { background:#d8f8d0; color:#226622; border-radius:12px; padding:12px 18px; font-weight:bold; margin-top:14px; font-size:0.95em; border:1px solid #a5d6a7; }
+    .pendiente-banner  { background:#fff3c4; color:#8a6500; border-radius:12px; padding:12px 18px; font-weight:bold; margin-top:14px; font-size:0.95em; border:1px solid #ffe082; }
+
+    /* ── Insignias ── */
+    .insignias-card { background:#fff9f3; border-radius:16px; padding:20px 25px; margin-bottom:25px; border:2px solid #f7d3a0; box-shadow:0 4px 10px rgba(90,60,20,0.1); }
+    .insignias-card h3 { color:#4b2e05; font-size:1.1em; margin-bottom:16px; }
+    .insignias-grid { display:flex; flex-wrap:wrap; gap:14px; margin-bottom:20px; }
+
+    .ins-card {
+      border-radius:16px; padding:14px 16px; text-align:center;
+      min-width:110px; max-width:130px; flex:1;
+      box-shadow:0 4px 10px rgba(90,60,20,0.12);
+      transition:transform 0.2s;
+    }
+    .ins-card:hover { transform:translateY(-4px); }
+    .ins-card .ins-emoji  { font-size:2.2em; line-height:1.2; font-family:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif; }
+    .ins-card .ins-nombre { font-weight:bold; font-size:0.82em; color:#4b2e05; margin-top:5px; }
+    .ins-card .ins-fecha  { font-size:0.7em; color:#7a5230; margin-top:3px; }
+
+    .ins-pendiente {
+      background:#f5f5f5; border:2px dashed #ccc;
+      border-radius:16px; padding:12px 14px; text-align:center;
+      min-width:105px; max-width:125px; flex:1;
+      opacity:0.55;
+    }
+    .ins-pendiente .ins-emoji  { font-size:1.9em; filter:grayscale(1); line-height:1.2; font-family:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif; }
+    .ins-pendiente .ins-nombre { font-size:0.78em; color:#999; font-weight:bold; margin-top:4px; }
+    .ins-pendiente .ins-desc   { font-size:0.7em; color:#bbb; margin-top:2px; line-height:1.3; }
+
+    .ins-contador { display:inline-block; background:#e26a2c; color:#fff; border-radius:20px;
+                    padding:3px 14px; font-size:0.82em; font-weight:bold; margin-bottom:12px; }
+    .ins-subtitulo { color:#7a5230; font-size:0.88em; margin:14px 0 10px; font-weight:bold; }
+
+    /* ── Tabla ── */
+    .tabla-card { background:#fff9f3; border-radius:16px; padding:20px 25px; margin-bottom:30px; border:2px solid #f7d3a0; box-shadow:0 4px 10px rgba(90,60,20,0.1); overflow-x:auto; }
     .tabla-card h3 { color:#4b2e05; font-size:1.1em; margin-bottom:14px; }
     table { width:100%; border-collapse:collapse; font-size:13px; }
     th { background:#e26a2c; color:#fff; padding:10px 12px; text-align:center; }
@@ -56,19 +77,14 @@
     .puntaje-alto  { color:#2e7d32; font-weight:bold; }
     .puntaje-medio { color:#f57f17; font-weight:bold; }
     .puntaje-bajo  { color:#c62828; font-weight:bold; }
- 
-    /* ── Sin datos ── */
     .sin-datos { text-align:center; color:#7a5230; padding:30px; font-size:1em; }
- 
-    /* ── Botones ── */
-    a.button { display:inline-block; margin:8px 6px; padding:10px 20px;
-               background:linear-gradient(135deg,#2c1810,#2c1810); color:#fff;
-               text-decoration:none; border-radius:10px; font-weight:bold; transition:all 0.3s; }
+
+    a.button { display:inline-block; margin:8px 6px; padding:10px 20px; background:linear-gradient(135deg,#2c1810,#2c1810); color:#fff; text-decoration:none; border-radius:10px; font-weight:bold; transition:all 0.3s; }
     a.button:hover { background:linear-gradient(135deg,#e26a2c,#c85018); transform:translateY(-2px); }
   </style>
 </head>
 <body>
- 
+
 <header>
   <div style="display:flex;align-items:center;">
     <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE">
@@ -83,10 +99,9 @@
     <li><a href="{{ url_for('logout') }}">🚪 Cerrar Sesión</a></li>
   </ul></nav>
 </header>
- 
+
 <main>
- 
-  <!-- ── Mensajes flash ── -->
+
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       {% for category, message in messages %}
@@ -97,17 +112,20 @@
       {% endfor %}
     {% endif %}
   {% endwith %}
- 
+
   <!-- ── Bienvenida ── -->
   <div class="bienvenida">
     <h2>📊 Mi Progreso Académico</h2>
     <p style="margin:0;color:#7a5230;">
       Hola, <strong>{{ session['nombre'] }}</strong> 👋 &nbsp;|&nbsp;
       Curso registrado: <span class="badge-curso">{{ curso }}</span>
+      {% if insignias_ganadas %}
+        &nbsp;|&nbsp; 🏅 <strong>{{ insignias_ganadas | length }}</strong> insignia{{ 's' if insignias_ganadas | length != 1 else '' }} ganada{{ 's' if insignias_ganadas | length != 1 else '' }}
+      {% endif %}
     </p>
   </div>
- 
-  <!-- ── Estadísticas resumen ── -->
+
+  <!-- ── Estadísticas ── -->
   <div class="stats-grid">
     <div class="stat-card">
       <div class="num num-azul">{{ total_jugadas }}</div>
@@ -126,7 +144,7 @@
       <div class="lbl">⭐ Promedio de puntaje</div>
     </div>
   </div>
- 
+
   <!-- ── Progreso de módulos ── -->
   <div class="modulos-card">
     <h3>📦 Módulos completados en <strong>{{ curso }}</strong></h3>
@@ -150,8 +168,131 @@
       </div>
     {% endif %}
   </div>
+
+
+  <!-- ══ CERTIFICADO ══════════════════════════════════════════════════════ -->
+  <div class="modulos-card" style="margin-bottom:25px;">
  
-  <!-- ── Tabla de historial ── -->
+    {% if curso_completado %}
+    <!-- ✅ CURSO COMPLETO: botón de descarga activo -->
+    <div style="background:linear-gradient(135deg,#fff8e1,#fff3cd);
+                border-radius:16px;padding:26px 28px;
+                border:2px solid #ffc107;text-align:center;">
+ 
+      <div style="font-size:3em;margin-bottom:6px;">🏆</div>
+ 
+      <h3 style="color:#4b2e05;margin:0 0 8px;font-size:1.2em;">
+        ¡Felicitaciones! Completaste el curso <strong>{{ curso }}</strong>
+      </h3>
+      <p style="color:#7a5230;font-size:0.92em;margin:0 0 20px;">
+        Has aprobado los 8 módulos de tu curso. Tu certificado oficial está listo. 🎓
+      </p>
+ 
+      <!-- Botón de descarga -->
+      <a href="{{ url_for('descargar_certificado', curso=curso) }}"
+         style="display:inline-flex;align-items:center;gap:10px;
+                background:linear-gradient(90deg,#e26a2c,#ff9933);
+                color:white;text-decoration:none;
+                padding:14px 34px;border-radius:14px;
+                font-weight:bold;font-size:1.05em;
+                box-shadow:0 4px 14px rgba(226,106,44,0.4);
+                transition:all 0.3s;"
+         onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 18px rgba(226,106,44,0.5)'"
+         onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 14px rgba(226,106,44,0.4)'">
+        <span style="font-size:1.3em;">📄</span>
+        Descargar Certificado PDF
+      </a>
+ 
+      <p style="color:#aaa;font-size:0.75em;margin-top:14px;">
+        El certificado incluye tu nombre, curso, fecha y un código único de verificación.
+      </p>
+    </div>
+ 
+    {% else %}
+    <!-- 🔒 CURSO INCOMPLETO: progreso hacia el certificado -->
+    <div style="background:#fff9f3;border-radius:16px;
+                padding:20px 24px;border:2px dashed #f7d3a0;">
+ 
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <span style="font-size:1.8em;">🎓</span>
+        <div>
+          <h3 style="color:#4b2e05;font-size:1em;margin:0 0 2px;">
+            Certificado de <strong>{{ curso }}</strong>
+          </h3>
+          <span style="color:#aaa;font-size:0.82em;">
+            🔒 Bloqueado — completa los 8 módulos para desbloquearlo
+          </span>
+        </div>
+      </div>
+ 
+      <p style="color:#7a5230;font-size:0.88em;margin:0 0 12px;">
+        Necesitas aprobar los 8 módulos de tu curso con puntaje ≥ 40% para obtener tu certificado oficial.
+      </p>
+ 
+      <!-- Barra de progreso hacia el certificado -->
+      {% set pct_cert = ((modulos_completados / total_modulos) * 100) | int %}
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="flex:1;background:#f0e0c8;border-radius:10px;
+                    height:18px;overflow:hidden;">
+          <div style="width:{{ pct_cert }}%;height:18px;
+                      background:linear-gradient(90deg,#ff9933,#e26a2c);
+                      border-radius:10px;transition:width 0.6s;
+                      display:flex;align-items:center;justify-content:center;">
+          </div>
+        </div>
+        <span style="font-weight:bold;color:#e26a2c;
+                     white-space:nowrap;font-size:0.95em;">
+          {{ modulos_completados }} / {{ total_modulos }} módulos
+        </span>
+      </div>
+ 
+      <p style="color:#bbb;font-size:0.78em;margin-top:8px;">
+        Te faltan <strong style="color:#e26a2c;">
+        {{ total_modulos - modulos_completados }}</strong> módulo(s) más.
+      </p>
+    </div>
+    {% endif %}
+ 
+  </div>
+
+  <!-- ── INSIGNIAS ── -->
+  <div class="insignias-card">
+    <h3>🏅 Mis Insignias</h3>
+
+    {% if insignias_ganadas %}
+      <span class="ins-contador">{{ insignias_ganadas | length }} / {{ (insignias_ganadas | length) + (insignias_pendientes | length) }} desbloqueadas</span>
+      <div class="insignias-grid">
+        {% for ins in insignias_ganadas %}
+          <div class="ins-card" style="background:#{{ ins.color }}22; border:2px solid #{{ ins.color }};">
+            <div class="ins-emoji">{{ ins.emoji }}</div>
+            <div class="ins-nombre">{{ ins.nombre }}</div>
+            <div class="ins-fecha">
+              {{ ins.fecha.strftime('%d/%m/%Y') if ins.fecha else '' }}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="color:#7a5230;margin-bottom:16px;">
+        🦊 Aún no tienes insignias. ¡Completa tu primer módulo para ganar la primera!
+      </p>
+    {% endif %}
+
+    {% if insignias_pendientes %}
+      <p class="ins-subtitulo">🔒 Por desbloquear:</p>
+      <div class="insignias-grid">
+        {% for ins in insignias_pendientes %}
+          <div class="ins-pendiente">
+            <div class="ins-emoji">{{ ins.emoji }}</div>
+            <div class="ins-nombre">{{ ins.nombre }}</div>
+            <div class="ins-desc">{{ ins.descripcion }}</div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- ── Historial de partidas ── -->
   <div class="tabla-card">
     <h3>🗂️ Historial de partidas</h3>
     {% if progreso %}
@@ -196,19 +337,18 @@
       </div>
     {% endif %}
   </div>
- 
+
   <a class="button" href="{{ url_for('tematicas') }}">📚 Ir a Temáticas</a>
   <a class="button" href="{{ url_for('home') }}">🏠 Inicio</a>
- 
+
 </main>
- 
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
- <!-- ── Smartsupp Live Chat ── -->
+<!-- ── Smartsupp Live Chat ── -->
 <script type="text/javascript">
   var _smartsupp = _smartsupp || {};
   _smartsupp.key = 'dc68ffdd55d786d000505c6677df5ce9aa57e49d';
   _smartsupp.language = 'es';
-
   {% if session.get('nombre') %}
   _smartsupp.name  = '{{ session["nombre"] }}';
   _smartsupp.variables = {
@@ -216,7 +356,6 @@
     plan:  { label: 'Plan',  value: '{{ session.get("plan",  "gratuito") }}' }
   };
   {% endif %}
-
   window.smartsupp||(function(d) {
     var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
     s=d.getElementsByTagName('script')[0];

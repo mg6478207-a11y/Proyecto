@@ -3,595 +3,1864 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RETOMATE - Videos Educativos</title>
+    <title>RETOMATE - Videos Educativos Grados 1 a 5</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <style
+    <style>
         body {
             background: linear-gradient(135deg, #ff9a56 0%, #ff6a00 50%, #ff9a56 100%);
             font-family: 'Comic Sans MS', 'Arial', sans-serif;
             margin: 0;
             min-height: 100vh;
+            transition: background 0.5s;
         }
+        /* Fondos por grado */
+        body.g1 { background: linear-gradient(135deg, #bbf7d0, #4ade80, #16a34a); }
+        body.g2 { background: linear-gradient(135deg, #bae6fd, #38bdf8, #0369a1); }
+        body.g3 { background: linear-gradient(135deg, #fde68a, #fbbf24, #b45309); }
+        body.g4 { background: linear-gradient(135deg, #fecaca, #f87171, #b91c1c); }
+        body.g5 { background: linear-gradient(135deg, #ddd6fe, #a78bfa, #6d28d9); }
+        body.g6 { background: linear-gradient(135deg, #ff9a56, #ff6a00, #ff9a56); }
 
-        main {
-            max-width: 1400px;
-            margin: 40px auto;
-            padding: 30px;
-        }
+        main { max-width: 1400px; margin: 40px auto; padding: 30px; }
 
         .page-title {
-            text-align: center;
-            color: white;
-            font-size: 3em;
-            margin-bottom: 20px;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            text-align: center; color: white; font-size: 3em;
+            margin-bottom: 10px; text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
         }
-
         .page-subtitle {
-            text-align: center;
-            color: white;
-            font-size: 1.3em;
-            margin-bottom: 40px;
+            text-align: center; color: white;
+            font-size: 1.3em; margin-bottom: 30px;
         }
 
-        /* Filtros de Unidades */
-        .filters-container {
+        /* ── SELECTOR DE GRADO ── */
+        .grado-selector {
+            background: rgba(255,255,255,0.92);
+            border-radius: 20px; padding: 22px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+        .grado-selector h3 {
+            color: #ff6a00; font-size: 1.3em;
+            margin-bottom: 14px; text-align: center;
+        }
+        .grado-buttons {
+            display: flex; flex-wrap: wrap;
+            gap: 12px; justify-content: center;
+        }
+        .grado-btn-sel {
+            padding: 12px 28px; border-radius: 25px;
+            border: 3px solid transparent;
+            font-size: 1em; font-weight: bold;
+            font-family: 'Comic Sans MS', Arial, sans-serif;
+            cursor: pointer; transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             background: white;
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
+        .grado-btn-sel:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
+        .grado-btn-sel.g1 { border-color:#4ade80; color:#16a34a; }
+        .grado-btn-sel.g1.active { background:#4ade80; color:white; }
+        .grado-btn-sel.g2 { border-color:#38bdf8; color:#0369a1; }
+        .grado-btn-sel.g2.active { background:#38bdf8; color:white; }
+        .grado-btn-sel.g3 { border-color:#fbbf24; color:#b45309; }
+        .grado-btn-sel.g3.active { background:#fbbf24; color:white; }
+        .grado-btn-sel.g4 { border-color:#f87171; color:#b91c1c; }
+        .grado-btn-sel.g4.active { background:#f87171; color:white; }
+        .grado-btn-sel.g5 { border-color:#a78bfa; color:#6d28d9; }
+        .grado-btn-sel.g5.active { background:#a78bfa; color:white; }
+        .grado-btn-sel.g6 { border-color:#fb923c; color:#c2410c; }
+        .grado-btn-sel.g6.active { background:#fb923c; color:white; }
 
-        .filters-title {
-            color: #ff6a00;
-            font-size: 1.5em;
-            margin-bottom: 15px;
-            text-align: center;
+        /* ── FILTROS POR UNIDAD ── */
+        .filters-container {
+            background: white; border-radius: 20px;
+            padding: 22px; margin-bottom: 28px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
         }
-
-        .filter-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: center;
-        }
-
+        .filters-title { color: #ff6a00; font-size: 1.4em; margin-bottom: 14px; text-align: center; }
+        .filter-buttons { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
         .filter-btn {
-            background: linear-gradient(135deg, #ff6a00 0%, #ff8c42 100%);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            font-size: 1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            background: linear-gradient(135deg, #ff6a00, #ff8c42);
+            color: white; border: none;
+            padding: 10px 22px; border-radius: 25px;
+            font-size: 0.95em; font-weight: bold;
+            font-family: 'Comic Sans MS', Arial, sans-serif;
+            cursor: pointer; transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
         }
+        .filter-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.28); }
+        .filter-btn.active { background: linear-gradient(135deg, #2ecc71, #27ae60); transform: scale(1.05); }
 
-        .filter-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-
-        .filter-btn.active {
-            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-            transform: scale(1.05);
-        }
-
-        /* Grid de Videos */
+        /* ── GRID DE VIDEOS ── */
         .videos-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 30px;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 28px; margin-top: 28px;
         }
-
         .video-card {
-            background: white;
-            border-radius: 20px;
+            background: white; border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
             transition: all 0.3s;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
             cursor: pointer;
         }
-
-        .video-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-        }
-
-        .video-card.hidden {
-            display: none;
-        }
+        .video-card:hover { transform: translateY(-10px); box-shadow: 0 15px 40px rgba(0,0,0,0.35); }
+        .video-card.hidden { display: none; }
 
         .video-thumbnail {
-            position: relative;
-            width: 100%;
-            padding-bottom: 56.25%;
-            overflow: hidden;
-            background: #000;
+            position: relative; width: 100%;
+            padding-bottom: 56.25%; overflow: hidden;
+            background: linear-gradient(135deg, #ff6a00 0%, #ff8c00 50%, #ff9a56 100%);
         }
-
         .video-thumbnail img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; object-fit: cover;
+            transition: opacity 0.4s;
         }
+        .video-thumbnail img.img-fail {
+            opacity: 0 !important;
+        }
+        .thumb-fallback {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 16px; box-sizing: border-box;
+            pointer-events: none;
+        }
+        .thumb-fallback .thumb-emoji {
+            font-size: 2.8em; margin-bottom: 8px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+        .thumb-fallback .thumb-label {
+            color: white; font-family: 'Comic Sans MS', Arial, sans-serif;
+            font-size: 0.82em; font-weight: bold;
+            text-align: center; line-height: 1.3;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+            max-width: 90%;
+        }
+        /* Gradientes por grado */
+        .thumb-g1 { background: linear-gradient(135deg,#16a34a,#4ade80,#bbf7d0); }
+        .thumb-g2 { background: linear-gradient(135deg,#0369a1,#38bdf8,#7dd3fc); }
+        .thumb-g3 { background: linear-gradient(135deg,#b45309,#fbbf24,#fde68a); }
+        .thumb-g4 { background: linear-gradient(135deg,#b91c1c,#f87171,#fecaca); }
+        .thumb-g5 { background: linear-gradient(135deg,#6d28d9,#a78bfa,#ddd6fe); }
+        .thumb-g6 { background: linear-gradient(135deg,#c2410c,#f97316,#fed7aa); }
 
         .play-button {
-            position: absolute;
-            top: 50%;
-            left: 50%;
+            position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.95);
+            width: 76px; height: 76px;
+            background: rgba(255,255,255,0.95);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-            transition: all 0.3s;
-            z-index: 10;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.35);
+            transition: all 0.3s; z-index: 10;
         }
-
-        .video-card:hover .play-button {
-            transform: translate(-50%, -50%) scale(1.2);
-            background: rgba(255, 255, 255, 1);
-        }
-
-        .play-button::before {
-            content: "▶";
-            font-size: 35px;
-            color: #ff6a00;
-            margin-left: 5px;
-        }
+        .video-card:hover .play-button { transform: translate(-50%, -50%) scale(1.2); }
+        .play-button::before { content:"▶"; font-size:32px; color:#ff6a00; margin-left:5px; }
 
         .video-info {
-            padding: 20px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
+            padding: 18px; flex-grow: 1;
+            display: flex; flex-direction: column;
         }
-
         .video-unit {
-            display: inline-block;
-            background: #ff6a00;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 15px;
-            font-size: 0.85em;
-            font-weight: bold;
-            margin-bottom: 10px;
+            display: inline-block; background: #ff6a00;
+            color: white; padding: 4px 14px;
+            border-radius: 15px; font-size: 0.82em;
+            font-weight: bold; margin-bottom: 8px;
             align-self: flex-start;
         }
-
-        .video-title {
-            color: #333;
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 10px;
-            line-height: 1.4;
-        }
-
-        .video-description {
-            color: #666;
-            font-size: 0.95em;
-            line-height: 1.6;
-            flex-grow: 1;
-        }
-
-        .video-duration {
-            color: #ff6a00;
-            font-size: 0.9em;
-            font-weight: bold;
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+        .video-title { color: #333; font-size: 1.15em; font-weight: bold; margin-bottom: 8px; line-height: 1.4; }
+        .video-description { color: #666; font-size: 0.92em; line-height: 1.6; flex-grow: 1; }
+        .video-duration { color: #ff6a00; font-size: 0.88em; font-weight: bold; margin-top: 8px; }
 
         .no-videos-message {
-            text-align: center;
-            color: white;
-            font-size: 1.5em;
-            padding: 60px 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            margin-top: 30px;
+            text-align: center; color: white;
+            font-size: 1.4em; padding: 50px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px; margin-top: 28px;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
-            .page-title {
-                font-size: 2em;
-            }
-
-            .videos-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .filter-buttons {
-                flex-direction: column;
-            }
-
-            .filter-btn {
-                width: 100%;
-            }
+            .page-title { font-size: 2em; }
+            .videos-grid { grid-template-columns: 1fr; }
+            .filter-buttons, .grado-buttons { flex-direction: column; }
+            .filter-btn, .grado-btn-sel { width: 100%; text-align: center; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE" height="80">
-        <h1>RETOMATE</h1>
-        <nav>
-            <ul>
-                <li><a href="{{ url_for('home') }}">🏠 Inicio</a></li>
-                <li><a href="{{ url_for('tematicas') }}">📚 Temáticas</a></li>
-                <li><a href="{{ url_for('videos') }}">🎥 Videos</a></li>
-                <li><a href="{{ url_for('progreso') }}">📊 Progreso</a></li>
-                <li><a href="{{ url_for('planes') }}">💎 Planes</a></li>
-                
-                {% if 'user_id' in session %}
-                    <li><a href="{{ url_for('logout') }}" class="logout-btn">🚪 Cerrar Sesión</a></li>
-                {% else %}
-                    <li><a href="{{ url_for('login') }}">🔐 Iniciar Sesión</a></li>
-                {% endif %}
-            </ul>
-        </nav>
-    </header>
+<header>
+    <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo RETOMATE" height="80">
+    <h1>RETOMATE</h1>
+    <nav><ul>
+        <li><a href="{{ url_for('home') }}">🏠 Inicio</a></li>
+        <li><a href="{{ url_for('tematicas') }}">📚 Temáticas</a></li>
+        <li><a href="{{ url_for('videos') }}">🎥 Videos</a></li>
+        <li><a href="{{ url_for('progreso') }}">📊 Progreso</a></li>
+        {% if 'id' in session %}
+            <li><a href="{{ url_for('logout') }}">🚪 Cerrar Sesión</a></li>
+        {% else %}
+            <li><a href="{{ url_for('login') }}">🔐 Iniciar Sesión</a></li>
+        {% endif %}
+    </ul></nav>
+</header>
 
-    <main>
-        <h1 class="page-title">🎥 Videos Educativos 🦊</h1>
-        <p class="page-subtitle">Aprende matemáticas con videos cortos y divertidos</p>
+<main>
+    <h1 class="page-title">🎥 Videos Educativos 🦊</h1>
+    <p class="page-subtitle">Aprende matemáticas con videos cortos y divertidos</p>
 
-        <!-- Filtros por Unidad -->
-        <div class="filters-container">
-            <h3 class="filters-title">🎯 Selecciona una Unidad</h3>
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-unit="todas" onclick="filterVideos('todas')">
-                    📖 Todas las Unidades
-                </button>
-                <button class="filter-btn" data-unit="unidad1" onclick="filterVideos('unidad1')">
-                    Unidad 1
-                </button>
-                <button class="filter-btn" data-unit="unidad2" onclick="filterVideos('unidad2')">
-                    Unidad 2
-                </button>
-                <button class="filter-btn" data-unit="unidad3" onclick="filterVideos('unidad3')">
-                    Unidad 3
-                </button>
-                <button class="filter-btn" data-unit="unidad4" onclick="filterVideos('unidad4')">
-                    Unidad 4
-                </button>
-                <button class="filter-btn" data-unit="unidad5" onclick="filterVideos('unidad5')">
-                    Unidad 5
-                </button>
-                <button class="filter-btn" data-unit="unidad6" onclick="filterVideos('unidad6')">
-                    Unidad 6
-                </button>
-                <button class="filter-btn" data-unit="unidad7" onclick="filterVideos('unidad7')">
-                    Unidad 7
-                </button>
-                <button class="filter-btn" data-unit="unidad8" onclick="filterVideos('unidad8')">
-                    Unidad 8
-                </button>
+    <!-- SELECTOR DE GRADO -->
+    <div class="grado-selector">
+        <h3>🎓 Selecciona tu Grado</h3>
+        <div class="grado-buttons">
+            <button class="grado-btn-sel g1 active" onclick="cambiarGrado(1)">🌿 Grado 1°</button>
+            <button class="grado-btn-sel g2"        onclick="cambiarGrado(2)">🌊 Grado 2°</button>
+            <button class="grado-btn-sel g3"        onclick="cambiarGrado(3)">🏗️ Grado 3°</button>
+            <button class="grado-btn-sel g4"        onclick="cambiarGrado(4)">🚀 Grado 4°</button>
+            <button class="grado-btn-sel g5"        onclick="cambiarGrado(5)">🔬 Grado 5°</button>
+            <button class="grado-btn-sel g6"        onclick="cambiarGrado(6)">🗺️ Grado 6°</button>
+        </div>
+    </div>
+
+    <!-- FILTROS POR UNIDAD -->
+    <div class="filters-container">
+        <h3 class="filters-title">🎯 Selecciona una Unidad</h3>
+        <div class="filter-buttons" id="filtrosUnidad">
+            <!-- Se genera dinámicamente -->
+        </div>
+    </div>
+
+    <!-- GRID DE VIDEOS -->
+    <div class="videos-grid" id="videosGrid">
+        <div class="video-card" data-grado="1" data-unit="g1u1" onclick="openVideo('https://www.youtube.com/watch?v=BpjX7NRV0EI&t=2s')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/BpjX7NRV0EI/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/BpjX7NRV0EI/hqdefault.jpg':this.src='https://img.youtube.com/vi/BpjX7NRV0EI/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g1">
+                    <div class="thumb-emoji">🍎</div>
+                    <div class="thumb-label">Unidad 1 · Contemos juntos</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 1 · Unidad 1</span>
+                <h3 class="video-title">Contemos del 1 al 10 con animales</h3>
+                <p class="video-description">Aprende a contar del 1 al 20 con canciones y animales del bosque. Ideal para primeros pasos en matemáticas.</p>
+                <div class="video-duration"></div>
             </div>
         </div>
-
-        <!-- Grid de Videos -->
-        <div class="videos-grid" id="videosGrid">
-            <!-- UNIDAD 1: NÚMEROS NATURALES -->
-            <div class="video-card" data-unit="unidad1" onclick="openVideo('https://youtu.be/hd5qnZfGO1c')">
-                <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/hd5qnZfGO1c/maxresdefault.jpg" alt="Video thumbnail">
-                    <div class="play-button"></div>
+        <div class="video-card" data-grado="1" data-unit="g1u1" onclick="openVideo('https://www.youtube.com/watch?v=DxIGzsIfvhc&list=RDDxIGzsIfvhc&start_radio=1')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/DxIGzsIfvhc/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/DxIGzsIfvhc/hqdefault.jpg':this.src='https://img.youtube.com/vi/DxIGzsIfvhc/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g1">
+                    <div class="thumb-emoji">🍎</div>
+                    <div class="thumb-label">Unidad 1 · Contemos juntos</div>
                 </div>
-                <div class="video-info">
-                    <span class="video-unit">Unidad 1</span>
-                    <h3 class="video-title">NÚMEROS NATURALES Super Fácil</h3>
-                    <p class="video-description">Aprende los números naturales de forma súper fácil, ideal para principiantes.</p>
-                    <div class="video-duration">⏱️ Para principiantes</div>
-                </div>
+                <div class="play-button"></div>
             </div>
-
-            <div class="video-card" data-unit="unidad1" onclick="openVideo('https://youtu.be/xLAhqCkajWM')">
-                <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/xLAhqCkajWM/maxresdefault.jpg" alt="Video thumbnail">
-                    <div class="play-button"></div>
-                </div>
-                <div class="video-info">
-                    <span class="video-unit">Unidad 1</span>
-                    <h3 class="video-title">Números Naturales: Uso, Escritura y Lectura</h3>
-                    <p class="video-description">Aprende cómo usar, escribir y leer los números naturales correctamente.</p>
-                    <div class="video-duration">⏱️ Matemáticas para niños</div>
-                </div>
-            </div>
-
-            <!-- UNIDAD 2: TEORÍA DE NÚMEROS -->
-            <div class="video-card" data-unit="unidad2" onclick="openVideo('https://youtu.be/I_gjkfQm3WY')">
-                <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/I_gjkfQm3WY/maxresdefault.jpg" alt="Video thumbnail">
-                    <div class="play-button"></div>
-                </div>
-                <div class="video-info">
-                    <span class="video-unit">Unidad 2</span>
-                    <h3 class="video-title">Teoría de Números</h3>
-                    <p class="video-description">Descubre los conceptos fundamentales de la teoría de números con la Profe Monse.</p>
-                    <div class="video-duration">⏱️ Profe Monse</div>
-                </div>
-            </div>
-
-            <div class="video-card" data-unit="unidad2" onclick="openVideo('https://youtu.be/A8g-Z_N7-sA')">
-                <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/A8g-Z_N7-sA/maxresdefault.jpg" alt="Video thumbnail">
-                    <div class="play-button"></div>
-                </div>
-                <div class="video-info">
-                    <span class="video-unit">Unidad 2</span>
-                    <h3 class="video-title">Múltiplos y Divisores</h3>
-                    <p class="video-description">Aprende sobre múltiplos, divisores y números primos de manera clara.</p>
-                    <div class="video-duration">⏱️ Explicación detallada</div>
-                </div>
-            </div>
-
-            <!-- UNIDAD 3: CONJUNTOS -->
-            <div class="video-card" data-unit="unidad3" onclick="openVideo('https://youtu.be/SBcuckgn9rI')">
-                <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/SBcuckgn9rI/maxresdefault.jpg" alt="Video thumbnail">
-                    <div class="play-button"></div>
-                </div>
-                <div class="video-info">
-                    <span class="video-unit">Unidad 3</span>
-                    <h3 class="video-title">Problemas con Conjuntos</h3>
-                    <p class="video-description">Resuelve problemas utilizando la teoría de conjuntos de forma práctica.</p>
-                    <div class="video-duration">⏱️ Ejercicios resueltos</div>
-                </div>
-            </div>
-
-            <div class="video-card" data-unit="unidad3" onclick="openVideo('https://youtu.be/UIeYM0a2PTc')">
-                <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/UIeYM0a2PTc/maxresdefault.jpg" alt="Video thumbnail">
-                    <div class="play-button"></div>
-                </div>
-                <div class="video-info">
-                    <span class="video-unit">Unidad 3</span>
-                    <h3 class="video-title">Unión e Intersección de Conjuntos</h3>
-                    <p class="video-description">Aprende las operaciones básicas con conjuntos: unión e intersección.</p>
-                    <div class="video-duration">⏱️ Operaciones con conjuntos</div>
-                </div>
-            </div>
-
-            <!-- UNIDAD 4: FRACCIONES -->
-            <div class="video-card" data-unit="unidad4" onclick="openVideo('https://youtu.be/c9cTIjBqFTw')">
-                <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/c9cTIjBqFTw/maxresdefault.jpg" alt="Video thumbnail">
-                    <div class="play-button"></div>
-                </div>
-                <div class="video-info">
-                    <span class="video-unit">Unidad 4</span>
-                    <h3 class="video-title">Fracciones para Niños con Pizza</h3>
-                    <p class="video-description">Aprende las fracciones de forma divertida usando pizzas como ejemplo.</p>
-                    <div class="video-duration">⏱️ Introducción divertida</div>
-                </div>
-            </div>
-
-            <div class="video-card" data-unit="unidad4" onclick="openVideo('https://youtu.be/DVXZi9ZWFvo')">
-                <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/DVXZi9ZWFvo/maxresdefault.jpg" alt="Video thumbnail">
-                    <div class="play-button"></div>
-                </div>
-                <div class="video-info">
-                    <span class="video-unit">Unidad 4</span>
-                    <h3 class="video-title">Aprende a Leer Fracciones</h3>
-                    <p class="video-description">Descubre cómo leer e interpretar fracciones correctamente.</p>
-                    <div class="video-duration">⏱️ Matemáticas para niños</div>
-                </div>
-            </div>
-
-            <!-- UNIDAD 5: DECIMALES -->
-            <div class="video-card" data-unit="unidad5" onclick="openVideo('https://youtu.be/OYjW1gV8SJU')">
-                <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/OYjW1gV8SJU/maxresdefault.jpg" alt="Video thumbnail">
-                    <div class="play-button"></div>
-                </div>
-                <div class="video-info">
-                    <span class="video-unit">Unidad 5</span>
-                    <h3 class="video-title">Números Decimales - Video 1</h3>
-                    <p class="video-description">Entiende qué son los números decimales y cómo se relacionan con las fracciones.</p>
-                    <div class="video-duration">⏱️ Introducción</div>
-                </div>
-            </div>
-
-            <div class="video-card" data-unit="unidad5" onclick="openVideo('https://youtu.be/bVFExqCCwfE')">
-                <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/bVFExqCCwfE/maxresdefault.jpg" alt="Video thumbnail">
-                    <div class="play-button"></div>
-                </div>
-                <div class="video-info">
-                    <span class="video-unit">Unidad 5</span>
-                    <h3 class="video-title">Operaciones con Decimales</h3>
-                    <p class="video-description">Aprende a sumar, restar, multiplicar y dividir números decimales.</p>
-                    <div class="video-duration">⏱️ Operaciones básicas</div>
-                </div>
-            </div>
-
-            <!-- UNIDAD 6: GEOMETRÍA -->
-            <div class="video-card" data-unit="unidad6" onclick="openVideo('https://youtu.be/WPMrb95J8i0')">
-                <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/WPMrb95J8i0/maxresdefault.jpg" alt="Video thumbnail">
-                    <div class="play-button"></div>
-                </div>
-                <div class="video-info">
-                    <span class="video-unit">Unidad 6</span>
-                    <h3 class="video-title">Medida y Geometría - Video 1</h3>
-                    <p class="video-description">Conoce las figuras geométricas y aprende a medirlas correctamente.</p>
-                    <div class="video-duration">⏱️ Figuras básicas</div>
-                </div>
-            </div>
-
-            <div class="video-card" data-unit="unidad6" onclick="openVideo('https://youtu.be/-FvTH9sdL3Q')">
-                <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/-FvTH9sdL3Q/maxresdefault.jpg" alt="Video thumbnail">
-                    <div class="play-button"></div>
-                </div>
-                <div class="video-info">
-                    <span class="video-unit">Unidad 6</span>
-                    <h3 class="video-title">Perímetro y Área</h3>
-                    <p class="video-description">Aprende a calcular el perímetro y área de diferentes figuras geométricas.</p>
-                    <div class="video-duration">⏱️ Cálculos geométricos</div>
-                </div>
-            </div>
-
-            <!-- UNIDAD 7: PROPORCIONES -->
-            <div class="video-card" data-unit="unidad7" onclick="openVideo('https://youtu.be/3eYwW4sDlxM')">
-                <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/3eYwW4sDlxM/maxresdefault.jpg" alt="Video thumbnail">
-                    <div class="play-button"></div>
-                </div>
-                <div class="video-info">
-                    <span class="video-unit">Unidad 7</span>
-                    <h3 class="video-title">Razón, Proporción y Porcentaje - Video 1</h3>
-                    <p class="video-description">Entiende qué son las razones y proporciones para comparar cantidades.</p>
-                    <div class="video-duration">⏱️ Conceptos básicos</div>
-                </div>
-            </div>
-
-            <div class="video-card" data-unit="unidad7" onclick="openVideo('https://youtu.be/sWg-OtWlkfs')">
-                <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/sWg-OtWlkfs/maxresdefault.jpg" alt="Video thumbnail">
-                    <div class="play-button"></div>
-                </div>
-                <div class="video-info">
-                    <span class="video-unit">Unidad 7</span>
-                    <h3 class="video-title">Cálculo de Porcentajes</h3>
-                    <p class="video-description">Aprende a calcular porcentajes de manera fácil y práctica.</p>
-                    <div class="video-duration">⏱️ Ejemplos prácticos</div>
-                </div>
-            </div>
-
-            <!-- UNIDAD 8: ESTADÍSTICA -->
-            <div class="video-card" data-unit="unidad8" onclick="openVideo('https://youtu.be/PcFhnJiZ9v8')">
-                <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/PcFhnJiZ9v8/maxresdefault.jpg" alt="Video thumbnail">
-                    <div class="play-button"></div>
-                </div>
-                <div class="video-info">
-                    <span class="video-unit">Unidad 8</span>
-                    <h3 class="video-title">Estadística Descriptiva - Video 1</h3>
-                    <p class="video-description">Descubre qué es la estadística y cómo organizar y representar datos.</p>
-                    <div class="video-duration">⏱️ Introducción</div>
-                </div>
-            </div>
-
-            <div class="video-card" data-unit="unidad8" onclick="openVideo('https://youtu.be/0_ybaigJd1s')">
-                <div class="video-thumbnail">
-                    <img src="https://img.youtube.com/vi/0_ybaigJd1s/maxresdefault.jpg" alt="Video thumbnail">
-                    <div class="play-button"></div>
-                </div>
-                <div class="video-info">
-                    <span class="video-unit">Unidad 8</span>
-                    <h3 class="video-title">Media, Moda y Mediana</h3>
-                    <p class="video-description">Aprende a calcular e interpretar la media, moda y mediana de datos.</p>
-                    <div class="video-duration">⏱️ Medidas estadísticas</div>
-                </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 1 · Unidad 1</span>
+                <h3 class="video-title">Los números del 1 al 20</h3>
+                <p class="video-description">Practica el conteo del 1 al 20 con juegos visuales y colores para niños.</p>
+                <div class="video-duration"></div>
             </div>
         </div>
-
-        <div class="no-videos-message" id="noVideosMsg" style="display: none;">
-            🦊 No hay videos disponibles para esta unidad todavía. ¡Pronto agregaremos más contenido!
+        <div class="video-card" data-grado="1" data-unit="g1u2" onclick="openVideo('https://www.youtube.com/watch?v=oexd_Dfic_Q')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/oexd_Dfic_Q/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/oexd_Dfic_Q/hqdefault.jpg':this.src='https://img.youtube.com/vi/oexd_Dfic_Q/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g1">
+                    <div class="thumb-emoji">➕</div>
+                    <div class="thumb-label">Unidad 2 · Sumas</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 1 · Unidad 2</span>
+                <h3 class="video-title">Sumas para niños - Introducción</h3>
+                <p class="video-description">Aprende a sumar con objetos cotidianos. Explicación clara y divertida para primero de primaria.</p>
+                <div class="video-duration"></div>
+            </div>
         </div>
-    </main>
+        <div class="video-card" data-grado="1" data-unit="g1u2" onclick="openVideo('https://www.youtube.com/watch?v=lgTHXU0AS-w')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/lgTHXU0AS-w/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/lgTHXU0AS-w/hqdefault.jpg':this.src='https://img.youtube.com/vi/lgTHXU0AS-w/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g1">
+                    <div class="thumb-emoji">➕</div>
+                    <div class="thumb-label">Unidad 2 · Sumas</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 1 · Unidad 2</span>
+                <h3 class="video-title">Sumas divertidas con canciones</h3>
+                <p class="video-description">Canciones matemáticas para aprender a sumar de forma memorizable y entretenida.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="1" data-unit="g1u3" onclick="openVideo('https://www.youtube.com/watch?v=mRbfMJxratU')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/mRbfMJxratU/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/mRbfMJxratU/hqdefault.jpg':this.src='https://img.youtube.com/vi/mRbfMJxratU/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g1">
+                    <div class="thumb-emoji">➖</div>
+                    <div class="thumb-label">Unidad 3 · Restas</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 1 · Unidad 3</span>
+                <h3 class="video-title">La resta para niños - Fácil y rápido</h3>
+                <p class="video-description">Aprende qué es restar y cómo hacerlo con ejemplos visuales y simples.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="1" data-unit="g1u3" onclick="openVideo('https://www.youtube.com/watch?v=42vjqtleG9E')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/42vjqtleG9E/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/42vjqtleG9E/hqdefault.jpg':this.src='https://img.youtube.com/vi/42vjqtleG9E/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g1">
+                    <div class="thumb-emoji">➖</div>
+                    <div class="thumb-label">Unidad 3 · Restas</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 1 · Unidad 3</span>
+                <h3 class="video-title">Restas con objetos del hogar</h3>
+                <p class="video-description">Practica la resta usando objetos del hogar. Muy visual y práctico para niños de grado 1.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="1" data-unit="g1u4" onclick="openVideo('https://www.youtube.com/watch?v=sDYrHwKcVCA&list=RDsDYrHwKcVCA&start_radio=1')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/sDYrHwKcVCA/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/sDYrHwKcVCA/hqdefault.jpg':this.src='https://img.youtube.com/vi/sDYrHwKcVCA/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g1">
+                    <div class="thumb-emoji">🔷</div>
+                    <div class="thumb-label">Unidad 4 · Figuras</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 1 · Unidad 4</span>
+                <h3 class="video-title">Figuras geométricas para niños</h3>
+                <p class="video-description">Conoce el círculo, cuadrado, triángulo y rectángulo con ejemplos del mundo real.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="1" data-unit="g1u4" onclick="openVideo('https://www.youtube.com/watch?v=XLqWGuw1rWI&list=RDXLqWGuw1rWI&start_radio=1')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/XLqWGuw1rWI/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/XLqWGuw1rWI/hqdefault.jpg':this.src='https://img.youtube.com/vi/XLqWGuw1rWI/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g1">
+                    <div class="thumb-emoji">🔷</div>
+                    <div class="thumb-label">Unidad 4 · Figuras</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 1 · Unidad 4</span>
+                <h3 class="video-title">Las formas y sus nombres</h3>
+                <p class="video-description">Aprende los nombres y características de las formas geométricas básicas cantando.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="1" data-unit="g1u5" onclick="openVideo('https://www.youtube.com/watch?v=uI1J0j4lBuk')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/uI1J0j4lBuk/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/uI1J0j4lBuk/hqdefault.jpg':this.src='https://img.youtube.com/vi/uI1J0j4lBuk/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g1">
+                    <div class="thumb-emoji">📏</div>
+                    <div class="thumb-label">Unidad 5 · ¿Cuánto mide?</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 1 · Unidad 5</span>
+                <h3 class="video-title">Medidas de longitud para niños</h3>
+                <p class="video-description">Aprende a medir objetos con regla y compara longitudes. Explicación sencilla y divertida.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="1" data-unit="g1u5" onclick="openVideo('https://www.youtube.com/watch?v=Gn6CDOj0_cY')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/Gn6CDOj0_cY/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/Gn6CDOj0_cY/hqdefault.jpg':this.src='https://img.youtube.com/vi/Gn6CDOj0_cY/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g1">
+                    <div class="thumb-emoji">📏</div>
+                    <div class="thumb-label">Unidad 5 · ¿Cuánto mide?</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 1 · Unidad 5</span>
+                <h3 class="video-title">Largo, corto, alto y bajo</h3>
+                <p class="video-description">Comprende los conceptos de medida comparando objetos del entorno cotidiano.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="1" data-unit="g1u6" onclick="openVideo('https://www.youtube.com/watch?v=fVh43cTZzTE&list=RDfVh43cTZzTE&start_radio=1')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/fVh43cTZzTE/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/fVh43cTZzTE/hqdefault.jpg':this.src='https://img.youtube.com/vi/fVh43cTZzTE/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g1">
+                    <div class="thumb-emoji">🔢</div>
+                    <div class="thumb-label">Unidad 6 · Hasta 100</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 1 · Unidad 6</span>
+                <h3 class="video-title">Contando del 1 al 100</h3>
+                <p class="video-description">Aprende a contar hasta el 100 con una canción pegajosa y animaciones coloridas.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="1" data-unit="g1u6" onclick="openVideo('https://www.youtube.com/watch?v=LiLE_f9I6Co')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/LiLE_f9I6Co/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/LiLE_f9I6Co/hqdefault.jpg':this.src='https://img.youtube.com/vi/LiLE_f9I6Co/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g1">
+                    <div class="thumb-emoji">🔢</div>
+                    <div class="thumb-label">Unidad 6 · Hasta 100</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 1 · Unidad 6</span>
+                <h3 class="video-title">Números del 1 al 100 paso a paso</h3>
+                <p class="video-description">Escribe y lee los números del 1 al 100. Aprende decenas y unidades de manera visual.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="1" data-unit="g1u7" onclick="openVideo('https://www.youtube.com/watch?v=TlxG2HGcQRA')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/TlxG2HGcQRA/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/TlxG2HGcQRA/hqdefault.jpg':this.src='https://img.youtube.com/vi/TlxG2HGcQRA/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g1">
+                    <div class="thumb-emoji">🔄</div>
+                    <div class="thumb-label">Unidad 7 · Patrones</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 1 · Unidad 7</span>
+                <h3 class="video-title">Patrones y secuencias para niños</h3>
+                <p class="video-description">Descubre cómo reconocer y completar patrones con figuras, colores y números.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="1" data-unit="g1u7" onclick="openVideo('https://www.youtube.com/watch?v=Mk6ZR3h8Q-I')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/Mk6ZR3h8Q-I/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/Mk6ZR3h8Q-I/hqdefault.jpg':this.src='https://img.youtube.com/vi/Mk6ZR3h8Q-I/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g1">
+                    <div class="thumb-emoji">🔄</div>
+                    <div class="thumb-label">Unidad 7 · Patrones</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 1 · Unidad 7</span>
+                <h3 class="video-title">Series numéricas: ¿qué sigue?</h3>
+                <p class="video-description">Aprende a identificar el patrón de una serie numérica y predecir el siguiente número.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="1" data-unit="g1u8" onclick="openVideo('https://www.youtube.com/watch?v=Rxj_0DsQzk8')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/Rxj_0DsQzk8/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/Rxj_0DsQzk8/hqdefault.jpg':this.src='https://img.youtube.com/vi/Rxj_0DsQzk8/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g1">
+                    <div class="thumb-emoji">⚖️</div>
+                    <div class="thumb-label">Unidad 8 · Comparar</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 1 · Unidad 8</span>
+                <h3 class="video-title">Mayor que, menor que, igual que</h3>
+                <p class="video-description">Aprende a comparar números y cantidades usando los signos &gt; &lt; = de forma divertida.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="1" data-unit="g1u8" onclick="openVideo('https://www.youtube.com/watch?v=v67X2aonkU4')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/v67X2aonkU4/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/v67X2aonkU4/hqdefault.jpg':this.src='https://img.youtube.com/vi/v67X2aonkU4/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g1">
+                    <div class="thumb-emoji">⚖️</div>
+                    <div class="thumb-label">Unidad 8 · Comparar</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 1 · Unidad 8</span>
+                <h3 class="video-title">Ordenar números de menor a mayor</h3>
+                <p class="video-description">Practica ordenar conjuntos de números y objetos de menor a mayor y viceversa.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="2" data-unit="g2u1" onclick="openVideo('https://www.youtube.com/watch?v=e1YEAn-WZx4')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/e1YEAn-WZx4/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/e1YEAn-WZx4/hqdefault.jpg':this.src='https://img.youtube.com/vi/e1YEAn-WZx4/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g2">
+                    <div class="thumb-emoji">➕</div>
+                    <div class="thumb-label">Unidad 1 · Sumas con lleva</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 2 · Unidad 1</span>
+                <h3 class="video-title">Sumas llevando - Paso a paso</h3>
+                <p class="video-description">Aprende a sumar números de dos cifras llevando decenas. Método claro y visual.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="2" data-unit="g2u1" onclick="openVideo('https://www.youtube.com/watch?v=kyJ6I_6F5SA')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/kyJ6I_6F5SA/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/kyJ6I_6F5SA/hqdefault.jpg':this.src='https://img.youtube.com/vi/kyJ6I_6F5SA/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g2">
+                    <div class="thumb-emoji">➕</div>
+                    <div class="thumb-label">Unidad 1 · Sumas con lleva</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 2 · Unidad 1</span>
+                <h3 class="video-title">Sumas de dos dígitos con lleva</h3>
+                <p class="video-description">Ejercicios resueltos de suma llevando, ideales para segundo grado.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="2" data-unit="g2u2" onclick="openVideo('https://www.youtube.com/watch?v=b_vekNIXF34')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/b_vekNIXF34/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/b_vekNIXF34/hqdefault.jpg':this.src='https://img.youtube.com/vi/b_vekNIXF34/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g2">
+                    <div class="thumb-emoji">➖</div>
+                    <div class="thumb-label">Unidad 2 · Restas</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 2 · Unidad 2</span>
+                <h3 class="video-title">Resta con préstamo explicada</h3>
+                <p class="video-description">Aprende a restar tomando prestado. Explicación paso a paso con ejemplos resueltos.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="2" data-unit="g2u2" onclick="openVideo('https://www.youtube.com/watch?v=FnSwaSQmAbc')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/FnSwaSQmAbc/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/FnSwaSQmAbc/hqdefault.jpg':this.src='https://img.youtube.com/vi/FnSwaSQmAbc/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g2">
+                    <div class="thumb-emoji">➖</div>
+                    <div class="thumb-label">Unidad 2 · Restas</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 2 · Unidad 2</span>
+                <h3 class="video-title">Restas con dos cifras: práctica</h3>
+                <p class="video-description">Ejercicios de resta de dos cifras con y sin préstamo para practicar en casa.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="2" data-unit="g2u3" onclick="openVideo('https://www.youtube.com/watch?v=Go3w9-d5ybM')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/Go3w9-d5ybM/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/Go3w9-d5ybM/hqdefault.jpg':this.src='https://img.youtube.com/vi/Go3w9-d5ybM/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g2">
+                    <div class="thumb-emoji">✖️</div>
+                    <div class="thumb-label">Unidad 3 · Tablas 2 y 5</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 2 · Unidad 3</span>
+                <h3 class="video-title">Tabla del 2 con canción</h3>
+                <p class="video-description">Memoriza la tabla del 2 de forma fácil con una canción pegajosa y animaciones.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="2" data-unit="g2u3" onclick="openVideo('https://www.youtube.com/watch?v=YFtEaVw5k1A')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/YFtEaVw5k1A/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/YFtEaVw5k1A/hqdefault.jpg':this.src='https://img.youtube.com/vi/YFtEaVw5k1A/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g2">
+                    <div class="thumb-emoji">✖️</div>
+                    <div class="thumb-label">Unidad 3 · Tablas 2 y 5</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 2 · Unidad 3</span>
+                <h3 class="video-title">Tabla del 5 - Canción para niños</h3>
+                <p class="video-description">Aprende la tabla del 5 cantando. Muy fácil de memorizar para niños de segundo grado.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="2" data-unit="g2u4" onclick="openVideo('https://www.youtube.com/watch?v=eC6-OOfx1tQ')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/eC6-OOfx1tQ/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/eC6-OOfx1tQ/hqdefault.jpg':this.src='https://img.youtube.com/vi/eC6-OOfx1tQ/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g2">
+                    <div class="thumb-emoji">🔢</div>
+                    <div class="thumb-label">Unidad 4 · Decenas y U</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 2 · Unidad 4</span>
+                <h3 class="video-title">Decenas y Unidades explicadas</h3>
+                <p class="video-description">Comprende la diferencia entre decenas y unidades con bloques de colores y ejemplos claros.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="2" data-unit="g2u4" onclick="openVideo('https://www.youtube.com/watch?v=nm9ynfE-tCI')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/nm9ynfE-tCI/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/nm9ynfE-tCI/hqdefault.jpg':this.src='https://img.youtube.com/vi/nm9ynfE-tCI/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g2">
+                    <div class="thumb-emoji">🔢</div>
+                    <div class="thumb-label">Unidad 4 · Decenas y U</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 2 · Unidad 4</span>
+                <h3 class="video-title">Descomponiendo números en D y U</h3>
+                <p class="video-description">Aprende a descomponer cualquier número de dos cifras en decenas y unidades.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="2" data-unit="g2u5" onclick="openVideo('https://www.youtube.com/watch?v=m4ng8_NAiXo&list=RDm4ng8_NAiXo&start_radio=1')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/m4ng8_NAiXo/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/m4ng8_NAiXo/hqdefault.jpg':this.src='https://img.youtube.com/vi/m4ng8_NAiXo/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g2">
+                    <div class="thumb-emoji">💯</div>
+                    <div class="thumb-label">Unidad 5 · Hasta 1000</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 2 · Unidad 5</span>
+                <h3 class="video-title">Números hasta 1000 - Centenas</h3>
+                <p class="video-description">Aprende las centenas y cómo representar números de tres cifras hasta el 1000.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="2" data-unit="g2u5" onclick="openVideo('https://www.youtube.com/watch?v=UwKAcjytkPc')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/UwKAcjytkPc/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/UwKAcjytkPc/hqdefault.jpg':this.src='https://img.youtube.com/vi/UwKAcjytkPc/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g2">
+                    <div class="thumb-emoji">💯</div>
+                    <div class="thumb-label">Unidad 5 · Hasta 1000</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 2 · Unidad 5</span>
+                <h3 class="video-title">Centenas, decenas y unidades</h3>
+                <p class="video-description">Descompon números de tres cifras en centenas, decenas y unidades. Muy visual.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="2" data-unit="g2u6" onclick="openVideo('https://www.youtube.com/watch?v=hrZY5nxyJ_U')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/hrZY5nxyJ_U/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/hrZY5nxyJ_U/hqdefault.jpg':this.src='https://img.youtube.com/vi/hrZY5nxyJ_U/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g2">
+                    <div class="thumb-emoji">🔄</div>
+                    <div class="thumb-label">Unidad 6 · Patrones</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 2 · Unidad 6</span>
+                <h3 class="video-title">Patrones numéricos para grado 2</h3>
+                <p class="video-description">Aprende a reconocer patrones que se repiten en secuencias de números.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="2" data-unit="g2u6" onclick="openVideo('https://www.youtube.com/watch?v=Veaefx6KhrQ')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/Veaefx6KhrQ/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/Veaefx6KhrQ/hqdefault.jpg':this.src='https://img.youtube.com/vi/Veaefx6KhrQ/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g2">
+                    <div class="thumb-emoji">🔄</div>
+                    <div class="thumb-label">Unidad 6 · Patrones</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 2 · Unidad 6</span>
+                <h3 class="video-title">Secuencias y series de 2 en 2 y 5 en 5</h3>
+                <p class="video-description">Practica contar de 2 en 2 y de 5 en 5 para entender patrones numéricos.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="2" data-unit="g2u7" onclick="openVideo('https://www.youtube.com/watch?v=SXONzObzFk0')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/SXONzObzFk0/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/SXONzObzFk0/hqdefault.jpg':this.src='https://img.youtube.com/vi/SXONzObzFk0/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g2">
+                    <div class="thumb-emoji">📐</div>
+                    <div class="thumb-label">Unidad 7 · Figuras planas</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 2 · Unidad 7</span>
+                <h3 class="video-title">Figuras planas: lados y vértices</h3>
+                <p class="video-description">Conoce las figuras planas, sus lados, vértices y ángulos de manera clara.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="2" data-unit="g2u7" onclick="openVideo('https://www.youtube.com/watch?v=zblBZbPdzIc')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/zblBZbPdzIc/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/zblBZbPdzIc/hqdefault.jpg':this.src='https://img.youtube.com/vi/zblBZbPdzIc/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g2">
+                    <div class="thumb-emoji">📐</div>
+                    <div class="thumb-label">Unidad 7 · Figuras planas</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 2 · Unidad 7</span>
+                <h3 class="video-title">Polígonos para niños</h3>
+                <p class="video-description">Aprende qué son los polígonos y cómo clasificarlos según sus lados.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="2" data-unit="g2u8" onclick="openVideo('https://www.youtube.com/watch?v=CGC8slvdsL8')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/CGC8slvdsL8/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/CGC8slvdsL8/hqdefault.jpg':this.src='https://img.youtube.com/vi/CGC8slvdsL8/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g2">
+                    <div class="thumb-emoji">📅</div>
+                    <div class="thumb-label">Unidad 8 · Tiempo</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 2 · Unidad 8</span>
+                <h3 class="video-title">El calendario: días, meses y años</h3>
+                <p class="video-description">Aprende a leer el calendario, los días de la semana y los meses del año.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="2" data-unit="g2u8" onclick="openVideo('https://www.youtube.com/watch?v=XCgJB97DEGM')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/XCgJB97DEGM/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/XCgJB97DEGM/hqdefault.jpg':this.src='https://img.youtube.com/vi/XCgJB97DEGM/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g2">
+                    <div class="thumb-emoji">📅</div>
+                    <div class="thumb-label">Unidad 8 · Tiempo</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 2 · Unidad 8</span>
+                <h3 class="video-title">Las horas del reloj para niños</h3>
+                <p class="video-description">Aprende a leer la hora en el reloj analógico y digital de forma divertida.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="3" data-unit="g3u1" onclick="openVideo('https://www.youtube.com/watch?v=WES-u3UPDRA')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/WES-u3UPDRA/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/WES-u3UPDRA/hqdefault.jpg':this.src='https://img.youtube.com/vi/WES-u3UPDRA/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g3">
+                    <div class="thumb-emoji">✖️</div>
+                    <div class="thumb-label">Unidad 1 · Multiplicación</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 3 · Unidad 1</span>
+                <h3 class="video-title">Multiplicación para niños - Introducción</h3>
+                <p class="video-description">Aprende qué es la multiplicación y cómo se relaciona con la suma repetida.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="3" data-unit="g3u1" onclick="openVideo('https://www.youtube.com/watch?v=-d2BBu78NC8')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/-d2BBu78NC8/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/-d2BBu78NC8/hqdefault.jpg':this.src='https://img.youtube.com/vi/-d2BBu78NC8/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g3">
+                    <div class="thumb-emoji">✖️</div>
+                    <div class="thumb-label">Unidad 1 · Multiplicación</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 3 · Unidad 1</span>
+                <h3 class="video-title">Tablas de multiplicar - Todas juntas</h3>
+                <p class="video-description">Repaso completo de las tablas de multiplicar del 1 al 10 con canción.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="3" data-unit="g3u2" onclick="openVideo('https://www.youtube.com/watch?v=65WcGWLRauQ')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/65WcGWLRauQ/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/65WcGWLRauQ/hqdefault.jpg':this.src='https://img.youtube.com/vi/65WcGWLRauQ/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g3">
+                    <div class="thumb-emoji">➗</div>
+                    <div class="thumb-label">Unidad 2 · División</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 3 · Unidad 2</span>
+                <h3 class="video-title">División exacta para niños</h3>
+                <p class="video-description">Aprende a dividir de forma exacta con ejemplos visuales y fáciles de entender.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="3" data-unit="g3u2" onclick="openVideo('https://www.youtube.com/watch?v=IRFuKIZCgp0')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/IRFuKIZCgp0/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/IRFuKIZCgp0/hqdefault.jpg':this.src='https://img.youtube.com/vi/IRFuKIZCgp0/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g3">
+                    <div class="thumb-emoji">➗</div>
+                    <div class="thumb-label">Unidad 2 · División</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 3 · Unidad 2</span>
+                <h3 class="video-title">Cómo dividir paso a paso</h3>
+                <p class="video-description">Método paso a paso para aprender la división con ejemplos resueltos.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="3" data-unit="g3u3" onclick="openVideo('https://www.youtube.com/watch?v=ecSMePh4Mzw&list=RDecSMePh4Mzw&start_radio=1')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/ecSMePh4Mzw/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/ecSMePh4Mzw/hqdefault.jpg':this.src='https://img.youtube.com/vi/ecSMePh4Mzw/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g3">
+                    <div class="thumb-emoji">📋</div>
+                    <div class="thumb-label">Unidad 3 · Tablas</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 3 · Unidad 3</span>
+                <h3 class="video-title">Todas las tablas cantadas</h3>
+                <p class="video-description">Memoriza todas las tablas del 1 al 10 con canciones animadas.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="3" data-unit="g3u3" onclick="openVideo('https://www.youtube.com/watch?v=ot42bQBaI7E')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/ot42bQBaI7E/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/ot42bQBaI7E/hqdefault.jpg':this.src='https://img.youtube.com/vi/ot42bQBaI7E/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g3">
+                    <div class="thumb-emoji">📋</div>
+                    <div class="thumb-label">Unidad 3 · Tablas</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 3 · Unidad 3</span>
+                <h3 class="video-title">Trucos para aprender las tablas</h3>
+                <p class="video-description">Trucos y métodos visuales para memorizar todas las tablas de multiplicar.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="3" data-unit="g3u4" onclick="openVideo('https://youtu.be/c9cTIjBqFTw')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/c9cTIjBqFTw/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/c9cTIjBqFTw/hqdefault.jpg':this.src='https://img.youtube.com/vi/c9cTIjBqFTw/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g3">
+                    <div class="thumb-emoji">🍕</div>
+                    <div class="thumb-label">Unidad 4 · Fracciones</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 3 · Unidad 4</span>
+                <h3 class="video-title">Fracciones simples con pizza</h3>
+                <p class="video-description">Aprende las fracciones simples de forma divertida usando pizzas.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="3" data-unit="g3u4" onclick="openVideo('https://youtu.be/DVXZi9ZWFvo')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/DVXZi9ZWFvo/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/DVXZi9ZWFvo/hqdefault.jpg':this.src='https://img.youtube.com/vi/DVXZi9ZWFvo/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g3">
+                    <div class="thumb-emoji">🍕</div>
+                    <div class="thumb-label">Unidad 4 · Fracciones</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 3 · Unidad 4</span>
+                <h3 class="video-title">Numerador y denominador</h3>
+                <p class="video-description">Aprende qué es el numerador y el denominador de una fracción.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="3" data-unit="g3u5" onclick="openVideo('https://youtu.be/aBb2EuRkFzU')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/aBb2EuRkFzU/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/aBb2EuRkFzU/hqdefault.jpg':this.src='https://img.youtube.com/vi/aBb2EuRkFzU/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g3">
+                    <div class="thumb-emoji">🔢</div>
+                    <div class="thumb-label">Unidad 5 · Hasta 10.000</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 3 · Unidad 5</span>
+                <h3 class="video-title">Números hasta 10.000</h3>
+                <p class="video-description">Aprende a leer y escribir números hasta diez mil. Valor posicional explicado.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="3" data-unit="g3u5" onclick="openVideo('https://youtu.be/HZLB_LGEOSU')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/HZLB_LGEOSU/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/HZLB_LGEOSU/hqdefault.jpg':this.src='https://img.youtube.com/vi/HZLB_LGEOSU/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g3">
+                    <div class="thumb-emoji">🔢</div>
+                    <div class="thumb-label">Unidad 5 · Hasta 10.000</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 3 · Unidad 5</span>
+                <h3 class="video-title">Miles, centenas, decenas y unidades</h3>
+                <p class="video-description">Entiende el sistema posicional con millares y descompón números de 4 cifras.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="3" data-unit="g3u6" onclick="openVideo('https://youtu.be/WPMrb95J8i0')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/WPMrb95J8i0/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/WPMrb95J8i0/hqdefault.jpg':this.src='https://img.youtube.com/vi/WPMrb95J8i0/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g3">
+                    <div class="thumb-emoji">📏</div>
+                    <div class="thumb-label">Unidad 6 · Perímetro</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 3 · Unidad 6</span>
+                <h3 class="video-title">El perímetro de figuras planas</h3>
+                <p class="video-description">Aprende qué es el perímetro y cómo calcularlo en figuras geométricas.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="3" data-unit="g3u6" onclick="openVideo('https://youtu.be/-FvTH9sdL3Q')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/-FvTH9sdL3Q/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/-FvTH9sdL3Q/hqdefault.jpg':this.src='https://img.youtube.com/vi/-FvTH9sdL3Q/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g3">
+                    <div class="thumb-emoji">📏</div>
+                    <div class="thumb-label">Unidad 6 · Perímetro</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 3 · Unidad 6</span>
+                <h3 class="video-title">Perímetro: ejercicios resueltos</h3>
+                <p class="video-description">Calcula el perímetro de cuadrados, rectángulos y triángulos paso a paso.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="3" data-unit="g3u7" onclick="openVideo('https://youtu.be/PcFhnJiZ9v8')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/PcFhnJiZ9v8/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/PcFhnJiZ9v8/hqdefault.jpg':this.src='https://img.youtube.com/vi/PcFhnJiZ9v8/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g3">
+                    <div class="thumb-emoji">📊</div>
+                    <div class="thumb-label">Unidad 7 · Gráficos</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 3 · Unidad 7</span>
+                <h3 class="video-title">Gráficos de barras y tablas</h3>
+                <p class="video-description">Aprende a leer, interpretar y construir gráficos de barras y tablas de datos.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="3" data-unit="g3u7" onclick="openVideo('https://youtu.be/0_ybaigJd1s')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/0_ybaigJd1s/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/0_ybaigJd1s/hqdefault.jpg':this.src='https://img.youtube.com/vi/0_ybaigJd1s/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g3">
+                    <div class="thumb-emoji">📊</div>
+                    <div class="thumb-label">Unidad 7 · Gráficos</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 3 · Unidad 7</span>
+                <h3 class="video-title">Pictogramas y diagramas</h3>
+                <p class="video-description">Cómo leer pictogramas y diagramas de barras en ejercicios de estadística básica.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="3" data-unit="g3u8" onclick="openVideo('https://youtu.be/7KtESMH_txQ')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/7KtESMH_txQ/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/7KtESMH_txQ/hqdefault.jpg':this.src='https://img.youtube.com/vi/7KtESMH_txQ/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g3">
+                    <div class="thumb-emoji">🧩</div>
+                    <div class="thumb-label">Unidad 8 · Problemas</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 3 · Unidad 8</span>
+                <h3 class="video-title">Problemas de dos pasos</h3>
+                <p class="video-description">Aprende a resolver problemas que requieren dos operaciones: identificar datos, operación y respuesta.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="3" data-unit="g3u8" onclick="openVideo('https://youtu.be/xY5Rc67YZAM')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/xY5Rc67YZAM/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/xY5Rc67YZAM/hqdefault.jpg':this.src='https://img.youtube.com/vi/xY5Rc67YZAM/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g3">
+                    <div class="thumb-emoji">🧩</div>
+                    <div class="thumb-label">Unidad 8 · Problemas</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 3 · Unidad 8</span>
+                <h3 class="video-title">Estrategias para resolver problemas</h3>
+                <p class="video-description">Estrategias paso a paso para analizar y resolver problemas matemáticos de varios pasos.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="4" data-unit="g4u1" onclick="openVideo('https://youtu.be/A8g-Z_N7-sA')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/A8g-Z_N7-sA/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/A8g-Z_N7-sA/hqdefault.jpg':this.src='https://img.youtube.com/vi/A8g-Z_N7-sA/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g4">
+                    <div class="thumb-emoji">🔢</div>
+                    <div class="thumb-label">Unidad 1 · Múltiplos</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 4 · Unidad 1</span>
+                <h3 class="video-title">Múltiplos y divisores explicados</h3>
+                <p class="video-description">Aprende qué son los múltiplos y divisores de un número con ejemplos prácticos.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="4" data-unit="g4u1" onclick="openVideo('https://youtu.be/I_gjkfQm3WY')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/I_gjkfQm3WY/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/I_gjkfQm3WY/hqdefault.jpg':this.src='https://img.youtube.com/vi/I_gjkfQm3WY/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g4">
+                    <div class="thumb-emoji">🔢</div>
+                    <div class="thumb-label">Unidad 1 · Múltiplos</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 4 · Unidad 1</span>
+                <h3 class="video-title">Números primos y compuestos</h3>
+                <p class="video-description">Identifica números primos y compuestos, y aprende a factorizar.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="4" data-unit="g4u2" onclick="openVideo('https://youtu.be/DVXZi9ZWFvo')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/DVXZi9ZWFvo/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/DVXZi9ZWFvo/hqdefault.jpg':this.src='https://img.youtube.com/vi/DVXZi9ZWFvo/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g4">
+                    <div class="thumb-emoji">🍕</div>
+                    <div class="thumb-label">Unidad 2 · Fracciones</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 4 · Unidad 2</span>
+                <h3 class="video-title">Fracciones equivalentes</h3>
+                <p class="video-description">Aprende qué son las fracciones equivalentes y cómo encontrarlas.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="4" data-unit="g4u2" onclick="openVideo('https://youtu.be/c9cTIjBqFTw')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/c9cTIjBqFTw/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/c9cTIjBqFTw/hqdefault.jpg':this.src='https://img.youtube.com/vi/c9cTIjBqFTw/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g4">
+                    <div class="thumb-emoji">🍕</div>
+                    <div class="thumb-label">Unidad 2 · Fracciones</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 4 · Unidad 2</span>
+                <h3 class="video-title">Comparar y simplificar fracciones</h3>
+                <p class="video-description">Cómo comparar fracciones y simplificarlas a su mínima expresión.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="4" data-unit="g4u3" onclick="openVideo('https://youtu.be/OYjW1gV8SJU')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/OYjW1gV8SJU/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/OYjW1gV8SJU/hqdefault.jpg':this.src='https://img.youtube.com/vi/OYjW1gV8SJU/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g4">
+                    <div class="thumb-emoji">💯</div>
+                    <div class="thumb-label">Unidad 3 · Decimales</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 4 · Unidad 3</span>
+                <h3 class="video-title">Números decimales - Grado 4</h3>
+                <p class="video-description">Entiende los decimales: décimas, centésimas y milésimas con ejemplos claros.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="4" data-unit="g4u3" onclick="openVideo('https://youtu.be/bVFExqCCwfE')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/bVFExqCCwfE/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/bVFExqCCwfE/hqdefault.jpg':this.src='https://img.youtube.com/vi/bVFExqCCwfE/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g4">
+                    <div class="thumb-emoji">💯</div>
+                    <div class="thumb-label">Unidad 3 · Decimales</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 4 · Unidad 3</span>
+                <h3 class="video-title">Operaciones con decimales</h3>
+                <p class="video-description">Suma, resta y multiplica números decimales paso a paso.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="4" data-unit="g4u4" onclick="openVideo('https://youtu.be/-FvTH9sdL3Q')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/-FvTH9sdL3Q/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/-FvTH9sdL3Q/hqdefault.jpg':this.src='https://img.youtube.com/vi/-FvTH9sdL3Q/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g4">
+                    <div class="thumb-emoji">📐</div>
+                    <div class="thumb-label">Unidad 4 · Área y Perímetro</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 4 · Unidad 4</span>
+                <h3 class="video-title">Área y perímetro de figuras</h3>
+                <p class="video-description">Aprende a calcular área y perímetro de rectángulos, cuadrados y triángulos.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="4" data-unit="g4u4" onclick="openVideo('https://youtu.be/WPMrb95J8i0')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/WPMrb95J8i0/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/WPMrb95J8i0/hqdefault.jpg':this.src='https://img.youtube.com/vi/WPMrb95J8i0/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g4">
+                    <div class="thumb-emoji">📐</div>
+                    <div class="thumb-label">Unidad 4 · Área y Perímetro</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 4 · Unidad 4</span>
+                <h3 class="video-title">Área de figuras irregulares</h3>
+                <p class="video-description">Cómo calcular el área de figuras geométricas irregulares mediante descomposición.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="4" data-unit="g4u5" onclick="openVideo('https://youtu.be/pqrh-MZcyxg')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/pqrh-MZcyxg/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/pqrh-MZcyxg/hqdefault.jpg':this.src='https://img.youtube.com/vi/pqrh-MZcyxg/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g4">
+                    <div class="thumb-emoji">📐</div>
+                    <div class="thumb-label">Unidad 5 · Ángulos</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 4 · Unidad 5</span>
+                <h3 class="video-title">Los ángulos para niños</h3>
+                <p class="video-description">Aprende qué son los ángulos, cómo clasificarlos y medirlos con transportador.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="4" data-unit="g4u5" onclick="openVideo('https://youtu.be/KQlqxBoVbgI')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/KQlqxBoVbgI/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/KQlqxBoVbgI/hqdefault.jpg':this.src='https://img.youtube.com/vi/KQlqxBoVbgI/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g4">
+                    <div class="thumb-emoji">📐</div>
+                    <div class="thumb-label">Unidad 5 · Ángulos</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 4 · Unidad 5</span>
+                <h3 class="video-title">Ángulos: agudo, recto y obtuso</h3>
+                <p class="video-description">Clasifica los ángulos según su medida: agudo, recto, obtuso y llano.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="4" data-unit="g4u6" onclick="openVideo('https://youtu.be/PcFhnJiZ9v8')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/PcFhnJiZ9v8/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/PcFhnJiZ9v8/hqdefault.jpg':this.src='https://img.youtube.com/vi/PcFhnJiZ9v8/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g4">
+                    <div class="thumb-emoji">📊</div>
+                    <div class="thumb-label">Unidad 6 · Estadística</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 4 · Unidad 6</span>
+                <h3 class="video-title">Estadística básica para grado 4</h3>
+                <p class="video-description">Aprende a recolectar datos, organizarlos en tablas y representarlos en gráficas.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="4" data-unit="g4u6" onclick="openVideo('https://youtu.be/0_ybaigJd1s')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/0_ybaigJd1s/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/0_ybaigJd1s/hqdefault.jpg':this.src='https://img.youtube.com/vi/0_ybaigJd1s/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g4">
+                    <div class="thumb-emoji">📊</div>
+                    <div class="thumb-label">Unidad 6 · Estadística</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 4 · Unidad 6</span>
+                <h3 class="video-title">Media y moda para niños</h3>
+                <p class="video-description">Aprende a calcular la media aritmética y la moda de un conjunto de datos.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="4" data-unit="g4u7" onclick="openVideo('https://youtu.be/xY5Rc67YZAM')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/xY5Rc67YZAM/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/xY5Rc67YZAM/hqdefault.jpg':this.src='https://img.youtube.com/vi/xY5Rc67YZAM/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g4">
+                    <div class="thumb-emoji">🧩</div>
+                    <div class="thumb-label">Unidad 7 · Problemas</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 4 · Unidad 7</span>
+                <h3 class="video-title">Problemas de tres pasos</h3>
+                <p class="video-description">Estrategia para resolver problemas que requieren tres operaciones matemáticas.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="4" data-unit="g4u7" onclick="openVideo('https://youtu.be/7KtESMH_txQ')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/7KtESMH_txQ/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/7KtESMH_txQ/hqdefault.jpg':this.src='https://img.youtube.com/vi/7KtESMH_txQ/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g4">
+                    <div class="thumb-emoji">🧩</div>
+                    <div class="thumb-label">Unidad 7 · Problemas</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 4 · Unidad 7</span>
+                <h3 class="video-title">Razonamiento matemático avanzado</h3>
+                <p class="video-description">Aprende a analizar problemas, identificar la estrategia correcta y resolverlos.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="4" data-unit="g4u8" onclick="openVideo('https://youtu.be/W5Y-vTyDSwM')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/W5Y-vTyDSwM/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/W5Y-vTyDSwM/hqdefault.jpg':this.src='https://img.youtube.com/vi/W5Y-vTyDSwM/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g4">
+                    <div class="thumb-emoji">➖</div>
+                    <div class="thumb-label">Unidad 8 · Negativos</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 4 · Unidad 8</span>
+                <h3 class="video-title">Números negativos para niños</h3>
+                <p class="video-description">Aprende qué son los números negativos y cómo usarlos en la recta numérica.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="4" data-unit="g4u8" onclick="openVideo('https://youtu.be/bJOfyEtGbpg')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/bJOfyEtGbpg/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/bJOfyEtGbpg/hqdefault.jpg':this.src='https://img.youtube.com/vi/bJOfyEtGbpg/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g4">
+                    <div class="thumb-emoji">➖</div>
+                    <div class="thumb-label">Unidad 8 · Negativos</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 4 · Unidad 8</span>
+                <h3 class="video-title">La recta numérica con negativos</h3>
+                <p class="video-description">Ubica números negativos y positivos en la recta numérica y aprende a compararlos.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="5" data-unit="g5u1" onclick="openVideo('https://youtu.be/hd5qnZfGO1c')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/hd5qnZfGO1c/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/hd5qnZfGO1c/hqdefault.jpg':this.src='https://img.youtube.com/vi/hd5qnZfGO1c/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g5">
+                    <div class="thumb-emoji">🔢</div>
+                    <div class="thumb-label">Unidad 1 · Sistema Decimal</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 5 · Unidad 1</span>
+                <h3 class="video-title">Sistema decimal y numeración</h3>
+                <p class="video-description">Repaso del sistema decimal y la numeración posicional para grado 5.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="5" data-unit="g5u1" onclick="openVideo('https://youtu.be/xLAhqCkajWM')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/xLAhqCkajWM/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/xLAhqCkajWM/hqdefault.jpg':this.src='https://img.youtube.com/vi/xLAhqCkajWM/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g5">
+                    <div class="thumb-emoji">🔢</div>
+                    <div class="thumb-label">Unidad 1 · Sistema Decimal</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 5 · Unidad 1</span>
+                <h3 class="video-title">Números naturales: propiedades</h3>
+                <p class="video-description">Propiedades de los números naturales y operaciones con grandes cantidades.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="5" data-unit="g5u2" onclick="openVideo('https://youtu.be/3eYwW4sDlxM')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/3eYwW4sDlxM/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/3eYwW4sDlxM/hqdefault.jpg':this.src='https://img.youtube.com/vi/3eYwW4sDlxM/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g5">
+                    <div class="thumb-emoji">💯</div>
+                    <div class="thumb-label">Unidad 2 · Porcentajes</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 5 · Unidad 2</span>
+                <h3 class="video-title">Porcentajes fácil y rápido</h3>
+                <p class="video-description">Aprende qué es el porcentaje y cómo calcularlo con ejemplos del mundo real.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="5" data-unit="g5u2" onclick="openVideo('https://youtu.be/sWg-OtWlkfs')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/sWg-OtWlkfs/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/sWg-OtWlkfs/hqdefault.jpg':this.src='https://img.youtube.com/vi/sWg-OtWlkfs/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g5">
+                    <div class="thumb-emoji">💯</div>
+                    <div class="thumb-label">Unidad 2 · Porcentajes</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 5 · Unidad 2</span>
+                <h3 class="video-title">Cómo calcular el porcentaje de algo</h3>
+                <p class="video-description">Practica el cálculo de porcentajes con descuentos, notas y problemas reales.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="5" data-unit="g5u3" onclick="openVideo('https://youtu.be/sWg-OtWlkfs')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/sWg-OtWlkfs/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/sWg-OtWlkfs/hqdefault.jpg':this.src='https://img.youtube.com/vi/sWg-OtWlkfs/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g5">
+                    <div class="thumb-emoji">⚖️</div>
+                    <div class="thumb-label">Unidad 3 · Proporción</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 5 · Unidad 3</span>
+                <h3 class="video-title">Razón y proporción explicadas</h3>
+                <p class="video-description">Aprende la diferencia entre razón y proporción con ejemplos cotidianos.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="5" data-unit="g5u3" onclick="openVideo('https://youtu.be/3eYwW4sDlxM')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/3eYwW4sDlxM/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/3eYwW4sDlxM/hqdefault.jpg':this.src='https://img.youtube.com/vi/3eYwW4sDlxM/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g5">
+                    <div class="thumb-emoji">⚖️</div>
+                    <div class="thumb-label">Unidad 3 · Proporción</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 5 · Unidad 3</span>
+                <h3 class="video-title">Regla de tres simple</h3>
+                <p class="video-description">Aprende a resolver problemas de proporcionalidad usando la regla de tres.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="5" data-unit="g5u4" onclick="openVideo('https://youtu.be/UIeYM0a2PTc')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/UIeYM0a2PTc/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/UIeYM0a2PTc/hqdefault.jpg':this.src='https://img.youtube.com/vi/UIeYM0a2PTc/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g5">
+                    <div class="thumb-emoji">📦</div>
+                    <div class="thumb-label">Unidad 4 · Geometría 3D</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 5 · Unidad 4</span>
+                <h3 class="video-title">Figuras geométricas 3D</h3>
+                <p class="video-description">Aprende a identificar y describir sólidos geométricos: cubo, esfera, cilindro, cono.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="5" data-unit="g5u4" onclick="openVideo('https://youtu.be/SBcuckgn9rI')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/SBcuckgn9rI/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/SBcuckgn9rI/hqdefault.jpg':this.src='https://img.youtube.com/vi/SBcuckgn9rI/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g5">
+                    <div class="thumb-emoji">📦</div>
+                    <div class="thumb-label">Unidad 4 · Geometría 3D</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 5 · Unidad 4</span>
+                <h3 class="video-title">Volumen de sólidos geométricos</h3>
+                <p class="video-description">Aprende a calcular el volumen de cubos, prismas y cilindros.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="5" data-unit="g5u5" onclick="openVideo('https://youtu.be/PcFhnJiZ9v8')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/PcFhnJiZ9v8/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/PcFhnJiZ9v8/hqdefault.jpg':this.src='https://img.youtube.com/vi/PcFhnJiZ9v8/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g5">
+                    <div class="thumb-emoji">📊</div>
+                    <div class="thumb-label">Unidad 5 · Estadística</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 5 · Unidad 5</span>
+                <h3 class="video-title">Estadística descriptiva - Grado 5</h3>
+                <p class="video-description">Organiza, representa e interpreta datos estadísticos a nivel de grado 5.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="5" data-unit="g5u5" onclick="openVideo('https://youtu.be/0_ybaigJd1s')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/0_ybaigJd1s/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/0_ybaigJd1s/hqdefault.jpg':this.src='https://img.youtube.com/vi/0_ybaigJd1s/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g5">
+                    <div class="thumb-emoji">📊</div>
+                    <div class="thumb-label">Unidad 5 · Estadística</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 5 · Unidad 5</span>
+                <h3 class="video-title">Media, moda y mediana</h3>
+                <p class="video-description">Calcula e interpreta la media, la moda y la mediana de conjuntos de datos.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="5" data-unit="g5u6" onclick="openVideo('https://youtu.be/I_gjkfQm3WY')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/I_gjkfQm3WY/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/I_gjkfQm3WY/hqdefault.jpg':this.src='https://img.youtube.com/vi/I_gjkfQm3WY/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g5">
+                    <div class="thumb-emoji">🔢</div>
+                    <div class="thumb-label">Unidad 6 · Potencias</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 5 · Unidad 6</span>
+                <h3 class="video-title">Potencias y exponentes para niños</h3>
+                <p class="video-description">Aprende qué son las potencias, la base y el exponente con ejemplos sencillos.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="5" data-unit="g5u6" onclick="openVideo('https://youtu.be/A8g-Z_N7-sA')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/A8g-Z_N7-sA/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/A8g-Z_N7-sA/hqdefault.jpg':this.src='https://img.youtube.com/vi/A8g-Z_N7-sA/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g5">
+                    <div class="thumb-emoji">🔢</div>
+                    <div class="thumb-label">Unidad 6 · Potencias</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 5 · Unidad 6</span>
+                <h3 class="video-title">Cuadrados y cubos perfectos</h3>
+                <p class="video-description">Aprende las potencias de 2 y de 3: cuadrados y cubos perfectos.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="5" data-unit="g5u7" onclick="openVideo('https://youtu.be/UIeYM0a2PTc')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/UIeYM0a2PTc/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/UIeYM0a2PTc/hqdefault.jpg':this.src='https://img.youtube.com/vi/UIeYM0a2PTc/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g5">
+                    <div class="thumb-emoji">🔠</div>
+                    <div class="thumb-label">Unidad 7 · Álgebra</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 5 · Unidad 7</span>
+                <h3 class="video-title">Introducción al álgebra</h3>
+                <p class="video-description">Primeros pasos en álgebra: variables, expresiones y ecuaciones simples.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="5" data-unit="g5u7" onclick="openVideo('https://youtu.be/SBcuckgn9rI')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/SBcuckgn9rI/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/SBcuckgn9rI/hqdefault.jpg':this.src='https://img.youtube.com/vi/SBcuckgn9rI/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g5">
+                    <div class="thumb-emoji">🔠</div>
+                    <div class="thumb-label">Unidad 7 · Álgebra</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 5 · Unidad 7</span>
+                <h3 class="video-title">Ecuaciones sencillas: encuentra la x</h3>
+                <p class="video-description">Aprende a resolver ecuaciones simples encontrando el valor desconocido.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="5" data-unit="g5u8" onclick="openVideo('https://youtu.be/xY5Rc67YZAM')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/xY5Rc67YZAM/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/xY5Rc67YZAM/hqdefault.jpg':this.src='https://img.youtube.com/vi/xY5Rc67YZAM/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g5">
+                    <div class="thumb-emoji">🧩</div>
+                    <div class="thumb-label">Unidad 8 · Problemas</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 5 · Unidad 8</span>
+                <h3 class="video-title">Problemas complejos de matemáticas</h3>
+                <p class="video-description">Resuelve problemas que combinan múltiples operaciones y conceptos matemáticos.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="5" data-unit="g5u8" onclick="openVideo('https://youtu.be/7KtESMH_txQ')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/7KtESMH_txQ/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/7KtESMH_txQ/hqdefault.jpg':this.src='https://img.youtube.com/vi/7KtESMH_txQ/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g5">
+                    <div class="thumb-emoji">🧩</div>
+                    <div class="thumb-label">Unidad 8 · Problemas</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 5 · Unidad 8</span>
+                <h3 class="video-title">Pensamiento matemático avanzado</h3>
+                <p class="video-description">Desarrolla el pensamiento crítico y lógico aplicado a la resolución de problemas.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="6" data-unit="g6u1" onclick="openVideo('https://youtu.be/hd5qnZfGO1c')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/hd5qnZfGO1c/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/hd5qnZfGO1c/hqdefault.jpg':this.src='https://img.youtube.com/vi/hd5qnZfGO1c/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g6">
+                    <div class="thumb-emoji">🔢</div>
+                    <div class="thumb-label">Unidad 1 · Nros. Naturales</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 6 · Unidad 1</span>
+                <h3 class="video-title">Números Naturales Super Fácil</h3>
+                <p class="video-description">Aprende los números naturales de forma súper fácil, ideal para principiantes.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="6" data-unit="g6u1" onclick="openVideo('https://youtu.be/xLAhqCkajWM')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/xLAhqCkajWM/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/xLAhqCkajWM/hqdefault.jpg':this.src='https://img.youtube.com/vi/xLAhqCkajWM/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g6">
+                    <div class="thumb-emoji">🔢</div>
+                    <div class="thumb-label">Unidad 1 · Nros. Naturales</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 6 · Unidad 1</span>
+                <h3 class="video-title">Números Naturales: Uso, Escritura y Lectura</h3>
+                <p class="video-description">Aprende cómo usar, escribir y leer los números naturales correctamente.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="6" data-unit="g6u2" onclick="openVideo('https://youtu.be/I_gjkfQm3WY')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/I_gjkfQm3WY/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/I_gjkfQm3WY/hqdefault.jpg':this.src='https://img.youtube.com/vi/I_gjkfQm3WY/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g6">
+                    <div class="thumb-emoji">🧮</div>
+                    <div class="thumb-label">Unidad 2 · Teoría Números</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 6 · Unidad 2</span>
+                <h3 class="video-title">Teoría de Números</h3>
+                <p class="video-description">Descubre los conceptos fundamentales de la teoría de números con la Profe Monse.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="6" data-unit="g6u2" onclick="openVideo('https://youtu.be/A8g-Z_N7-sA')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/A8g-Z_N7-sA/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/A8g-Z_N7-sA/hqdefault.jpg':this.src='https://img.youtube.com/vi/A8g-Z_N7-sA/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g6">
+                    <div class="thumb-emoji">🧮</div>
+                    <div class="thumb-label">Unidad 2 · Teoría Números</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 6 · Unidad 2</span>
+                <h3 class="video-title">Múltiplos y Divisores</h3>
+                <p class="video-description">Aprende sobre múltiplos, divisores y números primos de manera clara.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="6" data-unit="g6u3" onclick="openVideo('https://youtu.be/SBcuckgn9rI')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/SBcuckgn9rI/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/SBcuckgn9rI/hqdefault.jpg':this.src='https://img.youtube.com/vi/SBcuckgn9rI/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g6">
+                    <div class="thumb-emoji">🎯</div>
+                    <div class="thumb-label">Unidad 3 · Conjuntos</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 6 · Unidad 3</span>
+                <h3 class="video-title">Problemas con Conjuntos</h3>
+                <p class="video-description">Resuelve problemas utilizando la teoría de conjuntos de forma práctica.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="6" data-unit="g6u3" onclick="openVideo('https://youtu.be/UIeYM0a2PTc')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/UIeYM0a2PTc/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/UIeYM0a2PTc/hqdefault.jpg':this.src='https://img.youtube.com/vi/UIeYM0a2PTc/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g6">
+                    <div class="thumb-emoji">🎯</div>
+                    <div class="thumb-label">Unidad 3 · Conjuntos</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 6 · Unidad 3</span>
+                <h3 class="video-title">Unión e Intersección de Conjuntos</h3>
+                <p class="video-description">Aprende las operaciones básicas con conjuntos: unión e intersección.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="6" data-unit="g6u4" onclick="openVideo('https://youtu.be/c9cTIjBqFTw')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/c9cTIjBqFTw/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/c9cTIjBqFTw/hqdefault.jpg':this.src='https://img.youtube.com/vi/c9cTIjBqFTw/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g6">
+                    <div class="thumb-emoji">🍕</div>
+                    <div class="thumb-label">Unidad 4 · Fraccionarios</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 6 · Unidad 4</span>
+                <h3 class="video-title">Fracciones para Niños con Pizza</h3>
+                <p class="video-description">Aprende las fracciones de forma divertida usando pizzas como ejemplo.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="6" data-unit="g6u4" onclick="openVideo('https://youtu.be/DVXZi9ZWFvo')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/DVXZi9ZWFvo/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/DVXZi9ZWFvo/hqdefault.jpg':this.src='https://img.youtube.com/vi/DVXZi9ZWFvo/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g6">
+                    <div class="thumb-emoji">🍕</div>
+                    <div class="thumb-label">Unidad 4 · Fraccionarios</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 6 · Unidad 4</span>
+                <h3 class="video-title">Aprende a Leer Fracciones</h3>
+                <p class="video-description">Descubre cómo leer e interpretar fracciones correctamente.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="6" data-unit="g6u5" onclick="openVideo('https://youtu.be/OYjW1gV8SJU')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/OYjW1gV8SJU/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/OYjW1gV8SJU/hqdefault.jpg':this.src='https://img.youtube.com/vi/OYjW1gV8SJU/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g6">
+                    <div class="thumb-emoji">💯</div>
+                    <div class="thumb-label">Unidad 5 · Decimales</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 6 · Unidad 5</span>
+                <h3 class="video-title">Números Decimales - Video 1</h3>
+                <p class="video-description">Entiende qué son los números decimales y cómo se relacionan con las fracciones.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="6" data-unit="g6u5" onclick="openVideo('https://youtu.be/bVFExqCCwfE')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/bVFExqCCwfE/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/bVFExqCCwfE/hqdefault.jpg':this.src='https://img.youtube.com/vi/bVFExqCCwfE/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g6">
+                    <div class="thumb-emoji">💯</div>
+                    <div class="thumb-label">Unidad 5 · Decimales</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 6 · Unidad 5</span>
+                <h3 class="video-title">Operaciones con Decimales</h3>
+                <p class="video-description">Aprende a sumar, restar, multiplicar y dividir números decimales.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="6" data-unit="g6u6" onclick="openVideo('https://youtu.be/WPMrb95J8i0')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/WPMrb95J8i0/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/WPMrb95J8i0/hqdefault.jpg':this.src='https://img.youtube.com/vi/WPMrb95J8i0/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g6">
+                    <div class="thumb-emoji">📐</div>
+                    <div class="thumb-label">Unidad 6 · Geometría</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 6 · Unidad 6</span>
+                <h3 class="video-title">Medida y Geometría - Video 1</h3>
+                <p class="video-description">Conoce las figuras geométricas y aprende a medirlas correctamente.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="6" data-unit="g6u6" onclick="openVideo('https://youtu.be/-FvTH9sdL3Q')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/-FvTH9sdL3Q/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/-FvTH9sdL3Q/hqdefault.jpg':this.src='https://img.youtube.com/vi/-FvTH9sdL3Q/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g6">
+                    <div class="thumb-emoji">📐</div>
+                    <div class="thumb-label">Unidad 6 · Geometría</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 6 · Unidad 6</span>
+                <h3 class="video-title">Perímetro y Área</h3>
+                <p class="video-description">Aprende a calcular el perímetro y área de diferentes figuras geométricas.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="6" data-unit="g6u7" onclick="openVideo('https://youtu.be/3eYwW4sDlxM')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/3eYwW4sDlxM/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/3eYwW4sDlxM/hqdefault.jpg':this.src='https://img.youtube.com/vi/3eYwW4sDlxM/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g6">
+                    <div class="thumb-emoji">📊</div>
+                    <div class="thumb-label">Unidad 7 · Proporción</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 6 · Unidad 7</span>
+                <h3 class="video-title">Razón, Proporción y Porcentaje</h3>
+                <p class="video-description">Entiende qué son las razones y proporciones para comparar cantidades.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="6" data-unit="g6u7" onclick="openVideo('https://youtu.be/sWg-OtWlkfs')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/sWg-OtWlkfs/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/sWg-OtWlkfs/hqdefault.jpg':this.src='https://img.youtube.com/vi/sWg-OtWlkfs/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g6">
+                    <div class="thumb-emoji">📊</div>
+                    <div class="thumb-label">Unidad 7 · Proporción</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 6 · Unidad 7</span>
+                <h3 class="video-title">Cálculo de Porcentajes</h3>
+                <p class="video-description">Aprende a calcular porcentajes de manera fácil y práctica.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="6" data-unit="g6u8" onclick="openVideo('https://youtu.be/PcFhnJiZ9v8')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/PcFhnJiZ9v8/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/PcFhnJiZ9v8/hqdefault.jpg':this.src='https://img.youtube.com/vi/PcFhnJiZ9v8/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g6">
+                    <div class="thumb-emoji">📈</div>
+                    <div class="thumb-label">Unidad 8 · Estadística</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 6 · Unidad 8</span>
+                <h3 class="video-title">Estadística Descriptiva - Video 1</h3>
+                <p class="video-description">Descubre qué es la estadística y cómo organizar y representar datos.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+        <div class="video-card" data-grado="6" data-unit="g6u8" onclick="openVideo('https://youtu.be/0_ybaigJd1s')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/0_ybaigJd1s/maxresdefault.jpg" alt="thumbnail" onerror="this.src.indexOf('maxresdefault')>-1?this.src='https://img.youtube.com/vi/0_ybaigJd1s/hqdefault.jpg':this.src='https://img.youtube.com/vi/0_ybaigJd1s/mqdefault.jpg'">
+                <div class="thumb-fallback thumb-g6">
+                    <div class="thumb-emoji">📈</div>
+                    <div class="thumb-label">Unidad 8 · Estadística</div>
+                </div>
+                <div class="play-button"></div>
+            </div>
+            <div class="video-info">
+                <span class="video-unit">Grado 6 · Unidad 8</span>
+                <h3 class="video-title">Media, Moda y Mediana</h3>
+                <p class="video-description">Aprende a calcular e interpretar la media, moda y mediana de datos.</p>
+                <div class="video-duration"></div>
+            </div>
+        </div>
+    </div><!-- fin videosGrid -->
 
-    <footer>
-        <p>© 2025 RETOMATE - Aprende matemáticas jugando 🦊📚</p>
-    </footer>
+    <div class="no-videos-message" id="noVideosMsg" style="display:none;">
+        🦊 No hay videos disponibles para esta selección todavía. ¡Pronto agregaremos más contenido!
+    </div>
+</main>
 
-    <script>
-        // Función para abrir video en YouTube
-        function openVideo(url) {
-            window.open(url, '_blank');
+<footer>
+    <p>© 2025 RETOMATE - Aprende matemáticas jugando 🦊📚✨</p>
+</footer>
+
+<script>
+// ── Datos de unidades por grado ────────────────────────────────
+const UNIDADES = {
+    1: ['Contemos juntos','Sumas divertidas','Restas con el zorrito','Figuras y formas','¿Cuánto mide?','Números hasta 100','Patrones y series','Comparar cantidades'],
+    2: ['Sumas con lleva','Restas con presta','Tablas del 2 y 5','Decenas y unidades','Números hasta 1000','Patrones y series','Figuras planas','Tiempo y calendario'],
+    3: ['Multiplicación','División exacta','Todas las tablas','Fracciones simples','Hasta 10.000','Perímetro','Datos y gráficos','Problemas 2 pasos'],
+    4: ['Múltiplos y divisores','Fracciones equiv.','Decimales','Área y perímetro','Ángulos','Estadística básica','Problemas 3 pasos','Números negativos'],
+    5: ['Nros. Naturales y Sist. Decimal','Porcentajes','Razón y proporción','Geometría 3D','Estadística','Potencias','Álgebra','Problemas complejos'],
+    6: ['Números Naturales','Teoría de Números','Problemas y Conjuntos','Fraccionarios','Decimales','Medida y Geometría','Razón y Proporción','Estadística'],
+};
+
+let gradoActual = 1;
+
+function cambiarGrado(g) {
+    gradoActual = g;
+    // Actualizar fondo y botones de grado
+    document.body.className = 'g' + g;
+    document.querySelectorAll('.grado-btn-sel').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.grado-btn-sel')[g - 1].classList.add('active');
+    // Reconstruir filtros de unidad
+    construirFiltros(g);
+    // Mostrar solo videos de ese grado, todas las unidades
+    filterVideos('todas');
+}
+
+function construirFiltros(g) {
+    const cont = document.getElementById('filtrosUnidad');
+    cont.innerHTML = '';
+    // Botón "Todas"
+    const btnTodas = document.createElement('button');
+    btnTodas.className = 'filter-btn active';
+    btnTodas.dataset.unit = 'todas';
+    btnTodas.textContent = '📖 Todas las Unidades';
+    btnTodas.onclick = () => filterVideos('todas');
+    cont.appendChild(btnTodas);
+    // Botones por unidad
+    UNIDADES[g].forEach((nombre, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'filter-btn';
+        btn.dataset.unit = `g${g}u${i + 1}`;
+        btn.textContent = `Unidad ${i + 1}: ${nombre}`;
+        btn.onclick = () => filterVideos(`g${g}u${i + 1}`);
+        cont.appendChild(btn);
+    });
+}
+
+function filterVideos(unit) {
+    const allCards = document.querySelectorAll('.video-card');
+    const allBtns  = document.querySelectorAll('.filter-btn');
+    const noMsg    = document.getElementById('noVideosMsg');
+    let visible = 0;
+
+    allBtns.forEach(b => {
+        b.classList.remove('active');
+        if (b.dataset.unit === unit) b.classList.add('active');
+    });
+
+    allCards.forEach(card => {
+        const mismoGrado = parseInt(card.dataset.grado) === gradoActual;
+        const mismaUnidad = unit === 'todas' || card.dataset.unit === unit;
+        if (mismoGrado && mismaUnidad) {
+            card.classList.remove('hidden');
+            visible++;
+        } else {
+            card.classList.add('hidden');
         }
+    });
 
-        // Función para filtrar videos por unidad
-        function filterVideos(unit) {
-            const allCards = document.querySelectorAll('.video-card');
-            const allButtons = document.querySelectorAll('.filter-btn');
-            const noVideosMsg = document.getElementById('noVideosMsg');
-            let visibleCount = 0;
+    noMsg.style.display = visible === 0 ? 'block' : 'none';
+    document.getElementById('videosGrid').scrollIntoView({ behavior:'smooth', block:'start' });
+}
 
-            // Actualizar botones activos
-            allButtons.forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.unit === unit) {
-                    btn.classList.add('active');
-                }
-            });
+function openVideo(url) { window.open(url, '_blank'); }
 
-            // Filtrar tarjetas
-            allCards.forEach(card => {
-                if (unit === 'todas' || card.dataset.unit === unit) {
-                    card.classList.remove('hidden');
-                    visibleCount++;
-                } else {
-                    card.classList.add('hidden');
-                }
-            });
-
-            // Mostrar mensaje si no hay videos
-            if (visibleCount === 0) {
-                noVideosMsg.style.display = 'block';
-            } else {
-                noVideosMsg.style.display = 'none';
-            }
-
-            // Scroll suave hacia los videos
-            document.getElementById('videosGrid').scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'start' 
-            });
-        }
-
-        // Cargar filtro desde URL si existe
-        window.addEventListener('load', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const unit = urlParams.get('unit');
-            if (unit) {
-                filterVideos(unit);
-            }
-        });
-    </script>
-    <!-- ── Smartsupp Live Chat ── -->
-<script type="text/javascript">
-  var _smartsupp = _smartsupp || {};
-  _smartsupp.key = 'dc68ffdd55d786d000505c6677df5ce9aa57e49d';
-  _smartsupp.language = 'es';
-
-  {% if session.get('nombre') %}
-  _smartsupp.name  = '{{ session["nombre"] }}';
-  _smartsupp.variables = {
-    curso: { label: 'Curso', value: '{{ session.get("curso", "Sin asignar") }}' },
-    plan:  { label: 'Plan',  value: '{{ session.get("plan",  "gratuito") }}' }
-  };
-  {% endif %}
-
-  window.smartsupp||(function(d) {
-    var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
-    s=d.getElementsByTagName('script')[0];
-    c=d.createElement('script');
-    c.type='text/javascript';c.charset='utf-8';c.async=true;
-    c.src='https://www.smartsuppchat.com/loader.js?';
-    s.parentNode.insertBefore(c,s);
-  })(document);
+// ── Inicializar ────────────────────────────────────────────────
+window.addEventListener('load', () => {
+    const params = new URLSearchParams(window.location.search);
+    const g = parseInt(params.get('grado')) || 1;
+    cambiarGrado(g);
+});
 </script>
-<!-- ── Fin Smartsupp ── -->
 </body>
 </html>

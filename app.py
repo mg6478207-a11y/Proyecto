@@ -1,6 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, send_file
 import pyodbc
-from psycopg.rows import dict_row
+import uuid
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.pdfgen        import canvas as rl_canvas
+from io                      import BytesIO
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -102,7 +105,7 @@ def login():
                 session['nombre'] = usuario['nombre']
                 session['tipo']   = usuario['tipo']
 
-                # ── Cargar curso y plan del estudiante ──
+                # ── Cargar curso del estudiante desde informacion_estudiantes ──
                 if usuario['tipo'] == 'estudiante':
                     db2  = conectar()
                     cur2 = db2.cursor()
@@ -118,7 +121,7 @@ def login():
                     db3  = conectar()
                     cur3 = db3.cursor()
                     cur3.execute("""
-                        SELECT plan FROM suscripciones
+                        SELECT [plan] FROM suscripciones
                         WHERE usuario_id = ?
                           AND activa = 1
                           AND fecha_fin >= CAST(GETDATE() AS DATE)
@@ -266,19 +269,17 @@ def _curso_esperado(prefijo):
     return []
 
 def ruta_modulo(ruta, template):
-    """Crea una ruta de módulo que verifica el curso y el plan del estudiante."""
+    """Crea una ruta de módulo que verifica el curso del estudiante."""
     def vista():
         if 'id' not in session:
             return redirect(url_for('login'))
 
-        # Administradores tienen acceso libre a todo
+        # Los administradores tienen acceso libre
         if session.get('tipo') == 'administrador':
             return render_template(template)
 
         import re as _re
-
-        # 1. Verificar que el módulo corresponde al curso del estudiante
-        match   = _re.match(r'^(.*?modulo)', ruta)
+        match  = _re.match(r'^(.*?modulo)', ruta)
         prefijo = match.group(1) if match else ruta
 
         curso_estudiante = session.get('curso', '')
@@ -311,7 +312,7 @@ def ruta_modulo(ruta, template):
 
         return render_template(template)
 
-    vista.__name__ = ruta
+    vista.__name__ = ruta  # Flask necesita nombres únicos
     return vista
 
 # ─── UNIDADES GRADO 1-3 (legado) ─────────────────────────────────────────────
@@ -369,6 +370,61 @@ for _n in range(1, 9):
         view_func=ruta_modulo(f'Grado6_modulo{_n}', f'Grado6_modulo{_n}.html')
     )
 
+# ─── INSIGNIAS ───────────────────────────────────────────────────────────────
+def verificar_insignias(usuario_id):
+    """Evalúa y otorga insignias al estudiante según su actividad en progreso."""
+    db  = conectar()
+    cur = db.cursor()
+
+    def otorgar(codigo):
+        try:
+            cur.execute("""
+                INSERT INTO insignias_estudiante (usuario_id, insignia_id)
+                SELECT ?, id FROM insignias_catalogo WHERE codigo = ?
+                  AND NOT EXISTS (
+                    SELECT 1 FROM insignias_estudiante ie
+                    JOIN insignias_catalogo ic ON ic.id = ie.insignia_id
+                    WHERE ie.usuario_id = ? AND ic.codigo = ?
+                  )
+            """, (usuario_id, codigo, usuario_id, codigo))
+        except Exception:
+            pass
+
+    cur.execute("""
+        SELECT COUNT(*)                                     AS partidas,
+               SUM(CASE WHEN fallos = 0 THEN 1 ELSE 0 END) AS sin_fallos,
+               MAX(puntaje)                                 AS max_puntaje,
+               COUNT(DISTINCT unidad)                       AS modulos_distintos
+        FROM progreso WHERE usuario_id = ?
+    """, (usuario_id,))
+    row = cur.fetchone()
+    partidas, sin_fallos, max_puntaje, modulos = row[0], row[1], row[2], row[3]
+
+    if partidas and partidas >= 1:  otorgar('primer_juego')
+    if sin_fallos and sin_fallos >= 1:  otorgar('sin_errores')
+    if max_puntaje and max_puntaje >= 100:  otorgar('puntaje_100')
+    if modulos and modulos >= 4:  otorgar('modulo_5')
+    if modulos and modulos >= 8:  otorgar('grado_completo')
+    if partidas and partidas >= 10: otorgar('constante')
+
+    cur.execute("""
+        SELECT DISTINCT CAST(fecha AS DATE) AS dia
+        FROM progreso WHERE usuario_id = ?
+        ORDER BY dia DESC
+    """, (usuario_id,))
+    dias = [r[0] for r in cur.fetchall()]
+    racha = 1
+    for i in range(len(dias) - 1):
+        if (dias[i] - dias[i + 1]).days == 1:
+            racha += 1
+        else:
+            break
+    if racha >= 3: otorgar('racha_3')
+    if racha >= 7: otorgar('racha_7')
+
+    db.commit()
+    db.close()
+
 # ─── GUARDAR PROGRESO ─────────────────────────────────────────────────────────
 @app.route('/guardar_progreso', methods=['POST'])
 def guardar_progreso():
@@ -391,6 +447,11 @@ def guardar_progreso():
     """, (session['id'], grado, unidad, aciertos, fallos, total, puntaje))
     db.commit()
     db.close()
+
+    try:
+        verificar_insignias(session['id'])
+    except Exception:
+        pass
 
     return jsonify({"success": True, "grado": grado, "unidad": unidad, "puntaje": puntaje})
 
@@ -460,6 +521,33 @@ def progreso_estudiante():
     modulos_completados = len(unidades_jugadas)
     curso_completado    = modulos_completados >= total_modulos
 
+    # ── 5. Consultar insignias ──
+    db  = conectar()
+    cur = db.cursor()
+    cur.execute("""
+        SELECT c.nombre, c.emoji, c.descripcion, c.color, e.fecha
+        FROM insignias_estudiante e
+        JOIN insignias_catalogo c ON c.id = e.insignia_id
+        WHERE e.usuario_id = ?
+        ORDER BY e.fecha DESC
+    """, (usuario_id,))
+    insignias_ganadas = [
+        {"nombre": r[0], "emoji": r[1], "descripcion": r[2], "color": r[3], "fecha": r[4]}
+        for r in cur.fetchall()
+    ]
+    cur.execute("""
+        SELECT nombre, emoji, descripcion, color
+        FROM insignias_catalogo
+        WHERE id NOT IN (
+            SELECT insignia_id FROM insignias_estudiante WHERE usuario_id = ?
+        )
+    """, (usuario_id,))
+    insignias_pendientes = [
+        {"nombre": r[0], "emoji": r[1], "descripcion": r[2], "color": r[3]}
+        for r in cur.fetchall()
+    ]
+    db.close()
+
     return render_template(
         "progreso_estudiante.html",
         progreso=progreso,
@@ -471,6 +559,8 @@ def progreso_estudiante():
         modulos_completados=modulos_completados,
         total_modulos=total_modulos,
         curso_completado=curso_completado,
+        insignias_ganadas=insignias_ganadas,
+        insignias_pendientes=insignias_pendientes,
     )
 
 # ─── PROGRESO ADMINISTRADOR CON KNN + FILTRO POR CURSO ────────────────────────
@@ -700,7 +790,6 @@ def nueva_contrasena():
             return redirect(url_for('recuperar'))
     return render_template('nueva_contrasena.html')
 
-
 # ─── PLANES / SUSCRIPCIÓN ────────────────────────────────────────────────────
 @app.route('/planes')
 def planes():
@@ -711,10 +800,7 @@ def planes():
 
 @app.route('/activar_plan', methods=['POST'])
 def activar_plan():
-    """
-    Simula la activación de un plan. En producción real aquí
-    iría la integración con pasarela de pago (PSE, Wompi, etc.).
-    """
+    """Activa un plan de suscripción para el estudiante."""
     if 'id' not in session:
         return redirect(url_for('login'))
 
@@ -727,15 +813,12 @@ def activar_plan():
     db  = conectar()
     cur = db.cursor()
 
-    # Desactivar planes anteriores del mismo usuario
-    cur.execute(
-        "UPDATE suscripciones SET activa = 0 WHERE usuario_id = ?",
-        (usuario_id,)
-    )
+    # Desactivar planes anteriores
+    cur.execute("UPDATE suscripciones SET activa = 0 WHERE usuario_id = ?", (usuario_id,))
 
     # Insertar nueva suscripción activa por 30 días
     cur.execute("""
-        INSERT INTO suscripciones (usuario_id, plan, fecha_inicio, fecha_fin, activa)
+        INSERT INTO suscripciones (usuario_id, [plan], fecha_inicio, fecha_fin, activa)
         VALUES (?, ?, CAST(GETDATE() AS DATE),
                 DATEADD(DAY, 30, CAST(GETDATE() AS DATE)), 1)
     """, (usuario_id, plan))
@@ -743,11 +826,184 @@ def activar_plan():
     db.commit()
     db.close()
 
-    # Actualizar sesión
     session['plan'] = plan
     nombre_plan = "Premium Estudiante" if plan == 'premium_estudiante' else "Institucional"
     flash(f"✅ ¡Plan {nombre_plan} activado! Tienes acceso completo a los 8 módulos de tu grado.", "success")
     return redirect(url_for('tematicas'))
+
+# ─── CERTIFICADOS ─────────────────────────────────────────────────────────────
+def _generar_pdf_certificado(nombre, curso, fecha_str, codigo):
+    import os
+    buf  = BytesIO()
+    W, H = landscape(A4)
+    c    = rl_canvas.Canvas(buf, pagesize=landscape(A4))
+
+    # ── Fondo blanco ──────────────────────────────────────────────────────────
+    c.setFillColorRGB(1, 1, 1)
+    c.rect(0, 0, W, H, fill=1, stroke=0)
+
+    # ── Bordes dorados ────────────────────────────────────────────────────────
+    c.setStrokeColorRGB(0.85, 0.70, 0.10)
+    c.setLineWidth(6)
+    c.rect(22, 22, W-44, H-44, fill=0, stroke=1)
+    c.setLineWidth(2)
+    c.setStrokeColorRGB(1.0, 0.75, 0.10)
+    c.rect(32, 32, W-64, H-64, fill=0, stroke=1)
+
+    # ── Logo (izquierda) ──────────────────────────────────────────────────────
+    logo_path = os.path.join(os.path.dirname(__file__), 'static', 'img', 'logo.jpg')
+    logo_h = 100
+    logo_w = 100
+    if os.path.exists(logo_path):
+        c.drawImage(logo_path, 50, H - 50 - logo_h,
+                    width=logo_w, height=logo_h, preserveAspectRatio=True, mask='auto')
+
+    # ── Encabezado ────────────────────────────────────────────────────────────
+    c.setFillColorRGB(0.55, 0.35, 0.05)
+    c.setFont("Helvetica-Bold", 11)
+    c.drawCentredString(W/2, H - 75, "PLATAFORMA EDUCATIVA DE MATEMATICAS")
+
+    c.setFont("Helvetica-Bold", 44)
+    c.setFillColorRGB(0.85, 0.60, 0.05)
+    c.drawCentredString(W/2, H - 118, "RETOMATE")
+
+    c.setStrokeColorRGB(0.85, 0.65, 0.10)
+    c.setLineWidth(1.5)
+    c.line(W/2 - 180, H - 130, W/2 + 180, H - 130)
+
+    # ── Cuerpo ────────────────────────────────────────────────────────────────
+    c.setFillColorRGB(0.2, 0.2, 0.2)
+    c.setFont("Helvetica", 14)
+    c.drawCentredString(W/2, H - 165, "Certifica que")
+
+    c.setFont("Helvetica-Bold", 30)
+    c.setFillColorRGB(0.70, 0.45, 0.02)
+    c.drawCentredString(W/2, H - 208, nombre)
+    nw = c.stringWidth(nombre, "Helvetica-Bold", 30)
+    c.setStrokeColorRGB(0.85, 0.65, 0.10)
+    c.setLineWidth(1)
+    c.line(W/2 - nw/2, H - 216, W/2 + nw/2, H - 216)
+
+    c.setFillColorRGB(0.2, 0.2, 0.2)
+    c.setFont("Helvetica", 13)
+    c.drawCentredString(W/2, H - 248,
+        "ha completado satisfactoriamente todos los modulos del curso")
+
+    c.setFont("Helvetica-Bold", 22)
+    c.setFillColorRGB(0.70, 0.45, 0.02)
+    c.drawCentredString(W/2, H - 280, curso)
+
+    c.setFillColorRGB(0.35, 0.35, 0.35)
+    c.setFont("Helvetica-Oblique", 11)
+    c.drawCentredString(W/2, H - 310,
+        "demostrando dedicacion, esfuerzo y dominio de los conceptos matematicos.")
+
+    c.setFillColorRGB(0.2, 0.2, 0.2)
+    c.setFont("Helvetica", 11)
+    c.drawCentredString(W/2, H - 340, f"Expedido el  {fecha_str}")
+
+    # ── Firmas (solo 2, centradas) ────────────────────────────────────────────
+    firma_h  = 70
+    firma_w  = 130
+    y_linea  = 125
+    y_nombre = 110
+    y_cargo  = 95
+
+    firmantes = [
+        (W/3,   "Laura Nataly Romero Romero",    "Directora del Proyecto RETOMATE",
+         os.path.join(os.path.dirname(__file__), 'static', 'img', 'FNataly.jpeg')),
+        (2*W/3, "Maria Alejandra Pena Gonzalez", "Directora del Proyecto RETOMATE",
+         os.path.join(os.path.dirname(__file__), 'static', 'img', 'FAlejandra.jpeg')),
+    ]
+
+    for cx, nf, cargo, firma_path in firmantes:
+        # Foto de firma justo encima de la línea
+        if os.path.exists(firma_path):
+            c.drawImage(firma_path,
+                        cx - firma_w/2, y_linea - firma_h + 50,
+                        width=firma_w, height=firma_h,
+                        preserveAspectRatio=True, mask='auto')
+
+        # Línea
+        c.setStrokeColorRGB(0.55, 0.40, 0.05)
+        c.setLineWidth(0.8)
+        c.line(cx - 90, y_linea, cx + 90, y_linea)
+
+        # Nombre
+        c.setFillColorRGB(0.15, 0.15, 0.15)
+        c.setFont("Helvetica-Bold", 10)
+        c.drawCentredString(cx, y_nombre, nf)
+
+        # Cargo
+        c.setFont("Helvetica", 9)
+        c.setFillColorRGB(0.55, 0.40, 0.05)
+        c.drawCentredString(cx, y_cargo, cargo)
+
+    # ── Código de verificación ────────────────────────────────────────────────
+    c.setFillColorRGB(0.55, 0.50, 0.35)
+    c.setFont("Helvetica", 7.5)
+    c.drawString(38, 38, f"Codigo de verificacion: {codigo}")
+
+    c.save()
+    buf.seek(0)
+    return buf
+@app.route('/certificado/<curso>')
+def descargar_certificado(curso):
+    if 'id' not in session:
+        return redirect(url_for('login'))
+    if session.get('tipo') == 'administrador':
+        flash("Los administradores no tienen certificados.", "info")
+        return redirect(url_for('progreso'))
+
+    usuario_id = session['id']
+    nombre     = session['nombre']
+
+    db  = conectar()
+    cur = db.cursor()
+    cur.execute("""
+        SELECT COUNT(DISTINCT unidad)
+        FROM progreso
+        WHERE usuario_id = ? AND puntaje >= 40
+    """, (usuario_id,))
+    modulos_ok = cur.fetchone()[0] or 0
+
+    if modulos_ok < 8:
+        db.close()
+        flash(f"Aún no puedes descargar el certificado. Tienes {modulos_ok}/8 módulos aprobados.", "warning")
+        return redirect(url_for('progreso_estudiante'))
+
+    cur.execute("""
+        SELECT codigo, fecha_emision FROM certificados
+        WHERE usuario_id = ? AND curso = ?
+    """, (usuario_id, curso))
+    fila = cur.fetchone()
+
+    if fila:
+        codigo        = fila[0]
+        fecha_emision = fila[1]
+    else:
+        codigo        = str(uuid.uuid4()).upper()[:19]
+        fecha_emision = datetime.now()
+        cur.execute("""
+            INSERT INTO certificados (usuario_id, curso, fecha_emision, codigo)
+            VALUES (?, ?, CAST(GETDATE() AS DATE), ?)
+        """, (usuario_id, curso, codigo))
+        db.commit()
+
+    db.close()
+
+    meses = {1:'enero',2:'febrero',3:'marzo',4:'abril',5:'mayo',6:'junio',
+             7:'julio',8:'agosto',9:'septiembre',10:'octubre',11:'noviembre',12:'diciembre'}
+    if hasattr(fecha_emision, 'day'):
+        fecha_str = f"{fecha_emision.day} de {meses.get(fecha_emision.month,'')} de {fecha_emision.year}"
+    else:
+        fecha_str = str(fecha_emision)
+
+    buf = _generar_pdf_certificado(nombre, curso, fecha_str, codigo)
+    nombre_archivo = f"Certificado_RETOMATE_{curso.replace(' ','_')}_{usuario_id}.pdf"
+
+    return send_file(buf, mimetype='application/pdf',
+                     as_attachment=True, download_name=nombre_archivo)
 
 @app.route('/politicas')
 def politicas():
